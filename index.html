@@ -170,6 +170,28 @@ h1{font-size:27px;font-weight:700;line-height:1.62;letter-spacing:-.01em;text-al
 }
 .ghost:hover,.ghost:focus-visible{color:var(--gold-soft)}
 footer{margin-top:40px;text-align:center;font-family:var(--sans);font-weight:300;font-size:11px;letter-spacing:.16em;color:#5C5473;line-height:2.2}
+
+/* ── 결과 이미지 저장 ── */
+.btn2{
+  display:block;width:100%;margin-top:30px;cursor:pointer;
+  background:none;border:1px solid rgba(201,164,76,.5);border-radius:2px;
+  color:var(--gold-soft);font-family:var(--serif);font-weight:400;
+  font-size:15.5px;letter-spacing:.04em;padding:16px;
+  transition:background .25s,border-color .25s,color .25s;
+}
+.btn2:hover,.btn2:focus-visible{background:rgba(201,164,76,.09);border-color:var(--gold);color:#F4E6C2}
+.btn2[disabled]{opacity:.5;cursor:default}
+.shot{
+  position:fixed;inset:0;z-index:50;display:none;
+  background:rgba(8,5,16,.94);
+  padding:26px 20px;overflow-y:auto;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.shot.on{display:block;animation:rise .4s ease both}
+.shot-in{max-width:340px;margin:0 auto;text-align:center}
+.shot img{width:100%;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.7);border:1px solid rgba(201,164,76,.25)}
+.shot .hint{font-size:13px;color:var(--mute);line-height:2;margin:20px 0 16px;white-space:pre-line}
+.shot .btn{margin-bottom:10px}
 footer a{color:#7A7096;text-decoration:none;border-bottom:1px solid rgba(122,112,150,.3)}
 footer a:hover{color:var(--gold-soft)}
 
@@ -236,6 +258,8 @@ footer a:hover{color:var(--gold-soft)}
     <div class="tail" id="ctail"></div>
     <p class="fixed-line">카드는 정해진 답이 아니라<br>지금의 결입니다.</p>
 
+    <button class="btn2" id="save">결과 이미지로 저장하기</button>
+
     <div class="cta">
       <h2>한 장으로는<br>다 읽히지 않는 마음이 있습니다</h2>
       <p>오늘의 카드는 흐름만 짚어줍니다.
@@ -257,12 +281,23 @@ footer a:hover{color:var(--gold-soft)}
   </section>
 </div>
 
+<div class="shot" id="shot">
+  <div class="shot-in">
+    <img id="shotImg" alt="오늘의 카드 결과 이미지">
+    <p class="hint" id="shotHint">이미지를 꾹 눌러 저장할 수 있습니다.</p>
+    <a class="btn" id="shotSave" download="마음의결타로.png">이미지 저장</a>
+    <button class="ghost" id="shotClose">닫기</button>
+  </div>
+</div>
+
 <script>
 /* ─────────────────────────────────────────────
    여기 두 줄만 바꾸시면 됩니다
    ───────────────────────────────────────────── */
 const KAKAO_LINK = "https://open.kakao.com/me/gyeoltaro";
 const INSTA_LINK = "https://instagram.com/gyeol_taro";
+/* 저장 이미지 아래에 찍힐 주소. 비워두면 현재 주소를 자동으로 씁니다. */
+const SITE_URL = "";
 /* ───────────────────────────────────────────── */
 
 const THEMES = [
@@ -372,6 +407,7 @@ const C = [
 
 /* ── 상태 ── */
 let theme = THEMES[0];
+let cur = null;
 const $ = id => document.getElementById(id);
 
 /* 카테고리 렌더 */
@@ -428,6 +464,7 @@ function reveal(){
   const c = C[i];
   const k = rev ? c[4] : c[2];
   const t = rev ? c[5] : c[3];
+  cur = {n:i+1, rev:rev, c:c, k:k, t:t, art:null};
 
   document.body.classList.remove("full","wane");
   document.body.classList.add(rev ? "wane" : "full");
@@ -458,6 +495,7 @@ function loadArt(face, n, rev){
     face.appendChild(img);
     face.classList.add("art");
     if(rev) face.classList.add("rev");
+    if(cur && cur.n === n) cur.art = img;
   };
   img.onerror = ()=>{
     idx++;
@@ -473,6 +511,201 @@ $("again").onclick = ()=>{
 };
 $("kakao").href = KAKAO_LINK;
 document.querySelector("footer a").href = INSTA_LINK;
+
+/* ─────────── 결과 이미지 만들기 (1080 × 1920) ─────────── */
+function rrect(x,a,b,w,h,r){
+  x.beginPath();
+  x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);
+  x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();
+}
+function wrap(x,text,maxW){
+  const out=[];
+  String(text).split("\n").forEach(line=>{
+    let buf="";
+    for(const ch of line){
+      if(buf && x.measureText(buf+ch).width > maxW){ out.push(buf); buf=ch; }
+      else buf += ch;
+    }
+    out.push(buf);
+  });
+  return out;
+}
+function svgImg(svg){
+  const s = svg.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ');
+  return new Promise(res=>{
+    const im = new Image();
+    im.onload = ()=>res(im);
+    im.onerror = ()=>res(null);
+    im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s);
+  });
+}
+
+async function makeShot(){
+  const W=1080, H=1920, MID=W/2;
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const x=cv.getContext("2d");
+
+  try{
+    await document.fonts.load('700 70px "Gowun Batang"');
+    await document.fonts.load('400 40px "Gowun Batang"');
+    await document.fonts.load('300 26px "Gothic A1"');
+    await document.fonts.ready;
+  }catch(e){}
+
+  // 배경
+  const g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#251B3F"); g.addColorStop(.42,"#150F26"); g.addColorStop(1,"#0B0814");
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+  const rg=x.createRadialGradient(MID,240,0,MID,240,760);
+  rg.addColorStop(0,"rgba(201,164,76,.17)"); rg.addColorStop(1,"rgba(201,164,76,0)");
+  x.fillStyle=rg; x.fillRect(0,0,W,H);
+
+  // 아래쪽 결
+  x.strokeStyle="rgba(201,164,76,.16)"; x.lineWidth=1.4;
+  for(let i=0;i<6;i++){
+    const y=H-260+i*44;
+    x.beginPath(); x.moveTo(-20,y);
+    x.bezierCurveTo(W*.28,y-22,W*.62,y+22,W+20,y-6);
+    x.stroke();
+  }
+
+  x.textAlign="center";
+
+  // 헤더
+  if("letterSpacing" in x) x.letterSpacing="14px";
+  x.font='300 27px "Gothic A1", sans-serif';
+  x.fillStyle="#C9A44C";
+  x.fillText("마음의 결 타로", MID, 132);
+  if("letterSpacing" in x) x.letterSpacing="0px";
+
+  // 달
+  const my=232, mr=40;
+  const mg=x.createRadialGradient(MID-14,my-14,2,MID,my,mr);
+  mg.addColorStop(0,"#FFF8E7"); mg.addColorStop(.5,"#E8D3A0"); mg.addColorStop(1,"#C9A44C");
+  x.beginPath(); x.arc(MID,my,mr,0,7); x.fillStyle=mg; x.fill();
+  if(cur.rev){
+    x.save(); x.globalCompositeOperation="destination-out";
+    x.beginPath(); x.arc(MID+mr*.62,my,mr,0,7); x.fill(); x.restore();
+  }
+
+  // 카드
+  const cw=364, ch=606, cx=MID-cw/2, cy=330;
+  x.save();
+  x.shadowColor="rgba(0,0,0,.6)"; x.shadowBlur=54; x.shadowOffsetY=20;
+  const cg=x.createLinearGradient(cx,cy,cx+cw,cy+ch);
+  cg.addColorStop(0,"#2C2049"); cg.addColorStop(1,"#150F26");
+  rrect(x,cx,cy,cw,ch,10); x.fillStyle=cg; x.fill();
+  x.restore();
+
+  if(cur.art){
+    x.save(); rrect(x,cx,cy,cw,ch,10); x.clip();
+    if(cur.rev){ x.translate(cx+cw/2,cy+ch/2); x.rotate(Math.PI); x.translate(-(cx+cw/2),-(cy+ch/2)); }
+    const ar=cur.art.width/cur.art.height, br=cw/ch;
+    let dw=cw, dh=ch, dx=cx, dy=cy;
+    if(ar>br){ dw=ch*ar; dx=cx-(dw-cw)/2; } else { dh=cw/ar; dy=cy-(dh-ch)/2; }
+    x.drawImage(cur.art,dx,dy,dw,dh);
+    x.restore();
+    x.save(); rrect(x,cx,cy,cw,ch,10); x.clip();
+    x.fillStyle="rgba(20,14,38,.26)"; x.fillRect(cx,cy,cw,ch); x.restore();
+  }else{
+    const sym = await svgImg(SYM[cur.c[1]]);
+    if(sym){
+      x.save();
+      x.translate(MID, cy+ch/2+34);
+      if(cur.rev) x.rotate(Math.PI);
+      x.drawImage(sym,-70,-70,140,140);
+      x.restore();
+    }
+    x.font='300 40px "Cormorant Garamond", serif';
+    x.fillStyle="#C9A44C";
+    x.fillText(String(cur.n), MID, cy+ch/2-96);
+  }
+  rrect(x,cx,cy,cw,ch,10);
+  x.strokeStyle="rgba(201,164,76,.55)"; x.lineWidth=2; x.stroke();
+
+  // 정 / 역
+  const dtxt = cur.rev ? "역방향" : "정방향";
+  x.font='300 24px "Gothic A1", sans-serif';
+  if("letterSpacing" in x) x.letterSpacing="10px";
+  const dw2 = x.measureText(dtxt).width + 46;
+  rrect(x, MID-dw2/2, 1002, dw2, 56, 3);
+  x.strokeStyle="rgba(201,164,76,.45)"; x.lineWidth=1.5; x.stroke();
+  x.fillStyle="#C9A44C"; x.fillText(dtxt, MID+5, 1039);
+  if("letterSpacing" in x) x.letterSpacing="0px";
+
+  // 카드 이름 · 키워드
+  x.font='700 70px "Gowun Batang", serif';
+  x.fillStyle="#EFE9DC";
+  x.fillText(cur.c[0], MID, 1152);
+  x.font='400 38px "Gowun Batang", serif';
+  x.fillStyle="#E8D3A0";
+  x.fillText(cur.k, MID, 1224);
+
+  // 구분선
+  x.beginPath(); x.moveTo(MID-34,1284); x.lineTo(MID+34,1284);
+  x.strokeStyle="rgba(201,164,76,.5)"; x.lineWidth=1.6; x.stroke();
+
+  // 해석
+  x.font='400 39px "Gowun Batang", serif';
+  x.fillStyle="#DCD5E6";
+  let y=1362;
+  wrap(x, cur.t, 840).forEach(l=>{ x.fillText(l, MID, y); y+=68; });
+
+  // 고정 문장
+  x.font='400 32px "Gowun Batang", serif';
+  x.fillStyle="#8A80A4";
+  x.fillText("카드는 정해진 답이 아니라 지금의 결입니다.", MID, y+56);
+
+  // 발
+  if("letterSpacing" in x) x.letterSpacing="8px";
+  x.font='500 30px "Gothic A1", sans-serif';
+  x.fillStyle="#C9A44C";
+  x.fillText("@gyeol_taro", MID, H-136);
+  x.font='300 24px "Gothic A1", sans-serif';
+  x.fillStyle="#6E6590";
+  const host = SITE_URL || (location.host + location.pathname).replace(/index\.html?$/i,"").replace(/\/$/,"");
+  x.fillText(host, MID, H-84);
+  if("letterSpacing" in x) x.letterSpacing="0px";
+
+  return cv;
+}
+
+$("save").onclick = async ()=>{
+  if(!cur) return;
+  const btn = $("save");
+  btn.disabled = true;
+  btn.textContent = "이미지 만드는 중…";
+  try{
+    const cv = await makeShot();
+    const url = cv.toDataURL("image/png");
+    $("shotImg").src = url;
+    $("shotSave").href = url;
+    $("shot").classList.add("on");
+    document.body.style.overflow = "hidden";
+
+    cv.toBlob(blob=>{
+      if(!blob) return;
+      const file = new File([blob], "마음의결타로.png", {type:"image/png"});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        $("shotSave").textContent = "공유 · 스토리에 올리기";
+        $("shotSave").onclick = (e)=>{
+          e.preventDefault();
+          navigator.share({files:[file]}).catch(()=>{});
+        };
+        $("shotHint").textContent = "인스타 스토리에 바로 올릴 수 있습니다.\n안 되면 이미지를 꾹 눌러 저장하세요.";
+      }
+    }, "image/png");
+  }catch(e){
+    alert("이미지를 만들지 못했습니다. 새로고침 후 다시 시도해 주세요.");
+  }
+  btn.disabled = false;
+  btn.textContent = "결과 이미지로 저장하기";
+};
+
+$("shotClose").onclick = ()=>{
+  $("shot").classList.remove("on");
+  document.body.style.overflow = "";
+};
 </script>
 </body>
 </html>
