@@ -155,14 +155,17 @@ h1{font-size:27px;font-weight:700;line-height:1.62;letter-spacing:-.01em;text-al
 .item i{font-style:normal;font-family:var(--num);font-size:16px;color:var(--gold-soft);letter-spacing:.03em}
 .btn{
   display:block;text-align:center;text-decoration:none;cursor:pointer;
-  background:var(--gold);color:#160F04;font-family:var(--sans);font-weight:700;
-  font-size:14px;letter-spacing:.1em;padding:16px;border-radius:3px;border:0;width:100%;
-  transition:filter .25s,transform .25s;
+  background:linear-gradient(180deg,#E3C67F 0%,#CBA754 52%,#AE8B39 100%);
+  color:#1C1305;font-family:var(--serif);font-weight:700;
+  font-size:16.5px;letter-spacing:.05em;text-indent:.05em;
+  padding:18px;border-radius:2px;border:0;width:100%;
+  box-shadow:0 7px 22px rgba(201,164,76,.2), inset 0 1px 0 rgba(255,248,229,.55);
+  transition:filter .25s,transform .25s,box-shadow .25s;
 }
-.btn:hover,.btn:focus-visible{filter:brightness(1.12);transform:translateY(-2px)}
+.btn:hover,.btn:focus-visible{filter:brightness(1.07);transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,164,76,.3), inset 0 1px 0 rgba(255,248,229,.6)}
 .ghost{
-  display:block;width:100%;margin-top:12px;text-align:center;background:none;border:0;cursor:pointer;
-  color:var(--mute);font-family:var(--sans);font-weight:300;font-size:12.5px;letter-spacing:.1em;padding:13px;
+  display:block;width:100%;margin-top:14px;text-align:center;background:none;border:0;cursor:pointer;
+  color:#9A8FB6;font-family:var(--serif);font-weight:400;font-size:14px;letter-spacing:.07em;padding:13px;
   transition:color .25s;
 }
 .ghost:hover,.ghost:focus-visible{color:var(--gold-soft)}
