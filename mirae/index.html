@@ -42,8 +42,6 @@ img,svg{display:block}
 #loader{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);transition:opacity .8s ease,visibility .8s}
 #loader.done{opacity:0;visibility:hidden}
 .ld{display:grid;justify-items:center;gap:18px}
-.ld-bar{width:180px;height:2px;background:var(--line);overflow:hidden;border-radius:2px}
-.ld-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
 .ld p{font-size:.85rem;letter-spacing:.2em;color:var(--mute)}
 
 /* header */
@@ -144,8 +142,6 @@ main{position:relative;z-index:1}
 
 footer{padding:40px var(--gutter) 110px;border-top:1px solid var(--line);color:var(--mute);font-size:.82rem;max-width:1240px;margin:0 auto;display:grid;gap:6px}
 footer b{color:var(--text)}
-footer .credit{opacity:.7}
-footer .credit a{text-decoration:underline}
 
 .fab{display:none}
 
@@ -185,17 +181,24 @@ footer .credit a{text-decoration:underline}
 .seg button b{font-size:.98rem}
 .seg button small{font-size:.8rem;color:var(--mute)}
 .seg button[aria-checked="true"]{background:rgba(76,141,255,.18);border-color:var(--accent);color:#fff}
-.check{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:.9rem;color:#d3d9e1;cursor:pointer}
-.check input{width:18px;height:18px;accent-color:var(--accent)}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.photo .shot{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#1a1f27}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .shot::before{content:"";position:absolute;inset:10px;pointer-events:none;
+  background:linear-gradient(#fff,#fff) top left/18px 2px,linear-gradient(#fff,#fff) top left/2px 18px,
+  linear-gradient(#fff,#fff) top right/18px 2px,linear-gradient(#fff,#fff) top right/2px 18px,
+  linear-gradient(#fff,#fff) bottom left/18px 2px,linear-gradient(#fff,#fff) bottom left/2px 18px,
+  linear-gradient(#fff,#fff) bottom right/18px 2px,linear-gradient(#fff,#fff) bottom right/2px 18px;background-repeat:no-repeat;opacity:.85}
+.photo .tag{position:absolute;left:10px;bottom:10px;font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(10,12,15,.72);color:#fff}
+.photo figcaption{margin-top:10px;font-size:.86rem;color:var(--mute);line-height:1.55}
+.photo figcaption b{display:block;color:var(--text);font-size:.95rem;margin-bottom:2px}
 .est-result{position:sticky;top:84px;padding:26px;border-radius:22px;background:linear-gradient(160deg,#142034,#0f141c);border:1px solid rgba(76,141,255,.3)}
-.sample{display:inline-block;font-size:.72rem;padding:3px 8px;border-radius:6px;background:rgba(255,177,74,.15);color:#ffb14a;margin-bottom:12px}
 .res-label{font-size:.85rem;color:var(--mute)}
 .res-total{font-size:1.9rem;font-weight:900;letter-spacing:-.02em;margin:4px 0 2px;line-height:1.3}
 .res-total.empty{font-size:1.05rem;color:var(--mute);font-weight:500}
 .res-car{font-size:.88rem;color:#c3cad4}
 .res-list{list-style:none;margin:16px 0 0;border-top:1px solid var(--line)}
 .res-list li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.88rem}
-.res-list li span:last-child{color:var(--mute);white-space:nowrap}
 .res-note{font-size:.78rem;color:var(--mute);margin:14px 0 8px}
 .est-result .btn{width:100%;justify-content:center;margin-top:10px}
 .est-bar{display:none}
@@ -229,6 +232,7 @@ footer .credit a{text-decoration:underline}
     padding:14px 20px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;box-shadow:0 12px 30px -8px rgba(76,141,255,.9)}
   .fab svg{width:18px;height:18px}
   .est-step{padding:20px 16px}
+  .photos{grid-template-columns:1fr;gap:18px}
   .est-bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:31;display:flex;align-items:center;gap:10px;
     padding:10px 10px 10px 16px;border-radius:16px;background:rgba(16,22,32,.95);border:1px solid rgba(76,141,255,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     box-shadow:0 12px 30px -10px rgba(0,0,0,.8);transform:translateY(160%);transition:transform .3s ease}
@@ -259,7 +263,6 @@ footer .credit a{text-decoration:underline}
 <div id="loader" aria-hidden="true">
   <div class="ld">
     <div class="brand"><span class="mark">M</span><span>미래자동차공업사</span></div>
-    <div class="ld-bar"><i id="ld-fill"></i></div>
     <p>도장 부스 준비 중</p>
   </div>
 </div>
@@ -272,7 +275,7 @@ footer .credit a{text-decoration:underline}
   <nav aria-label="주요 메뉴">
     <a href="#process">작업 과정</a>
     <a href="#studio">컬러</a>
-    <a href="#estimate">예상 견적</a>
+    <a href="#consult">수리 상담</a>
     <a href="#services">서비스</a>
     <a href="#contact">오시는 길</a>
   </nav>
@@ -291,7 +294,7 @@ footer .credit a{text-decoration:underline}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
         010-8735-8131
       </a>
-      <a class="btn ghost" href="#estimate">내 차 예상 견적 보기</a>
+      <a class="btn ghost" href="#consult">사진으로 수리 상담</a>
     </div>
     <ul class="badges">
       <li>보험 지정 업체</li><li>수입차 전 차종</li><li>수용성 도장</li><li>특수 열처리</li>
@@ -370,25 +373,15 @@ footer .credit a{text-decoration:underline}
   </section>
 
   <div class="solid" id="solid">
-    <section class="block" id="estimate">
-      <p class="sec-label">ESTIMATE</p>
-      <h2 class="sec-title">내 차, 대략 얼마 나올까?</h2>
-      <p class="sec-desc">차종과 수리할 부위를 누르면 예상 비용 범위를 바로 보여드려요. 정확한 금액은 전화로 상담해 드립니다.</p>
+    <section class="block" id="consult">
+      <p class="sec-label">CONSULT</p>
+      <h2 class="sec-title">어디를 고치고 싶으세요?</h2>
+      <p class="sec-desc">수리할 부위를 누르고 사진과 함께 문자로 보내주시면, 확인 후 정확한 수리 방법과 비용을 안내해 드려요. 급하시면 바로 전화 주세요.</p>
 
       <div class="est">
         <div class="est-steps">
           <div class="est-step">
-            <h3><span class="n">1</span>제조사</h3>
-            <div class="chips" id="brand-chips" role="group" aria-label="제조사 선택"></div>
-          </div>
-
-          <div class="est-step" id="model-step" hidden>
-            <h3><span class="n">2</span><span id="model-title">차종</span></h3>
-            <div class="chips" id="model-chips" role="group" aria-label="차종 선택"></div>
-          </div>
-
-          <div class="est-step">
-            <h3><span class="n">3</span>수리 부위 <small>누를 때마다 선택·해제 · 여러 곳 가능</small></h3>
+            <h3><span class="n">1</span>수리 부위 <small>누를 때마다 선택·해제 · 여러 곳 가능</small></h3>
             <svg class="diagram" id="diagram" viewBox="0 0 340 430" role="group" aria-label="차량 부위 선택">
               <text class="dlabel" x="64" y="40">운전석 쪽</text>
               <text class="dlabel" x="276" y="40">조수석 쪽</text>
@@ -428,28 +421,44 @@ footer .credit a{text-decoration:underline}
             </div>
           </div>
 
+
           <div class="est-step">
-            <h3><span class="n">4</span>손상 상태</h3>
+            <h3><span class="n">2</span>손상 상태</h3>
             <div class="seg" id="work-seg" role="radiogroup" aria-label="손상 상태">
-              <button type="button" role="radio" data-work="paint" aria-checked="true"><b>도색</b><small>긁힘 · 까짐 · 변색</small></button>
-              <button type="button" role="radio" data-work="sheet" aria-checked="false"><b>판금 + 도색</b><small>찌그러짐 · 눌림 · 파손</small></button>
+              <button type="button" role="radio" data-work="paint" aria-checked="false"><b>긁힘 · 까짐</b><small>도색이 필요해요</small></button>
+              <button type="button" role="radio" data-work="sheet" aria-checked="false"><b>찌그러짐 · 파손</b><small>판금 + 도색이 필요해요</small></button>
             </div>
-            <label class="check"><input type="checkbox" id="pearl"> 펄 · 3코트 색상이에요 (화이트펄 등)</label>
+          </div>
+
+          <div class="est-step">
+            <h3><span class="n">3</span>사진은 이렇게 찍어 주세요 <small>3장이면 충분해요</small></h3>
+            <div class="photos">
+              <figure class="photo">
+                <div class="shot"><img src="assets/photo-full.jpg" alt="차량 앞쪽 대각선에서 차 전체가 나오게 찍은 예시 사진" loading="lazy" width="1200" height="900"><span class="tag">예시 1</span></div>
+                <figcaption><b>전체샷</b>앞쪽 대각선에서 차 전체가 한 화면에 나오게 찍어 주세요.</figcaption>
+              </figure>
+              <figure class="photo">
+                <div class="shot"><img src="assets/photo-side.jpg" alt="손상된 쪽 옆면 전체를 찍은 예시 사진" loading="lazy" width="1200" height="900"><span class="tag">예시 2</span></div>
+                <figcaption><b>측면샷</b>손상된 쪽 옆면 전체를 2~3m 떨어져서 찍어 주세요.</figcaption>
+              </figure>
+              <figure class="photo">
+                <div class="shot"><img src="assets/photo-damage.jpg" alt="문짝의 긁힘과 찌그러짐을 가까이 찍은 예시 사진" loading="lazy" width="1200" height="900"><span class="tag">예시 3</span></div>
+                <figcaption><b>사고 부위샷</b>손상 부위를 30~50cm 거리에서 빛 반사를 피해 찍어 주세요.</figcaption>
+              </figure>
+            </div>
           </div>
         </div>
 
         <aside class="est-result" id="est-result" aria-live="polite">
-          <span class="sample" id="sample-badge">예시 단가 · 업체 실제 단가 반영 전</span>
-          <p class="res-label">예상 비용</p>
+          <p class="res-label">선택한 부위</p>
           <p class="res-total empty" id="res-total">수리할 부위를 눌러 주세요</p>
-          <p class="res-car" id="res-car"></p>
           <ul class="res-list" id="res-list"></ul>
-          <p class="res-note">표시 금액은 참고용 예상 범위예요. 실제 비용은 손상 정도, 부품 교환 여부, 색상, 보험 처리 여부에 따라 달라지며 차량을 확인한 뒤 정확히 안내해 드립니다.</p>
+          <p class="res-note">비용은 손상 정도, 부품 교환 여부, 색상, 보험 처리 여부에 따라 달라져요. 사진을 보내주시거나 전화 주시면 확인 후 안내해 드립니다.</p>
           <a class="btn primary" href="tel:01087358131">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
-            전화로 정확한 견적 받기
+            전화 상담 010-8735-8131
           </a>
-          <a class="btn ghost" id="res-sms" href="sms:01087358131">문자로 견적 내용 + 사진 보내기</a>
+          <a class="btn ghost" id="res-sms" href="sms:01087358131">문자로 사진 보내기</a>
         </aside>
       </div>
     </section>
@@ -533,13 +542,12 @@ footer .credit a{text-decoration:underline}
     <footer>
       <b>(주)미래자동차공업사</b>
       <span>서울시 도봉구 방학로 25 (방학동 725-3) · H.P 010-8735-8131 · FAX 02-3494-6046</span>
-      <span class="credit">3D 모델: Ferrari 458 Italia by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a> · three.js</span>
     </footer>
   </div>
 </main>
 
 <div class="est-bar" id="est-bar" aria-hidden="true">
-  <div class="sum"><small>예상 비용</small><b id="bar-total"></b></div>
+  <div class="sum"><small>수리 상담</small><b id="bar-total"></b></div>
   <a class="more" href="#est-result" tabindex="-1">내역</a>
   <a class="tel" href="tel:01087358131" tabindex="-1">전화 상담</a>
 </div>
@@ -577,122 +585,17 @@ footer .credit a{text-decoration:underline}
 </script>
 
 <script>
-// ─── 가격표 (단위: 만원) ─────────────────────────────────────────
-// 국산 준중형 세단, 일반/메탈릭 색상, 1판 기준 [최소, 최대].
-// 업체 실제 단가로 고친 뒤 PRICES_CONFIRMED 를 true 로 바꾸면 '예시 단가' 표시가 사라집니다.
-const PRICES_CONFIRMED = false;
-const PARTS = {
-  bumper: { paint: [15, 22], sheet: [20, 30] },
-  hood:   { paint: [20, 30], sheet: [28, 42] },
-  roof:   { paint: [22, 32], sheet: [32, 48] },
-  trunk:  { paint: [16, 24], sheet: [22, 34] },
-  fender: { paint: [12, 18], sheet: [17, 26] },
-  door:   { paint: [14, 20], sheet: [20, 30] },
-  qtr:    { paint: [15, 22], sheet: [24, 36] },
-  mirror: { paint: [5, 8],   sheet: [5, 8] },
-  sill:   { paint: [12, 18], sheet: [18, 28] },
-  wheel:  { paint: [8, 12],  sheet: [8, 12] },
-};
-// 차 크기·브랜드 등급별 배수
-const SIZE = {
-  S:  { name: '경차·소형', k: 0.85 },
-  M:  { name: '준중형', k: 1 },
-  L:  { name: '중형', k: 1.1 },
-  XL: { name: '대형', k: 1.25 },
-  SM: { name: '소형·중형 SUV', k: 1.1 },
-  SL: { name: '대형 SUV·RV', k: 1.3 },
-};
-const TIER = {
-  dom: { name: '국산', k: 1 },
-  gen: { name: '국산 고급', k: 1.3 },
-  imp: { name: '수입', k: 1.6 },
-  lux: { name: '수입 프리미엄', k: 2 },
-};
-const PEARL = 1.15;
-// [모델명, 크기, (선택) 등급 덮어쓰기]
-const BRANDS = [
-  { name: '현대', tier: 'dom', models: [['캐스퍼','S'],['아반떼','M'],['쏘나타','L'],['그랜저','XL'],['아이오닉 6','L'],['코나','SM'],['투싼','SM'],['아이오닉 5','SM'],['싼타페','SL'],['팰리세이드','SL'],['스타리아','SL']] },
-  { name: '기아', tier: 'dom', models: [['모닝','S'],['레이','S'],['K3','M'],['K5','L'],['K8','XL'],['K9','XL'],['니로','SM'],['셀토스','SM'],['스포티지','SM'],['EV6','SM'],['쏘렌토','SL'],['카니발','SL'],['EV9','SL']] },
-  { name: '제네시스', tier: 'gen', models: [['G70','L'],['G80','XL'],['G90','XL'],['GV60','SM'],['GV70','SM'],['GV80','SL']] },
-  { name: '쉐보레', tier: 'dom', models: [['스파크','S'],['말리부','L'],['트랙스','SM'],['트레일블레이저','SM'],['이쿼녹스','SM'],['트래버스','SL'],['콜로라도','SL']] },
-  { name: '르노코리아(삼성)', tier: 'dom', models: [['SM6','L'],['아르카나(XM3)','SM'],['QM6','SM'],['그랑 콜레오스','SL']] },
-  { name: 'KG모빌리티(쌍용)', tier: 'dom', models: [['티볼리','SM'],['코란도','SM'],['토레스','SM'],['렉스턴','SL']] },
-  { name: '벤츠', tier: 'imp', models: [['A클래스','M'],['CLA','M'],['C클래스','L'],['E클래스','XL'],['S클래스','XL','lux'],['GLA','SM'],['GLC','SM'],['GLE','SL'],['GLS','SL','lux'],['G클래스','SL','lux']] },
-  { name: 'BMW', tier: 'imp', models: [['1시리즈','M'],['3시리즈','L'],['5시리즈','XL'],['7시리즈','XL','lux'],['X1','SM'],['X3','SM'],['X5','SL'],['X7','SL','lux']] },
-  { name: '아우디', tier: 'imp', models: [['A3','M'],['A4','L'],['A6','XL'],['A8','XL','lux'],['Q3','SM'],['Q5','SM'],['Q7','SL'],['Q8 e-tron','SL']] },
-  { name: '렉서스', tier: 'imp', models: [['IS','L'],['ES','L'],['LS','XL','lux'],['NX','SM'],['RX','SL']] },
-  { name: '캐딜락', tier: 'imp', models: [['CT4','L'],['CT5','L'],['XT4','SM'],['XT5','SM'],['XT6','SL'],['에스컬레이드','SL','lux']] },
-  { name: '포드', tier: 'imp', models: [['머스탱','L'],['익스플로러','SL'],['브롱코','SL']] },
-  { name: '볼보', tier: 'imp', models: [['S60','L'],['S90','XL'],['XC40','SM'],['XC60','SM'],['XC90','SL']] },
-  { name: '테슬라', tier: 'imp', models: [['모델 3','L'],['모델 S','XL'],['모델 Y','SM'],['모델 X','SL']] },
-  { name: '폭스바겐', tier: 'imp', models: [['골프','M'],['제타','M'],['아테온','L'],['티구안','SM']] },
-  { name: '미니', tier: 'imp', models: [['쿠퍼','S'],['컨트리맨','SM']] },
-  { name: '포르쉐', tier: 'lux', models: [['911','L'],['타이칸','L'],['파나메라','XL'],['마칸','SM'],['카이엔','SL']] },
-  { name: '기타 국산', tier: 'dom', models: null },
-  { name: '기타 수입', tier: 'imp', models: null },
-];
 const PART_LIST = [
-  ['bumper_f', 'bumper', '앞범퍼'], ['hood', 'hood', '본넷'], ['roof', 'roof', '루프'], ['trunk', 'trunk', '트렁크'], ['bumper_r', 'bumper', '뒷범퍼'],
-  ['fender_l', 'fender', '앞휀다 (운전석)'], ['door_fl', 'door', '앞도어 (운전석)'], ['door_rl', 'door', '뒷도어 (운전석)'], ['qtr_l', 'qtr', '뒷휀다 (운전석)'],
-  ['fender_r', 'fender', '앞휀다 (조수석)'], ['door_fr', 'door', '앞도어 (조수석)'], ['door_rr', 'door', '뒷도어 (조수석)'], ['qtr_r', 'qtr', '뒷휀다 (조수석)'],
-  ['mirror_l', 'mirror', '사이드미러 (운전석)'], ['mirror_r', 'mirror', '사이드미러 (조수석)'], ['sill_l', 'sill', '사이드실 (운전석)'], ['sill_r', 'sill', '사이드실 (조수석)'],
+  ['bumper_f', '앞범퍼'], ['hood', '본넷'], ['roof', '루프'], ['trunk', '트렁크'], ['bumper_r', '뒷범퍼'],
+  ['fender_l', '앞휀다 (운전석)'], ['door_fl', '앞도어 (운전석)'], ['door_rl', '뒷도어 (운전석)'], ['qtr_l', '뒷휀다 (운전석)'],
+  ['fender_r', '앞휀다 (조수석)'], ['door_fr', '앞도어 (조수석)'], ['door_rr', '뒷도어 (조수석)'], ['qtr_r', '뒷휀다 (조수석)'],
+  ['mirror_l', '사이드미러 (운전석)'], ['mirror_r', '사이드미러 (조수석)'], ['sill_l', '사이드실 (운전석)'], ['sill_r', '사이드실 (조수석)'],
 ];
 const PHONE = '01087358131';
 
 (() => {
   const $ = id => document.getElementById(id);
-  const state = { brand: null, model: null, size: null, parts: new Set(), wheels: 0, work: 'paint', pearl: false };
-
-  const chip = (label, sub, pressed) => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'chip';
-    b.setAttribute('aria-pressed', String(pressed));
-    b.textContent = label;
-    if (sub) { const s = document.createElement('small'); s.textContent = sub; b.append(s); }
-    return b;
-  };
-
-  const renderBrands = () => {
-    const box = $('brand-chips'); box.replaceChildren();
-    BRANDS.forEach((br, i) => {
-      const b = chip(br.name, '', state.brand === i);
-      b.onclick = () => { state.brand = i; state.model = null; state.size = null; renderBrands(); renderModels(); update(); };
-      box.append(b);
-    });
-  };
-
-  const renderModels = () => {
-    const step = $('model-step'), box = $('model-chips');
-    step.hidden = state.brand === null;
-    if (state.brand === null) return;
-    const br = BRANDS[state.brand];
-    box.replaceChildren();
-    if (br.models) {
-      $('model-title').textContent = br.name + ' 차종';
-      br.models.forEach(([name, size], i) => {
-        const b = chip(name, '', state.model === i);
-        b.onclick = () => { state.model = i; renderModels(); update(); };
-        box.append(b);
-      });
-    } else {
-      $('model-title').textContent = '차 크기';
-      Object.entries(SIZE).forEach(([key, s]) => {
-        const b = chip(s.name, '', state.size === key);
-        b.onclick = () => { state.size = key; renderModels(); update(); };
-        box.append(b);
-      });
-    }
-  };
-
-  const currentCar = () => {
-    const br = state.brand !== null ? BRANDS[state.brand] : null;
-    if (br && br.models && state.model !== null) {
-      const [name, size, tier] = br.models[state.model];
-      return { label: `${br.name} ${name}`, size, tier: tier || br.tier, known: true };
-    }
-    if (br && !br.models && state.size) return { label: `${br.name} ${SIZE[state.size].name}`, size: state.size, tier: br.tier, known: true };
-    return { label: '', size: 'M', tier: br ? br.tier : 'dom', known: false };
-  };
+  const state = { parts: new Set(), wheels: 0, work: null };
 
   const togglePart = id => {
     state.parts.has(id) ? state.parts.delete(id) : state.parts.add(id);
@@ -704,7 +607,7 @@ const PHONE = '01087358131';
     g.setAttribute('role', 'button');
     g.setAttribute('tabindex', '0');
     g.setAttribute('aria-pressed', 'false');
-    g.setAttribute('aria-label', PART_LIST.find(p => p[0] === g.dataset.part)[2]);
+    g.setAttribute('aria-label', PART_LIST.find(p => p[0] === g.dataset.part)[1]);
     g.addEventListener('click', () => togglePart(g.dataset.part));
     g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePart(g.dataset.part); } });
   });
@@ -719,77 +622,47 @@ const PHONE = '01087358131';
     document.querySelectorAll('#work-seg button').forEach(x => x.setAttribute('aria-checked', String(x === b)));
     update();
   }));
-  $('pearl').addEventListener('change', e => { state.pearl = e.target.checked; update(); });
-
-  const range = (lo, hi) => lo === hi ? `약 ${lo}만원` : `약 ${lo}만 ~ ${hi}만원`;
 
   function update() {
-    const car = currentCar();
-    const k = SIZE[car.size].k * TIER[car.tier].k * (state.pearl ? PEARL : 1);
-    const rows = [];
-    for (const [id, kind, label] of PART_LIST) {
-      if (!state.parts.has(id)) continue;
-      const [a, b] = PARTS[kind][state.work];
-      rows.push([label, a * k, b * k]);
-    }
-    if (state.wheels) {
-      const [a, b] = PARTS.wheel.paint;
-      const wk = TIER[car.tier].k;
-      rows.push([`휠 복원 ×${state.wheels}`, a * wk * state.wheels, b * wk * state.wheels]);
-    }
-    const lo = Math.floor(rows.reduce((s, r) => s + r[1], 0));
-    const hi = Math.ceil(rows.reduce((s, r) => s + r[2], 0));
-
+    const names = PART_LIST.filter(([id]) => state.parts.has(id)).map(p => p[1]);
+    if (state.wheels) names.push(`휠 ${state.wheels}개`);
     const total = $('res-total');
-    total.classList.toggle('empty', !rows.length);
-    total.textContent = rows.length ? range(lo, hi) : '수리할 부위를 눌러 주세요';
-    $('res-car').textContent = car.known
-      ? `${car.label} · ${TIER[car.tier].name} ${SIZE[car.size].name} 기준`
-      : '차종을 고르면 더 정확해져요 (지금은 국산 준중형 기준)';
-    $('res-list').replaceChildren(...rows.map(([label, a, b]) => {
-      const li = document.createElement('li');
-      const l = document.createElement('span'); l.textContent = label;
-      const r = document.createElement('span'); r.textContent = range(Math.floor(a), Math.ceil(b)).replace('약 ', '');
-      li.append(l, r); return li;
-    }));
-    $('bar-total').textContent = rows.length ? range(lo, hi) : '';
+    total.classList.toggle('empty', !names.length);
+    total.textContent = names.length ? `${names.length}곳 선택` : '수리할 부위를 눌러 주세요';
+    $('res-list').replaceChildren(...names.map(n => { const li = document.createElement('li'); li.textContent = n; return li; }));
+    $('bar-total').textContent = names.length ? `${names.length}곳 선택` : '';
 
-    const work = state.work === 'sheet' ? '판금+도색' : '도색';
-    const body = ['[미래자동차공업사 견적 문의]',
-      `차량: ${car.known ? car.label : '(미선택)'}`,
-      `작업: ${work}${state.pearl ? ' / 펄·3코트' : ''}`,
-      `부위: ${rows.map(r => r[0]).join(', ') || '(미선택)'}`,
-      rows.length ? `홈페이지 예상: ${range(lo, hi)}` : '',
-      '(손상 부위 사진 첨부합니다)'].filter(Boolean).join('\n');
+    const work = { paint: '긁힘·까짐 (도색)', sheet: '찌그러짐·파손 (판금+도색)' }[state.work];
+    const body = ['[미래자동차공업사 수리 상담]',
+      `부위: ${names.join(', ') || '(미선택)'}`,
+      work ? `상태: ${work}` : '',
+      '차종: ',
+      '(전체샷 · 측면샷 · 사고 부위 사진 첨부합니다)'].filter(Boolean).join('\n');
     $('res-sms').href = `sms:${PHONE}?body=${encodeURIComponent(body)}`;
     syncBar();
   }
 
-  // mobile sticky summary bar
+  // mobile sticky bar
   const bar = $('est-bar');
-  let estVisible = false, resultVisible = false;
+  let secVisible = false, resultVisible = false;
   const syncBar = () => {
-    const show = estVisible && !resultVisible && (state.parts.size > 0 || state.wheels > 0);
+    const show = secVisible && !resultVisible && (state.parts.size > 0 || state.wheels > 0);
     bar.classList.toggle('show', show);
     document.body.classList.toggle('est-on', show);
   };
-  new IntersectionObserver(([e]) => { estVisible = e.isIntersecting; syncBar(); }).observe($('estimate'));
+  new IntersectionObserver(([e]) => { secVisible = e.isIntersecting; syncBar(); }).observe($('consult'));
   new IntersectionObserver(([e]) => { resultVisible = e.isIntersecting; syncBar(); }, { threshold: 0.3 }).observe($('est-result'));
 
-  $('sample-badge').hidden = PRICES_CONFIRMED;
-  renderBrands();
   update();
 })();
 </script>
 
 <script type="module">
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { buildCar, buildDamage, DAMAGE_POS } from './car.js';
 
 const loaderEl = document.getElementById('loader');
-const fill = document.getElementById('ld-fill');
 const fail = () => { document.documentElement.classList.add('no-webgl'); loaderEl.classList.add('done'); window.__sceneReady = true; };
 
 const canvas = document.getElementById('scene');
@@ -844,21 +717,20 @@ scene.add(lamp);
 
 // materials
 const paint = new THREE.Color('#1f4bb8');
-const bodyMat = new THREE.MeshPhysicalMaterial({ color: paint.clone(), metalness: 0.9, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.03 });
-const detailsMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0.45 });
-const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x1a1d22, metalness: 0.6, roughness: 0.04, transparent: true, opacity: 0.55 });
+const bodyMat = new THREE.MeshPhysicalMaterial({ color: paint.clone(), metalness: 0.65, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.03 });
 
-const car = new THREE.Group();
-scene.add(car);
+scene.add(buildCar(bodyMat));
+const damage = buildDamage();
+scene.add(damage);
 
-// damage marker + spray mist are placed after the model loads (depends on its size)
 const marker = new THREE.Group();
 const ringMat = new THREE.MeshBasicMaterial({ color: 0xff3b30, transparent: true, opacity: 0, side: THREE.DoubleSide, depthTest: false, toneMapped: false });
-const ring1 = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.19, 48), ringMat);
-const ring2 = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.30, 48), ringMat);
-const dot = new THREE.Mesh(new THREE.CircleGeometry(0.05, 24), ringMat);
-marker.add(ring1, ring2, dot);
+const ring1 = new THREE.Mesh(new THREE.RingGeometry(0.33, 0.355, 64), ringMat);
+const ring2 = new THREE.Mesh(new THREE.RingGeometry(0.4, 0.412, 64), ringMat);
+marker.add(ring1, ring2);
 marker.renderOrder = 10;
+marker.position.copy(DAMAGE_POS).add(new THREE.Vector3(0.02, 0, 0));
+marker.rotation.y = Math.PI / 2;
 scene.add(marker);
 
 const SPRAY_N = isMobile ? 260 : 520;
@@ -870,19 +742,19 @@ const sprayMat = new THREE.PointsMaterial({ color: paint.clone(), size: 0.035, t
 const spray = new THREE.Points(sprayGeo, sprayMat);
 spray.frustumCulled = false;
 scene.add(spray);
-const nozzle = new THREE.Vector3();
-const sprayTarget = new THREE.Vector3();
+const nozzle = new THREE.Vector3(-2.45, 1.05, 0.1);
+const sprayTarget = new THREE.Vector3(-0.95, 0.6, 0.1);
 
 // keyframes: one per scroll anchor (hero, 5 steps, studio)
 // col: 'paint' | 'dull' | 'metal' | 'primer'
 const K = [
-  { pos: [5.4, 1.7, -5.6], tgt: [0, 0.5, 0],   col: 'paint',  m: .9,  r: .38, cc: 1,  ccr: .03, mk: 0,  spray: 0, heat: 0, spin: 1, side: -1 },
-  { pos: [4.6, 1.2, 1.5],  tgt: [0.5, 0.55, 0.3], col: 'dull', m: .85, r: .5,  cc: .4, ccr: .25, mk: 1,  spray: 0, heat: 0, spin: 0, side: -1 },
-  { pos: [3.1, 0.85, 2.4], tgt: [0.6, 0.55, 0.3], col: 'metal', m: 1,  r: .3,  cc: 0,  ccr: .1,  mk: .8, spray: 0, heat: 0, spin: 0, side: 1 },
-  { pos: [4.3, 2.8, 4.4],  tgt: [0, 0.4, 0],   col: 'primer', m: 0,   r: .88, cc: 0,  ccr: .1,  mk: 0,  spray: 0, heat: 0, spin: 0, side: -1 },
-  { pos: [-4.9, 1.5, -3.2], tgt: [0, 0.5, 0.2], col: 'paint', m: .8,  r: .55, cc: 0,  ccr: .1,  mk: 0,  spray: 1, heat: 0, spin: 0, side: 1 },
-  { pos: [-5.0, 1.15, 3.9], tgt: [0, 0.45, 0], col: 'paint',  m: .9,  r: .32, cc: 1,  ccr: .02, mk: 0,  spray: 0, heat: 1, spin: 0, side: -1 },
-  { pos: [5.6, 2.0, 4.8],  tgt: [0, 0.45, 0],  col: 'paint',  m: .9,  r: .36, cc: 1,  ccr: .03, mk: 0,  spray: 0, heat: 0, spin: 1, side: -1 },
+  { pos: [6.1, 1.6, -4.9], tgt: [0, 0.55, 0],  col: 'paint',  m: .65, r: .36, cc: 1,  ccr: .03, mk: 0,  dmg: 0, spray: 0, heat: 0, spin: 1, side: -1, mz: 1.9 },
+  { pos: [4.3, 1.1, 0.8],  tgt: [0.7, 0.58, -0.35], col: 'dull', m: .6, r: .5,  cc: .4, ccr: .25, mk: 1,  dmg: 1, spray: 0, heat: 0, spin: 0, side: -1, mz: 1.4 },
+  { pos: [2.9, 0.8, 1.2], tgt: [0.8, 0.58, -0.4], col: 'metal', m: 1,  r: .3,  cc: 0,  ccr: .1,  mk: .8, dmg: 0, spray: 0, heat: 0, spin: 0, side: 1, mz: 1.4 },
+  { pos: [4.3, 2.8, 4.4],  tgt: [0, 0.4, 0],   col: 'primer', m: 0,   r: .88, cc: 0,  ccr: .1,  mk: 0,  dmg: 0, spray: 0, heat: 0, spin: 0, side: -1, mz: 1.5 },
+  { pos: [-4.9, 1.5, -3.2], tgt: [0, 0.5, 0.2], col: 'paint', m: .6,  r: .55, cc: 0,  ccr: .1,  mk: 0,  dmg: 0, spray: 1, heat: 0, spin: 0, side: 1, mz: 1.5 },
+  { pos: [-5.0, 1.15, 3.9], tgt: [0, 0.45, 0], col: 'paint',  m: .65,  r: .32, cc: 1,  ccr: .02, mk: 0,  dmg: 0, spray: 0, heat: 1, spin: 0, side: -1, mz: 1.5 },
+  { pos: [5.6, 2.0, 4.8],  tgt: [0, 0.45, 0],  col: 'paint',  m: .65,  r: .36, cc: 1,  ccr: .03, mk: 0,  dmg: 0, spray: 0, heat: 0, spin: 1, side: -1, mz: 1.85 },
 ];
 // orbit around the car instead of cutting straight through it
 for (const k of K) { const [x, y, z] = k.pos; k.rad = Math.hypot(x, z); k.az = Math.atan2(x, z); k.y = y; }
@@ -940,11 +812,11 @@ function frame() {
 
   // camera
   const narrow = innerWidth <= 760;
-  const az = lerpAngle(a.az, b.az, f), rad = mix('rad') * (narrow ? 1.4 : 1);
+  const az = lerpAngle(a.az, b.az, f), rad = mix('rad') * (narrow ? mix('mz') : 1);
   vPos.set(Math.sin(az) * rad, mix('y'), Math.cos(az) * rad);
   vTgt.fromArray(a.tgt).lerp(tmpB.fromArray(b.tgt), f);
   const spin = reduceMotion ? 0 : mix('spin');
-  if (spin > 0.001) vPos.applyAxisAngle(THREE.Object3D.DEFAULT_UP, Math.sin(t * 0.22) * 0.65 * spin);
+  if (spin > 0.001) vPos.applyAxisAngle(THREE.Object3D.DEFAULT_UP, Math.sin(t * 0.22) * 0.45 * spin);
   pointer.sx += (pointer.x - pointer.sx) * 0.05; pointer.sy += (pointer.y - pointer.sy) * 0.05;
   if (!reduceMotion) { vPos.x += pointer.sx * 0.35; vPos.y -= pointer.sy * 0.25; }
   camera.position.copy(vPos);
@@ -970,6 +842,10 @@ function frame() {
   const pulse = 1 + Math.sin(t * 4) * 0.08;
   ring2.scale.setScalar(pulse * (1 + (t * 0.8 % 1) * 0.35));
   ring1.scale.setScalar(pulse);
+
+  const dmg = mix('dmg');
+  damage.material.opacity = dmg;
+  damage.visible = dmg > 0.01;
 
   // spray mist
   const sp = mix('spray');
@@ -998,44 +874,12 @@ function frame() {
   renderer.render(scene, camera);
 }
 
-const manager = new THREE.LoadingManager();
-manager.onProgress = (_u, loaded, total) => { fill.style.width = Math.round(loaded / total * 100) + '%'; };
-const draco = new DRACOLoader(manager).setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/');
-const gltfLoader = new GLTFLoader(manager).setDRACOLoader(draco);
-const aoTex = new THREE.TextureLoader(manager).load('assets/car_ao.png');
-
-gltfLoader.load('assets/car.glb', gltf => {
-  const model = gltf.scene;
-  model.traverse(o => { if (o.isMesh && o.material && o.material.name === 'glass') o.material = glassMat; });
-  model.getObjectByName('body').material = bodyMat;
-  for (const n of ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim']) { const o = model.getObjectByName(n); if (o) o.material = detailsMat; }
-  const g = model.getObjectByName('glass'); if (g) g.material = glassMat;
-  car.add(model);
-
-  const shadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.655 * 4, 1.3 * 4),
-    new THREE.MeshBasicMaterial({ map: aoTex, blending: THREE.MultiplyBlending, toneMapped: false, transparent: true, premultipliedAlpha: true })
-  );
-  shadow.rotation.x = -Math.PI / 2;
-  shadow.position.y = 0.004;
-  shadow.renderOrder = 2;
-  car.add(shadow);
-
-  // place the dent marker on the right-side door and aim the spray gun at the left flank
-  const box = new THREE.Box3().setFromObject(model.getObjectByName('body'));
-  const size = box.getSize(new THREE.Vector3());
-  marker.position.set(box.max.x + 0.02, box.min.y + size.y * 0.42, box.min.z + size.z * 0.55);
-  marker.rotation.y = Math.PI / 2;
-  nozzle.set(box.min.x - 1.5, box.min.y + size.y * 0.75, box.min.z + size.z * 0.45);
-  sprayTarget.set(box.min.x + 0.05, box.min.y + size.y * 0.45, box.min.z + size.z * 0.45);
-
-  measure();
-  stage = targetStage();
-  ready = true;
-  window.__sceneReady = true;
-  renderer.compile(scene, camera);
-  setTimeout(() => loaderEl.classList.add('done'), 250);
-}, undefined, fail);
+measure();
+stage = targetStage();
+ready = true;
+window.__sceneReady = true;
+renderer.compile(scene, camera);
+setTimeout(() => loaderEl.classList.add('done'), 250);
 
 frame();
 
