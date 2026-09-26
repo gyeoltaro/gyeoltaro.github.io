@@ -8,161 +8,157 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Gothic+A1:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F7F1E8;
+  --bg:#FAF8F4;
   --bg2:#FFFFFF;
-  --panel:#FBF7F0;
-  --ink:#241E19;
-  --mute:#8B7F71;
-  --line:rgba(36,30,25,.12);
-  --accent:#B4623A;
-  --accent-soft:#E7C7AE;
-  --sage:#4B5842;
-  --serif:'Noto Serif KR',serif;
-  --sans:'Gothic A1',system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;
-  --gutter:clamp(16px,5vw,72px);
+  --ink:#16140F;
+  --mute:#6B6558;
+  --line:rgba(22,20,15,.14);
+  --line-soft:rgba(22,20,15,.08);
+  --accent:#9C4A26;
+  --accent-tint:#F0E2D6;
+  --serif:'Nanum Myeongjo',serif;
+  --sans:'Noto Sans KR',system-ui,-apple-system,sans-serif;
+  --gutter:clamp(20px,6vw,88px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.75;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 img,svg{display:block}
-h1,h2,h3{font-family:var(--serif)}
+h1,h2,h3{font-family:var(--serif);font-weight:700}
+button{font-family:inherit}
 
-/* demo ribbon */
-.demo-badge{position:fixed;top:76px;left:14px;z-index:19;display:flex;align-items:center;gap:8px;
-  padding:8px 14px;border-radius:999px;background:rgba(36,30,25,.92);color:#F7F1E8;font-size:.74rem;
-  letter-spacing:.06em;box-shadow:0 8px 22px -8px rgba(0,0,0,.5)}
-.demo-badge b{color:var(--accent-soft)}
-
-/* header */
-.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:24px;
-  padding:16px var(--gutter);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
-.top.scrolled{background:rgba(247,241,232,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:1.15rem;white-space:nowrap}
-.brand .mark{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-family:var(--serif);font-size:1rem}
-.top nav{display:flex;gap:26px;margin-left:auto;font-size:.92rem;color:var(--mute)}
-.top nav a:hover{color:var(--ink)}
-.book{padding:10px 18px;border-radius:999px;background:var(--ink);color:#F7F1E8;font-weight:700;font-size:.86rem;white-space:nowrap}
+.demo-badge{position:fixed;top:78px;left:var(--gutter);z-index:19;display:flex;align-items:center;gap:8px;
+  padding:7px 13px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);font-size:.7rem;
+  letter-spacing:.14em;font-weight:500}
+.demo-badge b{color:var(--accent)}
 .hero-badge{display:none}
+
+.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:32px;
+  padding:22px var(--gutter);border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
+.top.scrolled{background:rgba(250,248,244,.92);backdrop-filter:blur(10px);border-color:var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:1.2rem;white-space:nowrap}
+.brand .mark{width:30px;height:30px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:.92rem}
+.top nav{display:flex;gap:30px;margin-left:auto;font-size:.84rem;letter-spacing:.05em;color:var(--mute)}
+.top nav a:hover{color:var(--ink)}
+.book{padding:10px 20px;border:1px solid var(--ink);font-weight:500;font-size:.82rem;letter-spacing:.03em;white-space:nowrap;transition:background .2s,color .2s}
+.book:hover{background:var(--ink);color:var(--bg)}
 
 main{position:relative;z-index:1}
 
-/* hero */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:120px var(--gutter) 80px;max-width:800px;position:relative}
-.hero::before{content:"";position:absolute;top:-10%;right:-10%;width:60vw;height:60vw;max-width:640px;max-height:640px;border-radius:50%;
-  background:radial-gradient(circle,var(--accent-soft) 0%,rgba(231,199,174,0) 70%);opacity:.7;z-index:-1}
-.eyebrow{font-family:var(--sans);letter-spacing:.32em;font-size:.78rem;color:var(--accent);margin-bottom:20px;font-weight:700}
-.hero h1{word-break:keep-all;font-size:clamp(2.1rem,4.4vw,3.9rem);line-height:1.32;font-weight:700;letter-spacing:-.01em}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:130px var(--gutter) 90px;max-width:900px;position:relative}
+.eyebrow{display:flex;align-items:center;gap:14px;font-family:var(--sans);letter-spacing:.32em;font-size:.72rem;color:var(--accent);margin-bottom:26px;font-weight:500}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
+.hero h1{word-break:keep-all;font-size:clamp(2.3rem,5.4vw,4.6rem);line-height:1.32;letter-spacing:-.01em}
 .hero h1 em{font-style:normal;color:var(--accent)}
-.lead{margin-top:24px;font-size:clamp(1rem,1.4vw,1.12rem);color:#5A5044;max-width:32em}
-.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
-.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 24px;border-radius:12px;font-weight:700;font-size:.98rem;transition:transform .2s,background .2s,box-shadow .2s}
-.btn:hover{transform:translateY(-2px)}
-.btn.primary{background:var(--accent);color:#fff;box-shadow:0 14px 30px -12px rgba(180,98,58,.7)}
-.btn.ghost{border:1px solid rgba(36,30,25,.24);background:rgba(255,255,255,.5)}
-.btn svg{width:18px;height:18px}
-.badges{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:30px}
-.badges li{font-size:.8rem;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.6);color:#5A5044}
-.scroll-hint{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);font-size:.72rem;letter-spacing:.35em;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:10px}
-.scroll-hint::after{content:"";width:1px;height:38px;background:linear-gradient(var(--mute),transparent);animation:drip 1.8s ease-in-out infinite}
-@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.lead{margin-top:28px;font-size:clamp(1rem,1.3vw,1.08rem);color:var(--mute);max-width:34em;font-weight:300}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;font-weight:500;font-size:.92rem;letter-spacing:.02em;transition:background .2s,color .2s,border-color .2s}
+.btn.primary{background:var(--ink);color:var(--bg);border:1px solid var(--ink)}
+.btn.primary:hover{background:transparent;color:var(--ink)}
+.btn.ghost{border:1px solid var(--ink);background:transparent}
+.btn.ghost:hover{background:var(--ink);color:var(--bg)}
+.btn svg{width:16px;height:16px}
+.badges{list-style:none;display:flex;flex-wrap:wrap;gap:0;margin-top:40px;border-top:1px solid var(--line)}
+.badges li{font-size:.78rem;padding:14px 20px 0 0;color:var(--mute);letter-spacing:.02em}
+.scroll-hint{position:absolute;left:var(--gutter);bottom:36px;font-size:.7rem;letter-spacing:.3em;color:var(--mute);display:flex;align-items:center;gap:12px}
+.scroll-hint::after{content:"";width:38px;height:1px;background:var(--mute);animation:drip 2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleX(0);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}51%{transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
 
-/* section shared */
-.block{padding:14vh var(--gutter);max-width:1180px;margin:0 auto}
-.sec-label{font-family:var(--sans);letter-spacing:.3em;font-size:.78rem;color:var(--accent);font-weight:700}
-.sec-title{word-break:keep-all;font-size:clamp(1.7rem,3.2vw,2.5rem);font-weight:700;letter-spacing:-.01em;line-height:1.35;margin-top:10px}
-.sec-desc{color:var(--mute);margin-top:14px;max-width:42em}
+.block{padding:15vh var(--gutter);max-width:1180px;margin:0 auto}
+.sec-head{display:flex;align-items:baseline;gap:18px;border-bottom:1px solid var(--line);padding-bottom:22px}
+.sec-num{font-family:var(--serif);font-size:1.1rem;color:var(--accent)}
+.sec-label{font-family:var(--sans);letter-spacing:.28em;font-size:.72rem;color:var(--mute);font-weight:500}
+.sec-title{word-break:keep-all;font-size:clamp(1.7rem,3.2vw,2.6rem);letter-spacing:-.01em;line-height:1.4;margin-top:16px}
+.sec-desc{color:var(--mute);margin-top:16px;max-width:42em;font-weight:300}
 
-/* process */
-.steps{display:grid;gap:16px;margin-top:44px}
-.step{display:grid;grid-template-columns:64px 1fr;gap:22px;padding:28px;border-radius:20px;background:var(--panel);border:1px solid var(--line);
-  opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.steps{margin-top:8px}
+.step{display:grid;grid-template-columns:80px 1fr;gap:26px;padding:34px 0;border-bottom:1px solid var(--line);
+  opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 .step.in{opacity:1;transform:none}
-.step .n{width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:1.2rem;font-weight:700}
-.step h3{font-size:1.18rem;margin-bottom:6px}
-.step p{color:#5A5044;font-size:.96rem}
+.step .n{font-family:var(--serif);font-size:2.1rem;color:var(--accent-tint);font-weight:700}
+.step h3{font-size:1.15rem;margin-bottom:8px;font-weight:700}
+.step p{color:var(--mute);font-size:.94rem;font-weight:300;max-width:44em}
 
-/* diagnosis tool */
-.diag{background:var(--bg2);border:1px solid var(--line);border-radius:24px;padding:34px;margin-top:44px;box-shadow:0 30px 60px -40px rgba(36,30,25,.25)}
-.diag h3{display:flex;align-items:center;gap:10px;font-size:1.05rem;font-family:var(--sans);font-weight:700;margin-bottom:16px}
-.diag h3 .n{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:.78rem;display:grid;place-items:center;font-weight:700}
-.diag-row{margin-bottom:30px}
+.diag{border:1px solid var(--line);padding:40px;margin-top:8px}
+.diag h3{display:flex;align-items:center;gap:10px;font-size:.98rem;font-family:var(--sans);font-weight:500;margin-bottom:18px}
+.diag h3 .n{font-family:var(--serif);color:var(--accent);font-size:1.05rem}
+.diag-row{margin-bottom:34px}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
-.chip{padding:11px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:#5A5044;font:inherit;font-size:.92rem;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
-.chip:hover{border-color:var(--accent)}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.chip{padding:11px 18px;border:1px solid var(--line);background:transparent;color:var(--mute);font:inherit;font-size:.88rem;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.seg button{display:grid;gap:4px;padding:16px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:#5A5044;font:inherit;text-align:left;cursor:pointer}
-.seg button b{font-size:.96rem}
-.seg button small{font-size:.78rem;color:var(--mute)}
-.seg button[aria-checked="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
-.seg button[aria-checked="true"] small{color:rgba(255,255,255,.8)}
-.diag-result{margin-top:8px;padding:24px;border-radius:16px;background:linear-gradient(160deg,#FBEFE3,#F7F1E8);border:1px solid var(--accent-soft)}
-.diag-result .res-label{font-size:.82rem;color:var(--mute)}
-.diag-result .res-title{font-family:var(--serif);font-size:1.35rem;font-weight:700;margin:6px 0 8px}
-.diag-result .res-desc{color:#5A5044;font-size:.94rem}
-.diag-result .res-price{margin-top:14px;font-weight:700;color:var(--accent)}
-.diag-result .btn{margin-top:18px}
+.seg button{display:grid;gap:4px;padding:18px 14px;border:1px solid var(--line);background:transparent;color:var(--mute);font:inherit;text-align:left;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+.seg button b{font-size:.92rem;color:var(--ink)}
+.seg button small{font-size:.76rem;color:var(--mute)}
+.seg button[aria-checked="true"]{background:var(--ink);border-color:var(--ink)}
+.seg button[aria-checked="true"] b,.seg button[aria-checked="true"] small{color:var(--bg)}
+.diag-result{margin-top:8px;padding:28px 0 0;border-top:1px solid var(--line)}
+.diag-result .res-label{font-size:.76rem;letter-spacing:.2em;color:var(--mute)}
+.diag-result .res-title{font-family:var(--serif);font-size:1.5rem;font-weight:700;margin:10px 0 10px}
+.diag-result .res-desc{color:var(--mute);font-size:.92rem;font-weight:300}
+.diag-result .res-price{margin-top:16px;font-weight:500;color:var(--accent);font-family:var(--serif);font-size:1.1rem}
+.diag-result .btn{margin-top:22px}
 
-/* services grid */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
-.svc{padding:28px;border-radius:20px;background:var(--bg2);border:1px solid var(--line);transition:border-color .3s,transform .3s}
-.svc:hover{border-color:var(--accent);transform:translateY(-4px)}
-.svc .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);margin-bottom:18px}
-.svc .ic svg{width:22px;height:22px}
-.svc h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;font-family:var(--sans)}
-.svc p{font-size:.92rem;color:var(--mute)}
-.svc .price{margin-top:12px;font-weight:700;color:var(--accent);font-size:.94rem}
+.grid{margin-top:8px;border-top:1px solid var(--line)}
+.svc{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:20px;padding:26px 0;border-bottom:1px solid var(--line)}
+.svc h3{font-size:1.08rem;font-weight:700;margin-bottom:6px}
+.svc p{font-size:.88rem;color:var(--mute);font-weight:300;max-width:38em}
+.svc .price{font-family:var(--serif);font-size:1.15rem;color:var(--accent);white-space:nowrap}
 
-/* designers */
-.people{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
-.person{padding:26px;border-radius:20px;background:var(--panel);border:1px solid var(--line);text-align:center}
-.avatar{width:76px;height:76px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(160deg,var(--accent-soft),var(--accent));display:grid;place-items:center;color:#fff;font-family:var(--serif);font-size:1.4rem;font-weight:700}
-.person h3{font-size:1.05rem;margin-bottom:4px;font-family:var(--sans);font-weight:700}
-.person span{font-size:.84rem;color:var(--accent);font-weight:700}
-.person p{margin-top:10px;font-size:.88rem;color:var(--mute)}
+.people{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:8px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.person{padding:32px 28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.avatar{width:52px;height:52px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:1.2rem;margin-bottom:20px}
+.person h3{font-size:1rem;margin-bottom:4px;font-weight:700}
+.person span{font-size:.78rem;color:var(--accent);letter-spacing:.03em}
+.person p{margin-top:12px;font-size:.86rem;color:var(--mute);font-weight:300}
 
-/* contact / demo notice */
-.contact-wrap{background:var(--ink);color:#F7F1E8}
-.contact{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;margin-top:40px}
-.info{padding:34px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
-.info dl{display:grid;grid-template-columns:auto 1fr;gap:14px 22px;font-size:.96rem}
-.info dt{color:rgba(247,241,232,.55);font-size:.85rem;padding-top:2px}
-.notice{padding:34px;border-radius:22px;background:rgba(180,98,58,.16);border:1px solid rgba(180,98,58,.4)}
-.notice h3{font-size:1.05rem;margin-bottom:10px;font-family:var(--sans)}
-.notice p{font-size:.9rem;color:rgba(247,241,232,.82)}
-.notice .btn{margin-top:18px;width:100%;justify-content:center}
+.contact-wrap{background:var(--ink);color:var(--bg)}
+.contact-wrap .sec-label{color:rgba(250,248,244,.55)}
+.contact-wrap .sec-head{border-color:rgba(250,248,244,.18)}
+.contact{display:grid;grid-template-columns:1.1fr .9fr;gap:0;margin-top:8px;border-top:1px solid rgba(250,248,244,.18)}
+.info{padding:36px 34px 36px 0}
+.info dl{display:grid;grid-template-columns:auto 1fr;gap:16px 24px;font-size:.92rem;font-weight:300}
+.info dt{color:rgba(250,248,244,.5);font-size:.78rem;letter-spacing:.05em;padding-top:2px}
+.notice{padding:36px 0 36px 34px;border-left:1px solid rgba(250,248,244,.18)}
+.notice h3{font-size:1rem;margin-bottom:14px;font-family:var(--sans);font-weight:500}
+.notice p{font-size:.86rem;color:rgba(250,248,244,.68);font-weight:300;line-height:1.8}
+.notice .btn{margin-top:22px}
+.notice .btn.primary{background:var(--bg);color:var(--ink);border-color:var(--bg)}
+.notice .btn.primary:hover{background:transparent;color:var(--bg)}
 
-footer{padding:40px var(--gutter) 60px;border-top:1px solid rgba(255,255,255,.12);color:rgba(247,241,232,.55);font-size:.8rem;max-width:1180px;margin:0 auto;display:grid;gap:6px}
-footer b{color:#F7F1E8}
+footer{padding:36px var(--gutter) 60px;border-top:1px solid rgba(250,248,244,.18);color:rgba(250,248,244,.5);font-size:.78rem;max-width:1180px;margin:0 auto;display:grid;gap:8px;font-weight:300}
+footer b{color:var(--bg);font-family:var(--serif);font-weight:700}
 
 .fab{display:none}
 
 @media (max-width:860px){
-  .grid{grid-template-columns:1fr 1fr}
   .people{grid-template-columns:1fr}
   .seg{grid-template-columns:1fr 1fr}
   .contact{grid-template-columns:1fr}
+  .info{padding:32px 0 28px}
+  .notice{padding:28px 0 0;border-left:none;border-top:1px solid rgba(250,248,244,.18)}
 }
 @media (max-width:760px){
   .top nav{display:none}
-  .brand{margin-left:0}
   .book{margin-left:auto}
   .demo-badge{display:none}
-  .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:rgba(36,30,25,.92);color:#F7F1E8;font-size:.68rem;letter-spacing:.06em;margin-bottom:18px}
-  .hero-badge b{color:var(--accent-soft)}
-  .hero{padding-top:90px}
-  .hero h1{font-size:2rem}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--ink);color:var(--ink);font-size:.68rem;letter-spacing:.12em;margin-bottom:22px}
+  .hero-badge b{color:var(--accent)}
+  .hero{padding-top:96px}
+  .hero h1{font-size:2.1rem}
   .cta .btn{flex:1 1 100%;justify-content:center}
   .hero .badges{display:none}
   .scroll-hint{display:none}
-  .grid{grid-template-columns:1fr}
-  .diag{padding:22px}
+  .diag{padding:24px}
+  .svc{grid-template-columns:1fr}
+  .svc .price{margin-top:6px}
   .fab{display:flex;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:30;align-items:center;gap:8px;
-    padding:14px 20px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;box-shadow:0 12px 30px -8px rgba(180,98,58,.9)}
+    padding:14px 20px;background:var(--ink);color:var(--bg);font-weight:500;box-shadow:0 12px 30px -8px rgba(0,0,0,.4)}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -194,7 +190,7 @@ footer b{color:#F7F1E8}
     <p class="lead">라움 헤어는 성수동의 프라이빗 헤어 스튜디오입니다. 무작정 예약하기 전에 모발 고민을 먼저 진단하고, 맞는 시술과 예상 비용을 안내해 드려요.</p>
     <div class="cta">
       <a class="btn primary" href="#diagnosis">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
         내 스타일 진단하기
       </a>
       <a class="btn ghost" href="#services">시술 · 가격 보기</a>
@@ -206,24 +202,24 @@ footer b{color:#F7F1E8}
   </section>
 
   <section class="block" id="process" aria-label="케어 순서">
-    <p class="sec-label">PROCESS</p>
+    <div class="sec-head"><span class="sec-num">01</span><span class="sec-label">PROCESS</span></div>
     <h2 class="sec-title">예약 한 번으로,<br>진단부터 홈케어까지</h2>
     <div class="steps">
-      <div class="step"><div class="n">1</div><div><h3>모발·두피 진단</h3><p>시술 전 모발 굵기, 손상도, 두피 상태를 확인하고 원하는 스타일을 함께 이야기 나눠요.</p></div></div>
-      <div class="step"><div class="n">2</div><div><h3>맞춤 시술 설계</h3><p>진단 결과를 바탕으로 커트 라인, 펌 텐션, 염색 톤을 모발 상태에 맞게 조정합니다.</p></div></div>
-      <div class="step"><div class="n">3</div><div><h3>시술 진행</h3><p>디자이너 1인이 처음부터 끝까지 전담해, 중간에 담당자가 바뀌지 않아요.</p></div></div>
-      <div class="step"><div class="n">4</div><div><h3>홈케어 안내</h3><p>시술 후 관리 방법과 다음 방문 주기를 안내해, 스타일이 오래 유지되도록 도와드려요.</p></div></div>
+      <div class="step"><div class="n">01</div><div><h3>모발·두피 진단</h3><p>시술 전 모발 굵기, 손상도, 두피 상태를 확인하고 원하는 스타일을 함께 이야기 나눠요.</p></div></div>
+      <div class="step"><div class="n">02</div><div><h3>맞춤 시술 설계</h3><p>진단 결과를 바탕으로 커트 라인, 펌 텐션, 염색 톤을 모발 상태에 맞게 조정합니다.</p></div></div>
+      <div class="step"><div class="n">03</div><div><h3>시술 진행</h3><p>디자이너 1인이 처음부터 끝까지 전담해, 중간에 담당자가 바뀌지 않아요.</p></div></div>
+      <div class="step"><div class="n">04</div><div><h3>홈케어 안내</h3><p>시술 후 관리 방법과 다음 방문 주기를 안내해, 스타일이 오래 유지되도록 도와드려요.</p></div></div>
     </div>
   </section>
 
   <section class="block" id="diagnosis" aria-label="스타일 진단">
-    <p class="sec-label">DIAGNOSIS</p>
+    <div class="sec-head"><span class="sec-num">02</span><span class="sec-label">DIAGNOSIS</span></div>
     <h2 class="sec-title">30초 스타일 진단</h2>
     <p class="sec-desc">고민과 원하는 시술을 선택하면, 어울리는 시술과 예상 가격대를 바로 알려드려요.</p>
 
     <div class="diag">
       <div class="diag-row">
-        <h3><span class="n">1</span>모발 고민 <small style="color:var(--mute);font-weight:400">(중복 선택 가능)</small></h3>
+        <h3><span class="n">01</span>모발 고민 <small style="color:var(--mute);font-weight:300">(중복 선택 가능)</small></h3>
         <div class="chips" id="concern-chips" role="group" aria-label="모발 고민">
           <button type="button" class="chip" data-concern="damage" aria-pressed="false">건조 · 손상모</button>
           <button type="button" class="chip" data-concern="volume" aria-pressed="false">볼륨 부족</button>
@@ -233,7 +229,7 @@ footer b{color:#F7F1E8}
         </div>
       </div>
       <div class="diag-row">
-        <h3><span class="n">2</span>원하는 시술</h3>
+        <h3><span class="n">02</span>원하는 시술</h3>
         <div class="seg" id="style-seg" role="radiogroup" aria-label="원하는 시술">
           <button type="button" role="radio" data-style="cut" aria-checked="false"><b>커트</b><small>라인 변화</small></button>
           <button type="button" role="radio" data-style="perm" aria-checked="false"><b>펌</b><small>볼륨·웨이브</small></button>
@@ -253,51 +249,21 @@ footer b{color:#F7F1E8}
   </section>
 
   <section class="block" id="services" aria-label="시술 및 가격">
-    <p class="sec-label">SERVICES</p>
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-label">SERVICES</span></div>
     <h2 class="sec-title">시술 · 가격</h2>
     <p class="sec-desc">모발 길이와 상태에 따라 시간·비용이 달라질 수 있어, 진단 후 정확한 견적을 안내해 드려요.</p>
     <div class="grid">
-      <div class="svc">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
-        <h3>디자인 커트</h3>
-        <p>얼굴형과 모발 결을 고려한 1:1 맞춤 커트입니다.</p>
-        <p class="price">45,000원 ~</p>
-      </div>
-      <div class="svc">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg></div>
-        <h3>볼륨 · 웨이브 펌</h3>
-        <p>모발 굵기에 맞춰 텐션을 조절해 자연스러운 웨이브를 만듭니다.</p>
-        <p class="price">120,000원 ~</p>
-      </div>
-      <div class="svc">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18 9 9 0 0 1 0-18z"/></svg></div>
-        <h3>염색 · 탈색</h3>
-        <p>손상도를 확인한 뒤 원하는 톤에 맞춰 조색합니다.</p>
-        <p class="price">90,000원 ~</p>
-      </div>
-      <div class="svc">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-4 7-10V6l-7-3-7 3v6c0 6 7 10 7 10z"/></svg></div>
-        <h3>두피 클리닉</h3>
-        <p>두피 진단 후 맞춤 앰플로 관리하는 케어 프로그램입니다.</p>
-        <p class="price">70,000원 ~</p>
-      </div>
-      <div class="svc">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16M4 4h12l4 4-4 4H4"/></svg></div>
-        <h3>클리닉 트리트먼트</h3>
-        <p>손상모 결을 채워 시술 직후 상태를 오래 유지해 줍니다.</p>
-        <p class="price">50,000원 ~</p>
-      </div>
-      <div class="svc">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></div>
-        <h3>업스타일 · 세팅</h3>
-        <p>행사, 촬영 등 특별한 날을 위한 맞춤 스타일링입니다.</p>
-        <p class="price">80,000원 ~</p>
-      </div>
+      <div class="svc"><div><h3>디자인 커트</h3><p>얼굴형과 모발 결을 고려한 1:1 맞춤 커트입니다.</p></div><span class="price">45,000원 ~</span></div>
+      <div class="svc"><div><h3>볼륨 · 웨이브 펌</h3><p>모발 굵기에 맞춰 텐션을 조절해 자연스러운 웨이브를 만듭니다.</p></div><span class="price">120,000원 ~</span></div>
+      <div class="svc"><div><h3>염색 · 탈색</h3><p>손상도를 확인한 뒤 원하는 톤에 맞춰 조색합니다.</p></div><span class="price">90,000원 ~</span></div>
+      <div class="svc"><div><h3>두피 클리닉</h3><p>두피 진단 후 맞춤 앰플로 관리하는 케어 프로그램입니다.</p></div><span class="price">70,000원 ~</span></div>
+      <div class="svc"><div><h3>클리닉 트리트먼트</h3><p>손상모 결을 채워 시술 직후 상태를 오래 유지해 줍니다.</p></div><span class="price">50,000원 ~</span></div>
+      <div class="svc"><div><h3>업스타일 · 세팅</h3><p>행사, 촬영 등 특별한 날을 위한 맞춤 스타일링입니다.</p></div><span class="price">80,000원 ~</span></div>
     </div>
   </section>
 
   <section class="block" id="designers" aria-label="디자이너 소개">
-    <p class="sec-label">DESIGNERS</p>
+    <div class="sec-head"><span class="sec-num">04</span><span class="sec-label">DESIGNERS</span></div>
     <h2 class="sec-title">담당 디자이너</h2>
     <p class="sec-desc">예약 시 원하는 디자이너를 지정할 수 있어요.</p>
     <div class="people">
@@ -309,7 +275,7 @@ footer b{color:#F7F1E8}
 
   <div class="contact-wrap">
     <section class="block" id="contact" aria-label="문의">
-      <p class="sec-label" style="color:var(--accent-soft)">CONTACT</p>
+      <div class="sec-head"><span class="sec-num" style="color:var(--accent)">05</span><span class="sec-label">CONTACT</span></div>
       <h2 class="sec-title">예약 문의</h2>
       <div class="contact">
         <div class="info">
@@ -336,7 +302,7 @@ footer b{color:#F7F1E8}
 </main>
 
 <a class="fab" href="#diagnosis" aria-label="스타일 진단하기">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
   진단
 </a>
 
