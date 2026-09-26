@@ -49,7 +49,12 @@ button{font-family:inherit}
 
 main{position:relative;z-index:1}
 
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:130px var(--gutter) 90px;max-width:900px;position:relative}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:130px var(--gutter) 70px;max-width:1240px;margin:0 auto;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center}
+.hero-visual{position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
+.hero-visual .blob{position:absolute;inset:0;z-index:0}
+.hero-visual svg.art{position:relative;z-index:1;width:100%;max-width:380px;height:auto}
+.fig-label{position:relative;z-index:1;font-size:.72rem;letter-spacing:.08em;color:var(--mute);align-self:flex-start;margin-left:6px}
 .eyebrow{display:flex;align-items:center;gap:14px;font-family:var(--sans);letter-spacing:.32em;font-size:.72rem;color:var(--accent);margin-bottom:26px;font-weight:500}
 .eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
 .hero h1{word-break:keep-all;font-size:clamp(2.3rem,5.4vw,4.6rem);line-height:1.32;letter-spacing:-.01em}
@@ -74,6 +79,9 @@ main{position:relative;z-index:1}
 .sec-label{font-family:var(--sans);letter-spacing:.28em;font-size:.72rem;color:var(--mute);font-weight:500}
 .sec-title{word-break:keep-all;font-size:clamp(1.7rem,3.2vw,2.6rem);letter-spacing:-.01em;line-height:1.4;margin-top:16px}
 .sec-desc{color:var(--mute);margin-top:16px;max-width:42em;font-weight:300}
+
+.watermark{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:2.2vw 0;display:flex;justify-content:center}
+.watermark span{font-family:var(--serif);font-size:11vw;line-height:1;white-space:nowrap;color:transparent;-webkit-text-stroke:1px var(--line);letter-spacing:.02em}
 
 .steps{margin-top:8px}
 .step{display:grid;grid-template-columns:80px 1fr;gap:26px;padding:34px 0;border-bottom:1px solid var(--line);
@@ -142,6 +150,10 @@ footer b{color:var(--bg);font-family:var(--serif);font-weight:700}
   .contact{grid-template-columns:1fr}
   .info{padding:32px 0 28px}
   .notice{padding:28px 0 0;border-left:none;border-top:1px solid rgba(250,248,244,.18)}
+  .hero-grid{grid-template-columns:1fr}
+  .hero-visual{order:-1;max-width:280px;margin:0 auto 10px}
+  .hero-visual svg.art{max-width:220px}
+  .watermark span{font-size:16vw}
 }
 @media (max-width:760px){
   .top nav{display:none}
@@ -184,20 +196,39 @@ footer b{color:var(--bg);font-family:var(--serif);font-weight:700}
 
 <main>
   <section class="hero" id="top">
-    <span class="hero-badge">PORTFOLIO <b>DEMO</b> · 가상 브랜드</span>
-    <p class="eyebrow">BRUNCH & COFFEE · SEOUL YEONNAM</p>
-    <h1>오늘 기분에 맞는 한 잔을,<br><em>메뉴 추천부터 시작해요.</em></h1>
-    <p class="lead">카페 온기는 연남동의 작은 브런치 카페입니다. 메뉴판 앞에서 고민하지 않도록, 오늘 컨디션에 맞는 음료·디저트를 먼저 추천해 드려요.</p>
-    <div class="cta">
-      <a class="btn primary" href="#diagnosis">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
-        내 메뉴 추천받기
-      </a>
-      <a class="btn ghost" href="#menu">메뉴판 보기</a>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="hero-badge">PORTFOLIO <b>DEMO</b> · 가상 브랜드</span>
+        <p class="eyebrow">BRUNCH & COFFEE · SEOUL YEONNAM</p>
+        <h1>오늘 기분에 맞는 한 잔을,<br><em>메뉴 추천부터 시작해요.</em></h1>
+        <p class="lead">카페 온기는 연남동의 작은 브런치 카페입니다. 메뉴판 앞에서 고민하지 않도록, 오늘 컨디션에 맞는 음료·디저트를 먼저 추천해 드려요.</p>
+        <div class="cta">
+          <a class="btn primary" href="#diagnosis">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+            내 메뉴 추천받기
+          </a>
+          <a class="btn ghost" href="#menu">메뉴판 보기</a>
+        </div>
+        <ul class="badges">
+          <li>매일 원두 소량 로스팅</li><li>비건 디저트 있음</li><li>반려동물 동반 가능</li>
+        </ul>
+      </div>
+      <div class="hero-visual">
+        <svg class="blob" viewBox="0 0 400 480" aria-hidden="true"><path fill="var(--accent-tint)" d="M204 46c60 0 100 42 122 92 20 46 10 104-22 144-34 42-92 62-146 52-56-10-104-54-116-112-12-60 12-126 62-160 30-22 66-16 100-16z"/></svg>
+        <svg class="art" viewBox="0 0 400 480" aria-hidden="true">
+          <path d="M164 168c-8-28 6-46 6-46M198 162c-8-32 6-54 6-54M232 168c-8-28 6-46 6-46" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+          <ellipse cx="200" cy="192" rx="72" ry="15" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <path d="M130 192 116 318 Q200 340 284 318 L270 192" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <path d="M270 206c42-4 42 68 0 70" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <ellipse cx="200" cy="344" rx="108" ry="17" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <g fill="var(--ink)" opacity=".85">
+            <ellipse cx="108" cy="378" rx="15" ry="9" transform="rotate(-20 108 378)"/>
+            <ellipse cx="140" cy="396" rx="13" ry="8" transform="rotate(10 140 396)"/>
+          </g>
+        </svg>
+        <span class="fig-label">Fig. 01 — Today's Brew</span>
+      </div>
     </div>
-    <ul class="badges">
-      <li>매일 원두 소량 로스팅</li><li>비건 디저트 있음</li><li>반려동물 동반 가능</li>
-    </ul>
     <div class="scroll-hint">SCROLL</div>
   </section>
 
@@ -261,6 +292,8 @@ footer b{color:var(--bg);font-family:var(--serif);font-weight:700}
       <div class="svc"><div><h3>디카페인 메뉴</h3><p>카페인 부담 없이 즐길 수 있는 디카페인 라인업이에요.</p></div><span class="price">6,500원 ~</span></div>
     </div>
   </section>
+
+  <div class="watermark" aria-hidden="true"><span>TASTE</span></div>
 
   <section class="block" id="people" aria-label="공간 및 팀 소개">
     <div class="sec-head"><span class="sec-num">04</span><span class="sec-label">SPACE & TEAM</span></div>

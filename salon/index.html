@@ -49,7 +49,12 @@ button{font-family:inherit}
 
 main{position:relative;z-index:1}
 
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:130px var(--gutter) 90px;max-width:900px;position:relative}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:130px var(--gutter) 70px;max-width:1240px;margin:0 auto;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center}
+.hero-visual{position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
+.hero-visual .blob{position:absolute;inset:0;z-index:0}
+.hero-visual svg.art{position:relative;z-index:1;width:100%;max-width:380px;height:auto}
+.fig-label{position:relative;z-index:1;font-size:.72rem;letter-spacing:.08em;color:var(--mute);align-self:flex-start;margin-left:6px}
 .eyebrow{display:flex;align-items:center;gap:14px;font-family:var(--sans);letter-spacing:.32em;font-size:.72rem;color:var(--accent);margin-bottom:26px;font-weight:500}
 .eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
 .hero h1{word-break:keep-all;font-size:clamp(2.3rem,5.4vw,4.6rem);line-height:1.32;letter-spacing:-.01em}
@@ -74,6 +79,9 @@ main{position:relative;z-index:1}
 .sec-label{font-family:var(--sans);letter-spacing:.28em;font-size:.72rem;color:var(--mute);font-weight:500}
 .sec-title{word-break:keep-all;font-size:clamp(1.7rem,3.2vw,2.6rem);letter-spacing:-.01em;line-height:1.4;margin-top:16px}
 .sec-desc{color:var(--mute);margin-top:16px;max-width:42em;font-weight:300}
+
+.watermark{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:2.2vw 0;display:flex;justify-content:center}
+.watermark span{font-family:var(--serif);font-size:11vw;line-height:1;white-space:nowrap;color:transparent;-webkit-text-stroke:1px var(--line);letter-spacing:.02em}
 
 .steps{margin-top:8px}
 .step{display:grid;grid-template-columns:80px 1fr;gap:26px;padding:34px 0;border-bottom:1px solid var(--line);
@@ -142,6 +150,10 @@ footer b{color:var(--bg);font-family:var(--serif);font-weight:700}
   .contact{grid-template-columns:1fr}
   .info{padding:32px 0 28px}
   .notice{padding:28px 0 0;border-left:none;border-top:1px solid rgba(250,248,244,.18)}
+  .hero-grid{grid-template-columns:1fr}
+  .hero-visual{order:-1;max-width:280px;margin:0 auto 10px}
+  .hero-visual svg.art{max-width:220px}
+  .watermark span{font-size:16vw}
 }
 @media (max-width:760px){
   .top nav{display:none}
@@ -184,20 +196,42 @@ footer b{color:var(--bg);font-family:var(--serif);font-weight:700}
 
 <main>
   <section class="hero" id="top">
-    <span class="hero-badge">PORTFOLIO <b>DEMO</b> · 가상 브랜드</span>
-    <p class="eyebrow">PRIVATE HAIR STUDIO · SEOUL SEONGSU</p>
-    <h1>내 머릿결에 맞는 시술을,<br><em>진단부터 시작해요.</em></h1>
-    <p class="lead">라움 헤어는 성수동의 프라이빗 헤어 스튜디오입니다. 무작정 예약하기 전에 모발 고민을 먼저 진단하고, 맞는 시술과 예상 비용을 안내해 드려요.</p>
-    <div class="cta">
-      <a class="btn primary" href="#diagnosis">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
-        내 스타일 진단하기
-      </a>
-      <a class="btn ghost" href="#services">시술 · 가격 보기</a>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="hero-badge">PORTFOLIO <b>DEMO</b> · 가상 브랜드</span>
+        <p class="eyebrow">PRIVATE HAIR STUDIO · SEOUL SEONGSU</p>
+        <h1>내 머릿결에 맞는 시술을,<br><em>진단부터 시작해요.</em></h1>
+        <p class="lead">라움 헤어는 성수동의 프라이빗 헤어 스튜디오입니다. 무작정 예약하기 전에 모발 고민을 먼저 진단하고, 맞는 시술과 예상 비용을 안내해 드려요.</p>
+        <div class="cta">
+          <a class="btn primary" href="#diagnosis">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+            내 스타일 진단하기
+          </a>
+          <a class="btn ghost" href="#services">시술 · 가격 보기</a>
+        </div>
+        <ul class="badges">
+          <li>1:1 예약제 운영</li><li>모발·두피 진단 무료</li><li>비건 인증 제품 사용</li>
+        </ul>
+      </div>
+      <div class="hero-visual">
+        <svg class="blob" viewBox="0 0 400 480" aria-hidden="true"><path fill="var(--accent-tint)" d="M204 36c58 0 96 46 118 96 20 46 8 100-24 140-34 42-90 60-142 50-54-10-100-52-112-108-12-58 10-122 58-156 30-22 66-22 102-22z"/></svg>
+        <svg class="art" viewBox="0 0 400 480" aria-hidden="true">
+          <circle cx="200" cy="220" r="132" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <path d="M120 130c10-40 40-64 80-64s70 24 80 64" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <path d="M96 190c-6 60 10 118 44 158" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <path d="M304 190c6 60-10 118-44 158" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <path d="M132 168c-14 52-6 108 24 152" fill="none" stroke="var(--ink)" stroke-width="1" opacity=".5"/>
+          <path d="M268 168c14 52 6 108-24 152" fill="none" stroke="var(--ink)" stroke-width="1" opacity=".5"/>
+          <circle cx="200" cy="220" r="46" fill="none" stroke="var(--ink)" stroke-width="1"/>
+          <g transform="translate(298 336)">
+            <circle r="34" fill="var(--bg)" stroke="var(--ink)" stroke-width="1"/>
+            <path d="M-12 -8 4 8M4 -8 -12 8" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"/>
+            <circle r="3" fill="var(--ink)"/>
+          </g>
+        </svg>
+        <span class="fig-label">Fig. 01 — Style Diagnosis</span>
+      </div>
     </div>
-    <ul class="badges">
-      <li>1:1 예약제 운영</li><li>모발·두피 진단 무료</li><li>비건 인증 제품 사용</li>
-    </ul>
     <div class="scroll-hint">SCROLL</div>
   </section>
 
@@ -261,6 +295,8 @@ footer b{color:var(--bg);font-family:var(--serif);font-weight:700}
       <div class="svc"><div><h3>업스타일 · 세팅</h3><p>행사, 촬영 등 특별한 날을 위한 맞춤 스타일링입니다.</p></div><span class="price">80,000원 ~</span></div>
     </div>
   </section>
+
+  <div class="watermark" aria-hidden="true"><span>STYLE</span></div>
 
   <section class="block" id="designers" aria-label="디자이너 소개">
     <div class="sec-head"><span class="sec-num">04</span><span class="sec-label">DESIGNERS</span></div>
