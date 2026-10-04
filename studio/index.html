@@ -152,8 +152,8 @@ const GROUPS=[
    p:p=>CTX(p)+`당신은 재각본팀장입니다. 원문의 사실과 핵심 아이디어만 추출하고 문장은 전부 새로 쓰세요. 원문 순서를 그대로 따르지 말고 시청 유지율 중심으로 재구성(후크→문제→전개 3~5막→반전/요약→CTA)하며, 우리만의 관점·예시·비유를 추가하세요. 구어체 한국어, 한 문장 40자 내외. 결과는 studio/projects/${p.slug||'<slug>'}/02_rewrite.md 에 저장.`+SRC(p)},
  ]},
  {g:'🎞 제작본부 (롱폼)',teams:[
-  {id:'script',n:'대본·콘티팀',e:'📜',d:'만화 장면·대사 콘티 + project.json',t:['장면 분할(8~15장면)','나레이션 구어체 다듬기','화면 제목/요점 작성','길이 점검(분당 약 300자)'],
-   p:p=>CTX(p)+`당신은 대본팀장입니다. 재각본 결과(02_rewrite.md가 있으면 읽고, 없으면 아래 원문으로 직접 재각본)를 만화 콘티로 바꿔 캐릭터 2~3명의 대화+해설 장면으로 나누고 studio/projects/${p.slug||'<slug>'}/project.json 을 작성하세요. 총 나레이션 분량은 목표 ${p.mins}분(약 ${p.mins*300}자)에 맞춥니다.\n${SCHEMA}\n shorts는 숏폼으로 떼어내기 좋은 장면 묶기 2~4개(각 45초 이내)를 지정하세요.`+SRC(p)},
+  {id:'script',n:'대본·콘티팀',e:'📜',d:'만화 장면·대사 콘티 + project.json',t:['장면 분할(8~15장면)','나레이션 구어체 다듬기','화면 제목/요점 작성','길이 점검(분당 약 400자)'],
+   p:p=>CTX(p)+`당신은 대본팀장입니다. 재각본 결과(02_rewrite.md가 있으면 읽고, 없으면 아래 원문으로 직접 재각본)를 만화 콘티로 바꿔 캐릭터 2~3명의 대화+해설 장면으로 나누고 studio/projects/${p.slug||'<slug>'}/project.json 을 작성하세요. 총 나레이션 분량은 목표 ${p.mins}분(약 ${p.mins*400}자, 대사 1줄 평균 25자면 약 ${Math.round(p.mins*16)}줄)에 맞춥니다. 8분 이상이어야 미드롤 광고가 들어가니 8분 미만이 되지 않게 하세요.\n${SCHEMA}\n shorts는 숏폼으로 떼어내기 좋은 장면 묶기 2~4개(각 45초 이내)를 지정하세요.`+SRC(p)},
   {id:'hook',n:'후크·제목팀',e:'🪝',d:'첫 15초 후크, 제목 후보, 썸네일 문구',t:['첫 15초 후크 3안','제목 후보 10개(40자 이내)','썸네일 문구 5개','A/B 테스트 계획'],
    p:p=>CTX(p)+`당신은 후크·제목팀장입니다. 02_rewrite.md/project.json 기준으로 (1)첫 15초 후크 3안 (2)클릭률 높은 제목 10개(과장·낚시 금지, 40자 이내) (3)썸네일 문구 5개(3~8자)를 제안하고 최선 1안을 project.json의 title, thumbnail.text에 반영하세요. 결과 요약은 03_hook.md.`+SRC(p)},
   {id:'voice',n:'보이스팀 (TTS)',e:'🎙',d:'edge-tts 한국어 신경망 음성 생성',t:['음성 선택(SunHi/InJoon/Hyunsu)','속도(rate) 조정','발음 어려운 단어 표기 교정','장면별 mp3 생성'],
@@ -225,7 +225,7 @@ $('#dept').innerHTML=TEAMS.map(t=>`<option value="${t.id}">${t.e} ${t.n}</option
 const F=S.form;$('#slug').value=F.slug;$('#tone').value=F.tone;$('#mins').value=F.mins;$('#src').value=F.src;$('#dept').value=F.dept;
 function genPrompt(){
   F.slug=$('#slug').value.trim().replace(/[^a-z0-9-_]/gi,'-');F.tone=$('#tone').value;F.mins=+$('#mins').value||10;F.src=$('#src').value;F.dept=$('#dept').value;save();
-  $('#srccount').textContent=`원문 ${F.src.length.toLocaleString()}자 · 목표 나레이션 약 ${(F.mins*300).toLocaleString()}자`;
+  $('#srccount').textContent=`원문 ${F.src.length.toLocaleString()}자 · 목표 나레이션 약 ${(F.mins*400).toLocaleString()}자`;
   const t=TEAMS.find(x=>x.id===F.dept);$('#out').textContent=t.p(F);
 }
 ['slug','tone','mins','src','dept'].forEach(i=>$('#'+i).addEventListener('input',genPrompt));
