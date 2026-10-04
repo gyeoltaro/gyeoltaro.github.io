@@ -3,7 +3,9 @@
  "slug": "sim-habit",
  "voice": "ko-KR-SunHiNeural",
  "thumbnail": {
-  "text": "작심삼일 끝내는 법"
+  "text": "작심삼일\n끝내는 법",
+  "highlight": "작심삼일",
+  "badge": "2월에 무너지는 이유 4가지"
  },
  "cast": {
   "minsu": {

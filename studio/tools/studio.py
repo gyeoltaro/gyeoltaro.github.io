@@ -522,23 +522,27 @@ def cmd_shorts(proj, root, font):
 
 
 def cmd_thumb(proj, root, font):
+    """썸네일 A/B/C 3종 (유튜브 '테스트 및 비교'용). thumbnail.png 가 기본(A)"""
     out = root / "output"
     out.mkdir(exist_ok=True)
     font_path = find_font(font)
     t = proj.get("thumbnail", {})
     text = t.get("text") or proj["title"]
-    w, h = 1280, 720
-    img = gradient(w, h, (20, 20, 60), (120, 30, 90))
-    d = ImageDraw.Draw(img)
-    f = ImageFont.truetype(font_path, 130)
-    y = 130
-    for ln in wrap(d, text, f, w - 140)[:3]:
-        for dx, dy in [(-4, -4), (4, 4), (-4, 4), (4, -4)]:
-            d.text((70 + dx, y + dy), ln, font=f, fill="black")
-        d.text((70, y), ln, font=f, fill=(255, 224, 70) if y == 130 else "white")
-        y += 165
-    img.save(out / "thumbnail.png")
-    print(f"  ✔ {out / 'thumbnail.png'}")
+    cast = proj.get("cast", {}) or {"_mascot": proj.get("mascot", cartoon.DEFAULT_LOOK)}
+    ids = list(cast)
+    variants = t.get("variants") or [
+        {"palette": "yellow", "chars": [[ids[0], "surprised"]] + ([[ids[1], "happy"]] if len(ids) > 1 else [])},
+        {"palette": "blue", "chars": ([[ids[1], "happy"]] if len(ids) > 1 else []) + [[ids[0], "think"]]},
+        {"palette": "red", "chars": [[ids[0], "sad"]] + ([[ids[1], "angry"]] if len(ids) > 1 else [])},
+    ]
+    for i, v in enumerate(variants[:3]):
+        chars = [(cast[c], e) for c, e in v["chars"] if c in cast]
+        img = cartoon.render_thumbnail(v.get("text", text), chars, font_path, palette=v.get("palette", "yellow"),
+                                       highlight=v.get("highlight", t.get("highlight")),
+                                       badge=v.get("badge", t.get("badge")))
+        name = "thumbnail.png" if i == 0 else f"thumbnail_{'abc'[i]}.png"
+        img.save(out / name)
+        print(f"  ✔ {out / name}")
 
 
 def cmd_check():

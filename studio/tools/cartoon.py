@@ -401,3 +401,110 @@ class Renderer:
                 d.text((pad // 2 + int(42 * u), top - int(27 * u)), name, font=nf, fill=(20, 20, 30) if lum > 150 else "white")
         d.rectangle([0, h - int(8 * u), int(w * progress), h], fill=accent)
         return layer
+
+
+# ───────────────────────── 썸네일 ─────────────────────────
+HEAVY_FONTS = [  # (경로, ttc 인덱스) — 썸네일은 두꺼운 글씨가 핵심
+    ("/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc", 1),
+    ("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc", 1),
+    ("/usr/share/fonts/truetype/nanum/NanumGothicExtraBold.ttf", 0),
+    ("/usr/share/fonts/truetype/nanum/NanumSquareEB.ttf", 0),
+    ("/System/Library/Fonts/AppleSDGothicNeo.ttc", 8),
+    ("C:/Windows/Fonts/malgunbd.ttf", 0),
+]
+PALETTES = {  # 집중선 배경 2색, 강조 박스 색, 배지 글자색
+    "yellow": ((255, 214, 64), (255, 178, 0), (232, 36, 52), (255, 214, 64)),
+    "blue": ((92, 200, 255), (30, 150, 240), (232, 36, 52), (255, 230, 80)),
+    "red": ((255, 92, 92), (220, 30, 50), (20, 20, 30), (255, 230, 80)),
+    "green": ((120, 230, 140), (40, 180, 90), (232, 36, 52), (255, 230, 80)),
+    "purple": ((190, 140, 255), (130, 80, 230), (232, 36, 52), (255, 230, 80)),
+}
+
+
+def heavy_font(size, fallback):
+    for path, idx in HEAVY_FONTS:
+        try:
+            return ImageFont.truetype(path, int(size), index=idx)
+        except OSError:
+            continue
+    return ImageFont.truetype(fallback, int(size))
+
+
+def _split_balanced(text):
+    if "\n" in text:
+        return [t.strip() for t in text.split("\n") if t.strip()]
+    if " " not in text or len(text) <= 6:
+        return [text]
+    sp = [i for i, ch in enumerate(text) if ch == " "]
+    cut = min(sp, key=lambda i: abs(i - len(text) / 2))
+    return [text[:cut], text[cut + 1:]]
+
+
+def render_thumbnail(text, chars, font_path, *, palette="yellow", highlight=None, badge=None, w=1280, h=720):
+    """유튜브 썸네일: 집중선 배경 + 확대한 캐릭터(스티커 테두리) + 초대형 글씨 + 강조 박스 + 배지
+    chars: [(spec, emotion)] — 첫 번째가 주인공(앞, 크게)"""
+    from PIL import ImageFilter
+    c1, c2, box, badge_fg = PALETTES.get(palette, PALETTES["yellow"])
+    W, H = w * SS, h * SS
+    img = Image.new("RGB", (W, H), c1)
+    d = ImageDraw.Draw(img)
+    ox, oy = W * .70, H * .45  # 집중선 중심 = 캐릭터 쪽
+    n = 28
+    for k in range(n):
+        if k % 2:
+            continue
+        a0, a1 = 2 * math.pi * k / n, 2 * math.pi * (k + 1) / n
+        R = W * 1.5
+        d.polygon([(ox, oy), (ox + math.cos(a0) * R, oy + math.sin(a0) * R),
+                   (ox + math.cos(a1) * R, oy + math.sin(a1) * R)], fill=c2)
+
+    # 캐릭터 (뒤 → 앞 순서로)
+    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(layer)
+    slots = [(.70, .80, 1.03), (.90, .70, 1.01)]  # (x비율, 크기 배율, 바닥 위치)
+    fnt = lambda z: ImageFont.truetype(font_path, max(8, int(z)))
+    for (spec, emo), (fx, sc, fb) in reversed(list(zip(chars[:2], slots))):
+        draw_char(ld, W * fx, H * fb, H * sc, spec, emo, emo in ("surprised", "happy", "angry"), False, 0, fnt)
+    # 스티커 테두리(흰색) + 그림자
+    alpha = layer.split()[3]
+    small = alpha.resize((w // 2, h // 2))
+    halo = small.filter(ImageFilter.MaxFilter(9)).resize((W, H))
+    shadow = small.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(6)).resize((W, H))
+    img.paste((0, 0, 0), (int(10 * SS), int(10 * SS)), shadow.point(lambda v: int(v * .35)))
+    img.paste((255, 255, 255), (0, 0), halo)
+    img.paste(layer, (0, 0), layer)
+
+    img = img.reduce(SS)
+    d = ImageDraw.Draw(img)
+    pad = int(w * .045)
+    top = int(h * .07)
+    if badge:  # 좌상단 배지
+        bf = heavy_font(h * .075, font_path)
+        bw = d.textlength(badge, font=bf)
+        d.rounded_rectangle([pad, top, pad + bw + h * .06, top + h * .115], radius=int(h * .03), fill=(20, 20, 28))
+        d.text((pad + h * .03, top + h * .012), badge, font=bf, fill=badge_fg)
+        top += int(h * .16)
+    lines = _split_balanced(text)[:3]
+    max_w = w * .58
+    size = h * (.24 if len(lines) <= 2 else .18)
+    while size > 20:
+        tf = heavy_font(size, font_path)
+        if max(d.textlength(ln, font=tf) for ln in lines) <= max_w:
+            break
+        size *= .93
+    lh = int(size * 1.18)
+    y = max(top, int((h - lh * len(lines)) / 2 + h * .06))
+    sw = max(4, int(size * .085))
+    for ln in lines:
+        is_hl = highlight and highlight in ln
+        tw = d.textlength(ln, font=tf)
+        if is_hl:  # 강조 줄: 색 박스 + 살짝 기울인 느낌의 그림자
+            d.rounded_rectangle([pad - int(size * .12) + 8, y + int(size * .08) + 8, pad + tw + int(size * .12) + 8, y + lh + 8],
+                                radius=int(size * .12), fill=(0, 0, 0))
+            d.rounded_rectangle([pad - int(size * .12), y + int(size * .08), pad + tw + int(size * .12), y + lh],
+                                radius=int(size * .12), fill=box, outline=(0, 0, 0), width=max(3, sw // 2))
+        d.text((pad + 6, y + 6), ln, font=tf, fill=(0, 0, 0), stroke_width=sw, stroke_fill=(0, 0, 0))
+        d.text((pad, y), ln, font=tf, fill=(255, 255, 255) if (is_hl or palette != "yellow") else (255, 255, 255),
+               stroke_width=sw, stroke_fill=(0, 0, 0))
+        y += lh
+    return img

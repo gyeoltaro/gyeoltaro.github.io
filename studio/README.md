@@ -36,3 +36,9 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 - 첫 장면에 **후크 카드**가 자동으로 붙습니다: 큰 글씨 + 폭발 배경 + 캐릭터가 `hook_line` 을 외침 (약 1~2초) → 바로 본론
 - 기본 **1.25배속** (`shorts_speed`, 숏폼별 `speed` 로 변경). 음높이는 유지됩니다.
 - `shorts[]`: `scenes`, `hook`(상단 고정 문구), `hook_line`(후크 대사, 없으면 hook 사용), `hook_who`, `hook_emotion`, `speed`
+
+## 썸네일 (A/B/C 3종)
+`thumb` 명령이 `thumbnail.png`(A), `thumbnail_b.png`, `thumbnail_c.png` 를 만듭니다 — 유튜브 **테스트 및 비교**(썸네일 3개 A/B 테스트)용.
+- 구성: 집중선 배경 + 확대한 캐릭터(흰 스티커 테두리) + 초대형 굵은 글씨 + 강조 박스 + 배지
+- `thumbnail`: `text`(2줄은 `\n`), `highlight`(강조 단어), `badge`(좌상단 문구), `variants`(최대 3개: `palette` yellow/blue/red/green/purple, `chars` [[캐릭터, 표정], …])
+- 굵은 폰트: Noto Sans CJK KR Black 권장 (`sudo apt install fonts-noto-cjk-extra`), 없으면 일반 폰트 사용
