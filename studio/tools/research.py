@@ -8,6 +8,7 @@
   python3 studio/tools/research.py trend [--days 180] [--genres 썰 사연 ...]
 
 결과: studio/research/<이름>/report.md (사람·Claude 가 읽는 리포트) + data.json (원자료)
+     원자료는 git 에 올리지 않고 30일 뒤 자동 삭제 (YouTube API 개발자 정책). Claude 분석은 insights.* 로 남김
 API 키: 환경변수 YOUTUBE_API_KEY → GOOGLE_API_KEY → GOOGLE_TTS_API_KEY 순으로 사용
 할당량(하루 10,000): 검색 1회 100, 영상·채널·댓글 조회 1회 1
 """
@@ -212,6 +213,17 @@ GUIDE = """## Claude 분석 가이드
 4. **빈틈**: 수요(조회수)는 큰데 공급(영상 수·품질)이 부족해 보이는 하위 주제
 5. **우리 채널 적용**: 만화 대화극 형식으로 바꿨을 때의 제목 5개 / 썸네일 문구 3개 / 첫 3초 후크 대사 3개
 """
+
+
+def prune(days=30):
+    """YouTube API 개발자 정책: API 데이터는 30일 넘게 보관하지 않음 → 오래된 원자료 자동 삭제"""
+    if not ROOT.exists():
+        return
+    limit = datetime.now().timestamp() - days * 86400
+    for f in list(ROOT.glob("*/data.json")) + list(ROOT.glob("*/report.md")):
+        if f.stat().st_mtime < limit:
+            f.unlink()
+            print(f"· 30일 지난 원자료 삭제: {f.relative_to(ROOT)}")
 
 
 def save(name, report, data):
@@ -494,4 +506,5 @@ if __name__ == "__main__":
     tr.add_argument("--region", default="KR")
     tr.add_argument("--genres", nargs="+", default=DEFAULT_GENRES)
     a = ap.parse_args()
+    prune()
     {"topic": cmd_topic, "video": cmd_video, "channel": cmd_channel, "trend": cmd_trend}[a.cmd](a)

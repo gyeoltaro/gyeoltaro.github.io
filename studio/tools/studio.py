@@ -6,6 +6,7 @@
   python3 studio/tools/studio.py long   studio/projects/<slug>/project.json
   python3 studio/tools/studio.py shorts studio/projects/<slug>/project.json
   python3 studio/tools/studio.py thumb  studio/projects/<slug>/project.json
+  python3 studio/tools/studio.py kit    studio/projects/<slug>/project.json   # 휴대폰 업로드 키트
   python3 studio/tools/studio.py all    studio/projects/<slug>/project.json
 
 필요: ffmpeg, Pillow, edge-tts (pip install pillow edge-tts)
@@ -545,6 +546,138 @@ def cmd_thumb(proj, root, font):
         print(f"  ✔ {out / name}")
 
 
+def chapters_text(proj, root):
+    """롱폼 챕터 타임스탬프 (실제 음성 길이 + 대사 간 여백 기준)"""
+    t, out = 0.0, []
+    for sc in proj["scenes"]:
+        out.append(f"{int(t // 60)}:{int(t % 60):02d} {sc.get('title', '')}".rstrip())
+        if is_cartoon(proj, sc):
+            for ln in scene_lines(sc):
+                t += speak(proj, root, ln.get("who", "narrator"), ln["text"])[1] + 0.18
+        else:
+            t += speak(proj, root, "narrator", sc["narration"])[1]
+    return "\n".join(out)
+
+
+def publish_info(proj, root):
+    """업로드 메타데이터 정리: project.json 의 publish(롱폼)·shorts[](숏폼) + 기본값"""
+    pub = dict(proj.get("publish", {}))
+    pub.setdefault("title", proj["title"])
+    desc = pub.get("description", "")
+    ch = chapters_text(proj, root)
+    pub["description"] = desc.replace("{chapters}", ch) if "{chapters}" in desc else (desc + "\n\n⏱ 챕터\n" + ch).strip()
+    pub.setdefault("tags", [])
+    pub.setdefault("category", 1)  # 1 영화/애니메이션, 24 엔터테인먼트, 27 교육
+    pub.setdefault("made_for_kids", False)
+    pub.setdefault("synthetic_media", True)  # 합성 음성 사용
+    shorts = []
+    for n, s in enumerate(proj.get("shorts", []), 1):
+        title = s.get("title") or s.get("hook") or f"{proj['title']} #{n}"
+        d = s.get("description") or f"{title}\n전체 영상 👉 「{pub['title']}」\n#Shorts " + " ".join(
+            "#" + x.replace(" ", "") for x in pub["tags"][:3])
+        shorts.append({"file": f"short_{n:02d}.mp4", "title": title[:100], "description": d,
+                       "publish_at": s.get("publish_at", ""), "tags": s.get("tags", pub["tags"][:10])})
+    return pub, shorts
+
+
+def _thumb_b64(path):
+    import base64, io
+    if not path.exists():
+        return None
+    buf = io.BytesIO()
+    Image.open(path).convert("RGB").save(buf, "JPEG", quality=86)
+    return base64.b64encode(buf.getvalue()).decode()
+
+
+def when_ko(s):
+    """ISO 시각 → '10월 9일(금) 18:00'"""
+    from datetime import datetime
+    try:
+        d = datetime.fromisoformat(s)
+        return f"{d.month}월 {d.day}일({'월화수목금토일'[d.weekday()]}) {d:%H:%M}"
+    except (TypeError, ValueError):
+        return s
+
+
+def cmd_kit(proj, root, font):
+    """휴대폰 업로드 키트: 항목별 복사 버튼 + 썸네일 + 업로드 순서가 담긴 output/upload.html"""
+    import html as H
+    out = root / "output"
+    out.mkdir(exist_ok=True)
+    pub, shorts = publish_info(proj, root)
+    cats = {1: "영화/애니메이션", 22: "인물/블로그", 24: "엔터테인먼트", 27: "교육"}
+    (out / "upload.json").write_text(json.dumps({"long": dict(pub, file="longform.mp4"), "shorts": shorts},
+                                                ensure_ascii=False, indent=1), encoding="utf-8")
+
+    def field(label, value, rows=1):
+        v = H.escape(value)
+        box = f'<textarea readonly rows="{rows}">{v}</textarea>' if rows > 1 else f'<input readonly value="{v}">'
+        return f'<div class="field"><div class="fl"><span>{H.escape(label)}</span><button type="button" class="cp">복사</button></div>{box}</div>'
+
+    thumbs = ""
+    for name in ("thumbnail.png", "thumbnail_b.png", "thumbnail_c.png"):
+        b = _thumb_b64(out / name)
+        if b:
+            thumbs += f'<figure><img alt="{name}" src="data:image/jpeg;base64,{b}"><figcaption>{name}</figcaption></figure>'
+    when = when_ko(pub.get("publish_at")) or "직접 선택 (권장: 저녁 6~7시)"
+    long_block = (
+        f'<section><h2>롱폼 <small>longform.mp4</small></h2>'
+        + field("제목", pub["title"]) + field("설명", pub["description"], 10)
+        + field("태그 (쉼표 구분)", ", ".join(pub["tags"]), 3)
+        + (field("고정 댓글", pub["pinned_comment"], 3) if pub.get("pinned_comment") else "")
+        + f'<ul class="set"><li>공개 상태: <b>예약</b> · {H.escape(when)}</li>'
+        f'<li>시청자층: <b>아동용 아님</b></li>'
+        f'<li>변경되었거나 합성된 콘텐츠: <b>{"예" if pub["synthetic_media"] else "아니요"}</b> (합성 음성 사용)</li>'
+        f'<li>카테고리: <b>{cats.get(pub["category"], pub["category"])}</b></li>'
+        + (f'<li>재생목록: <b>{H.escape(pub["playlist"])}</b></li>' if pub.get("playlist") else "")
+        + f'</ul><div class="thumbs">{thumbs}</div>'
+        '<p class="hint">썸네일 3장은 길게 눌러 저장한 뒤, YouTube 스튜디오(웹)의 <b>테스트 및 비교</b>에 등록하세요. 휴대폰 앱에서는 1장만 고를 수 있습니다.</p></section>')
+    short_blocks = "".join(
+        f'<section><h2>숏폼 {i} <small>{s["file"]}</small></h2>' + field("제목", s["title"])
+        + field("설명", s["description"], 4)
+        + f'<ul class="set"><li>공개: <b>예약</b> · {H.escape(when_ko(s["publish_at"]) or "롱폼 다음 날부터 하루 1개")}</li><li>시청자층: <b>아동용 아님</b> · 합성 콘텐츠: <b>예</b></li></ul></section>'
+        for i, s in enumerate(shorts, 1))
+    page = f"""<title>업로드 키트 · {H.escape(pub['title'][:30])}</title>
+<style>
+:root{{--bg:#f4f5f7;--card:#fff;--fg:#17191e;--mu:#606674;--ln:#dcdfe5;--ac:#d8402a;--ok:#1f7a63}}
+@media (prefers-color-scheme:dark){{:root:not([data-theme=light]){{--bg:#121418;--card:#1b1e24;--fg:#eceef2;--mu:#a2a8b4;--ln:#2c3038;--ac:#ff7a5c;--ok:#5fd1ad;color-scheme:dark}}}}
+:root[data-theme=dark]{{--bg:#121418;--card:#1b1e24;--fg:#eceef2;--mu:#a2a8b4;--ln:#2c3038;--ac:#ff7a5c;--ok:#5fd1ad;color-scheme:dark}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;word-break:keep-all}}
+.w{{max-width:680px;margin:0 auto;padding-inline:16px;padding-block:20px 60px;display:grid;gap:18px}}
+h1{{font-size:21px;margin:0}}h2{{font-size:17px;margin:0 0 10px}}h2 small{{color:var(--mu);font-weight:400;font-size:12px;margin-left:6px}}
+section{{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:14px;display:grid;gap:10px}}
+ol{{margin:0;padding-left:20px;display:grid;gap:4px}}.field{{display:grid;gap:4px}}
+.fl{{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--mu)}}
+input,textarea{{width:100%;font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px 10px;resize:vertical}}
+button.cp{{font:inherit;font-size:13px;font-weight:600;background:var(--ac);color:#fff;border:0;border-radius:99px;padding:4px 14px;cursor:pointer}}
+button.cp.done{{background:var(--ok)}}button:focus-visible{{outline:2px solid var(--fg);outline-offset:2px}}
+.set{{margin:0;padding-left:18px;font-size:14px}}.thumbs{{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}}
+figure{{margin:0}}img{{width:100%;border-radius:8px;display:block}}figcaption,.hint{{font-size:12px;color:var(--mu);margin:0}}
+</style>
+<div class="w">
+<h1>업로드 키트</h1>
+<section><h2>휴대폰 YouTube 앱으로 올리는 순서</h2><ol>
+<li>앱 아래 <b>+</b> → <b>동영상 업로드</b> → 영상 파일 선택</li>
+<li><b>세부정보 추가</b>: 아래 제목·설명을 복사해서 붙여넣기</li>
+<li><b>공개 상태 → 예약</b>, <b>시청자층 → 아동용 아님</b></li>
+<li><b>추가 설정</b>에서 태그 붙여넣기, 변경되었거나 합성된 콘텐츠 <b>예</b></li>
+<li>업로드 후 고정 댓글 달기, 썸네일 등록</li></ol></section>
+{long_block}{short_blocks}
+<p class="hint">project.json 의 publish 정보로 자동 생성 · 챕터는 실제 음성 길이로 계산했습니다.</p>
+</div>
+<script>
+document.querySelectorAll('button.cp').forEach(function(b){{b.addEventListener('click',function(){{
+ var el=b.closest('.field').querySelector('input,textarea');
+ function ok(){{b.textContent='복사됨';b.classList.add('done');setTimeout(function(){{b.textContent='복사';b.classList.remove('done')}},1500)}}
+ function fb(){{el.focus();el.select();try{{document.execCommand('copy');ok()}}catch(e){{b.textContent='길게 눌러 복사'}}}}
+ if(navigator.clipboard&&navigator.clipboard.writeText){{navigator.clipboard.writeText(el.value).then(ok,fb)}}else fb();
+}})}});
+</script>
+"""
+    (out / "upload.html").write_text(page, encoding="utf-8")
+    print(f"  ✔ {out / 'upload.html'}  (+ upload.json)")
+
+
 def cmd_check():
     ok = True
     for tool in ("ffmpeg", "ffprobe"):
@@ -567,7 +700,7 @@ def cmd_check():
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["check", "long", "shorts", "thumb", "all"])
+    ap.add_argument("cmd", choices=["check", "long", "shorts", "thumb", "kit", "all"])
     ap.add_argument("project", nargs="?")
     ap.add_argument("--font")
     ap.add_argument("--fast", action="store_true", help="미리보기용 빠른 인코딩(가변 프레임레이트)")
@@ -584,3 +717,5 @@ if __name__ == "__main__":
         cmd_shorts(proj, root, a.font)
     if a.cmd in ("thumb", "all"):
         cmd_thumb(proj, root, a.font)
+    if a.cmd in ("kit", "all"):
+        cmd_kit(proj, root, a.font)
