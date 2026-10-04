@@ -157,8 +157,21 @@ def split_subs(text, max_chars=26):
     return out or [text]
 
 
+def _trust_extra_ca():
+    """프록시/회사망 환경: SSL_CERT_FILE 등에 지정된 CA 를 edge-tts 에도 신뢰시키기"""
+    import edge_tts.communicate as ec
+    for k in ("SSL_CERT_FILE", "REQUESTS_CA_BUNDLE", "CURL_CA_BUNDLE"):
+        path = os.environ.get(k)
+        if path and os.path.exists(path):
+            try:
+                ec._SSL_CTX.load_verify_locations(cafile=path)
+            except Exception:
+                pass
+
+
 async def _tts(text, voice, rate, pitch, out):
     import edge_tts
+    _trust_extra_ca()
     await edge_tts.Communicate(text, voice, rate=rate, pitch=pitch).save(str(out))
 
 
