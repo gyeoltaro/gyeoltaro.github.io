@@ -9,7 +9,7 @@
   python3 studio/tools/studio.py all    studio/projects/<slug>/project.json
 
 필요: ffmpeg, Pillow, edge-tts (pip install pillow edge-tts)
-TTS(edge-tts)가 안 되면 무음 + 자막 영상으로 대체되며 경고를 출력합니다.
+TTS(edge-tts)가 안 되면 espeak-ng(오프라인), 그것도 없으면 무음으로 대체됩니다.
 """
 import argparse, asyncio, hashlib, json, os, random, re, shutil, subprocess, sys
 from pathlib import Path
@@ -162,14 +162,45 @@ async def _tts(text, voice, rate, pitch, out):
     await edge_tts.Communicate(text, voice, rate=rate, pitch=pitch).save(str(out))
 
 
+_warned = set()
+
+
+def warn_once(msg):
+    if msg not in _warned:
+        _warned.add(msg)
+        print(msg, file=sys.stderr)
+
+
+def espeak_audio(text, voice, pitch, out):
+    """오프라인 대체 음성(espeak-ng, 로봇 느낌). 성공 시 True"""
+    if not shutil.which("espeak-ng"):
+        return False
+    male = any(k in voice for k in ("InJoon", "Hyunsu", "Male"))
+    m = re.match(r"([+-]?\d+)Hz", pitch or "")
+    p = max(0, min(99, 50 + (int(m.group(1)) * 2 if m else 0) + (-12 if male else 8)))
+    wav = out.with_suffix(".wav")
+    try:
+        sh(["espeak-ng", "-v", "ko+" + ("m3" if male else "f3"), "-s", "150", "-p", str(p), "-w", str(wav), text])
+        sh(["ffmpeg", "-y", "-i", str(wav), "-af", "volume=1.3,highpass=f=80", "-ar", "24000", "-ac", "1",
+            "-q:a", "4", str(out)])
+        return out.exists() and out.stat().st_size > 1000
+    except Exception:
+        return False
+    finally:
+        wav.unlink(missing_ok=True)
+
+
 def make_audio(text, voice, rate, pitch, out):
-    """TTS 성공 시 mp3, 실패 시 글자수 기반 길이의 무음 mp3"""
+    """True=edge-tts 고품질 음성. False=대체본(espeak-ng 또는 무음, 다음 실행에 edge-tts 재시도)"""
     try:
         asyncio.run(_tts(text, voice, rate, pitch, out))
         if out.exists() and out.stat().st_size > 1000:
             return True
     except Exception as e:  # 네트워크/모듈 문제
-        print(f"  ! TTS 실패({type(e).__name__}) → 무음 대체", file=sys.stderr)
+        warn_once(f"  ! edge-tts 사용 불가({type(e).__name__}) → 오프라인 대체 음성 사용 (네트워크 되는 PC에서 다시 렌더링하면 고품질 음성)")
+    if espeak_audio(text, voice, pitch, out):
+        return False
+    warn_once("  ! espeak-ng 도 없음 → 무음 (sudo apt install espeak-ng)")
     secs = max(1.6, len(text) / 5.5)
     sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{secs:.2f}",
         "-q:a", "9", str(out)])
@@ -374,7 +405,8 @@ def cmd_check():
         import edge_tts  # noqa
         print("✔ edge-tts")
     except ImportError:
-        print("! edge-tts 없음 → 무음 영상으로 대체 (pip install edge-tts)")
+        print("! edge-tts 없음 → 대체 음성 사용 (pip install edge-tts)")
+    print(("✔" if shutil.which("espeak-ng") else "!"), "espeak-ng (오프라인 대체 음성)")
     sys.exit(0 if ok else 1)
 
 
