@@ -177,6 +177,7 @@ async def _tts(text, voice, rate, pitch, out):
 
 
 _warned = set()
+CHARS_PER_MIN = 400  # 실측: Google 음성 + 대사 간 여백 기준 분당 약 400자
 FAST = False  # --fast: 가변 프레임레이트(VFR)로 인코딩 2배 빠름 (미리보기용)
 
 
@@ -486,7 +487,8 @@ def cmd_long(proj, root, font):
     ids = list(range(len(proj["scenes"])))
     secs = render_video(proj, root, ids, (1920, 1080), out / "longform.mp4", font=font)
     if secs < 8 * 60:
-        print("  ! 8분 미만: 미드롤 광고를 위해선 8분 이상 권장 (장면/대본 확장 필요)")
+        need = int((480 - secs) / 60 * CHARS_PER_MIN) + 1
+        print(f"  ! 8분 미만: 미드롤 광고를 위해선 8분 이상 필요 → 대사 약 {need:,}자(≈{need // 25 + 1}줄) 더 추가하세요")
 
 
 def cmd_shorts(proj, root, font):
