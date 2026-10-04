@@ -1,0 +1,697 @@
+{
+ "title": "새해 결심이 2월에 무너지는 진짜 이유 4가지",
+ "slug": "sim-habit",
+ "voice": "ko-KR-SunHiNeural",
+ "thumbnail": {
+  "text": "작심삼일 끝내는 법"
+ },
+ "cast": {
+  "minsu": {
+   "name": "민수",
+   "voice": "ko-KR-InJoonNeural",
+   "color": "#4f8cff",
+   "hair": "short",
+   "hair_color": "#2f2a2a",
+   "accessory": "glasses"
+  },
+  "yuna": {
+   "name": "유나",
+   "voice": "ko-KR-SunHiNeural",
+   "color": "#ff7a9c",
+   "hair": "long",
+   "hair_color": "#5a3320",
+   "accessory": "bow",
+   "pitch": "+8Hz"
+  }
+ },
+ "scenes": [
+  {
+   "title": "12번째 새해 결심",
+   "bg": "cafe",
+   "lines": [
+    {
+     "who": "minsu",
+     "text": "유나야, 나 올해는 진짜 달라질 거야!",
+     "emotion": "happy",
+     "react": {
+      "yuna": "think"
+     }
+    },
+    {
+     "who": "yuna",
+     "text": "그 말, 작년에도 들은 것 같은데?",
+     "emotion": "think"
+    },
+    {
+     "who": "minsu",
+     "text": "이번엔 진짜야. 매일 한 시간 운동, 매일 책 한 권!",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "하루에 책 한 권? 그거 2월 되기 전에 끝나.",
+     "emotion": "normal",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "왜 그렇게 단정해? 나 의지력 강하거든!",
+     "emotion": "angry"
+    },
+    {
+     "who": "yuna",
+     "text": "의지력 문제가 아니야. 결심을 만드는 방식이 문제지.",
+     "emotion": "normal",
+     "react": {
+      "minsu": "think"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "오늘은 새해 결심이 무너지는 진짜 이유 네 가지와, 그걸 뒤집는 방법을 알아봅니다."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "왜 작심삼일이 될까",
+   "bg": "cafe",
+   "lines": [
+    {
+     "who": "minsu",
+     "text": "솔직히 나도 궁금해. 왜 맨날 사흘이면 끝나지?",
+     "emotion": "sad"
+    },
+    {
+     "who": "yuna",
+     "text": "대부분 사람들이 똑같아. 너만 그런 게 아니야.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "우리는 실패하면 '난 의지가 약해'라고 생각하잖아.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "맞아. 그래서 더 자괴감이 들어.",
+     "emotion": "sad"
+    },
+    {
+     "who": "yuna",
+     "text": "그런데 결심 자체가 잘못 설계된 경우가 훨씬 많아.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "설계만 바꾸면 의지력이 덜 필요해져.",
+     "emotion": "happy",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "설계? 결심에도 설계가 있어?",
+     "emotion": "surprised"
+    },
+    {
+     "who": "narrator",
+     "text": "첫 번째 이유부터 살펴보겠습니다."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "이유 1. 목표가 너무 크다",
+   "bg": "office",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "첫 번째. 목표가 너무 커.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "크게 잡아야 크게 이루는 거 아니야?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "하루 한 시간 운동이면, 피곤한 날은 시작조차 못 해.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "그리고 하루 빠지면 '어차피 망했네' 하고 포기하지.",
+     "emotion": "normal",
+     "react": {
+      "minsu": "sad"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "헉. 그거 완전 나야.",
+     "emotion": "surprised"
+    },
+    {
+     "who": "minsu",
+     "text": "작년에 헬스장 1년 등록하고 세 번 갔어.",
+     "emotion": "sad",
+     "react": {
+      "yuna": "happy"
+     }
+    },
+    {
+     "who": "yuna",
+     "text": "그 회원권 덕분에 헬스장 사장님은 행복하셨겠다.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "웃지 마. 아직도 마음 아파.",
+     "emotion": "angry"
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "해결 1. 2분 규칙",
+   "bg": "office",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "그래서 추천하는 게 2분 규칙이야.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "새 습관은 2분 안에 끝날 만큼 작게 시작하는 거지.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "2분? 2분 운동으로 뭐가 바뀌어?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "처음 목표는 운동이 아니라 '운동화 신기'야.",
+     "emotion": "normal",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "yuna",
+     "text": "책 한 권 대신 한 쪽 읽기. 이 정도면 피곤해도 하겠지?",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "그건 너무 쉬워서 오히려 민망한데.",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "쉬워야 매일 해. 매일 해야 습관이 되고.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "핵심은 잘하는 것이 아니라, 빠지지 않는 것입니다. 습관은 반복 횟수로 만들어집니다."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "이유 2. 언제 할지 안 정했다",
+   "bg": "room",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "두 번째 이유. 언제, 어디서 할지 안 정해.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "난 보통 시간 날 때 하려고 하지.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "시간 날 때는 영원히 안 와.",
+     "emotion": "normal",
+     "react": {
+      "minsu": "sad"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "팩트 폭력 그만해 줄래?",
+     "emotion": "angry"
+    },
+    {
+     "who": "yuna",
+     "text": "퇴근하고 나면 이미 지쳐 있잖아. 그때 결정하면 소파가 이겨.",
+     "emotion": "think"
+    },
+    {
+     "who": "minsu",
+     "text": "맞아. 소파는 항상 이기지.",
+     "emotion": "sad"
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "해결 2. 습관 연결하기",
+   "bg": "room",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "그래서 이미 매일 하는 행동 뒤에 새 습관을 붙여.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "예를 들면 '커피 내린 다음에 스쿼트 열 개'.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "오, 커피는 매일 마시니까 까먹을 일이 없겠네.",
+     "emotion": "surprised"
+    },
+    {
+     "who": "yuna",
+     "text": "'양치한 다음에 플랭크 30초'도 좋아.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "공식은 간단해. '무엇을 한 다음에, 무엇을 한다'.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "그럼 나는 '점심 먹은 다음에 계단으로 올라가기' 해볼래.",
+     "emotion": "happy",
+     "react": {
+      "yuna": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "새 습관을 기존 습관에 연결하면, 매번 결심할 필요가 줄어듭니다."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "이유 3. 결과만 본다",
+   "bg": "street",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "세 번째. 결과만 보고 있어.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "결과를 봐야 동기부여가 되지.",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "그런데 결과는 늦게 와. 일주일 운동해도 체중계 숫자는 그대로야.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "맞아! 그래서 허무해서 그만뒀어.",
+     "emotion": "angry"
+    },
+    {
+     "who": "yuna",
+     "text": "결과는 몇 달 뒤에야 보이거든.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "그 몇 달을 버티는 게 제일 어려운데.",
+     "emotion": "sad"
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "해결 3. 과정을 눈에 보이게",
+   "bg": "street",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "그래서 결과 대신 과정을 눈에 보이게 만들어.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "달력에 했던 날마다 크게 X 표시를 하는 거야.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "그게 무슨 효과가 있어?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "너 게임 연속 출석 보상, 절대 안 끊잖아.",
+     "emotion": "happy",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "그건 그렇지. 30일 연속 출석하면 아까워서 못 끊어.",
+     "emotion": "surprised"
+    },
+    {
+     "who": "yuna",
+     "text": "습관도 똑같아. X 표시가 이어지면 끊기 싫어져.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "결과는 늦게 오지만, 체크 표시는 오늘 바로 얻을 수 있습니다."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "이유 4. 한 번 실패로 포기",
+   "bg": "night",
+   "lines": [
+    {
+     "who": "minsu",
+     "text": "근데 바쁜 날은 어떡해? 하루쯤은 빠질 수도 있잖아.",
+     "emotion": "sad"
+    },
+    {
+     "who": "yuna",
+     "text": "그게 네 번째 이유야. 한 번 실패하면 다 끝났다고 생각해.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "맞아. 하루 빠지면 그날로 결심 종료야.",
+     "emotion": "sad"
+    },
+    {
+     "who": "yuna",
+     "text": "하루 빠지는 건 사실 아무 문제 없어.",
+     "emotion": "happy",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "진짜? 완벽하게 해야 하는 줄 알았는데.",
+     "emotion": "surprised"
+    },
+    {
+     "who": "yuna",
+     "text": "완벽주의가 오히려 습관을 망쳐.",
+     "emotion": "think"
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "해결 4. 이틀 연속만 피하기",
+   "bg": "night",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "기억할 규칙은 하나야. 이틀 연속으로는 빠지지 않기.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "하루는 괜찮고, 이틀은 안 된다?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "응. 하루는 실수지만, 이틀은 새로운 습관의 시작이거든.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "빠진 다음 날엔 2분짜리라도 꼭 해.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "운동화만 신어도 인정해 주는 거지?",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "인정. 연결만 끊지 않으면 돼.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "실패는 끝이 아니라 기록의 일부입니다. 중요한 건 다시 돌아오는 속도입니다."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "진짜 비밀: 정체성",
+   "bg": "park",
+   "lines": [
+    {
+     "who": "minsu",
+     "text": "네 가지 다 알겠어. 근데 이걸로 끝이야?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "마지막으로 제일 강력한 게 하나 있어.",
+     "emotion": "happy",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "yuna",
+     "text": "'운동을 해야 하는 사람'이 아니라 '운동하는 사람'이라고 생각하는 거야.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "말만 바꾸는 거 아니야?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "담배 권유받았을 때 '끊는 중이에요'랑 '저 안 피워요'는 다르잖아.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "아, 뒤의 말이 훨씬 단단하게 들린다.",
+     "emotion": "surprised"
+    },
+    {
+     "who": "yuna",
+     "text": "매일 하는 2분이 '나는 이런 사람'이라는 증거가 돼.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "작은 행동 하나하나가, 내가 어떤 사람인지에 대한 한 표가 됩니다."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "민수의 새 결심",
+   "bg": "park",
+   "lines": [
+    {
+     "who": "minsu",
+     "text": "좋아, 결심 다시 세울게.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "매일 한 시간 운동 말고, 커피 내린 다음에 스쿼트 열 개.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "달력에 X 표시하고, 이틀 연속으로는 안 빠지기.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "오, 이번엔 진짜 될 것 같은데?",
+     "emotion": "happy",
+     "react": {
+      "minsu": "happy"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "그리고 난 이제 운동하는 사람이야.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "그 말 3월에도 할 수 있길.",
+     "emotion": "happy"
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "정리",
+   "bg": "cafe",
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "오늘 내용을 정리합니다."
+    },
+    {
+     "who": "narrator",
+     "text": "하나, 2분 안에 끝날 만큼 작게 시작하기."
+    },
+    {
+     "who": "narrator",
+     "text": "둘, 이미 하는 행동 뒤에 새 습관 붙이기."
+    },
+    {
+     "who": "narrator",
+     "text": "셋, 달력 체크로 과정을 눈에 보이게 만들기."
+    },
+    {
+     "who": "narrator",
+     "text": "넷, 하루는 괜찮지만 이틀 연속으로는 빠지지 않기."
+    },
+    {
+     "who": "narrator",
+     "text": "그리고 스스로를 그런 사람이라고 정의하기."
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  },
+  {
+   "title": "오늘의 2분 미션",
+   "bg": "room",
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "여러분도 오늘 바로 해볼 2분짜리 습관 하나 정해 보세요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "댓글에 '무엇을 한 다음에 무엇을 한다' 형식으로 적어 주세요!",
+     "emotion": "happy",
+     "react": {
+      "yuna": "happy"
+     }
+    },
+    {
+     "who": "yuna",
+     "text": "적는 순간 결심이 훨씬 구체적이 돼요.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "도움이 됐다면 구독이랑 좋아요도 2분 습관에 넣어 주세요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "다음 영상에서 또 만나요!",
+     "emotion": "happy",
+     "react": {
+      "minsu": "happy"
+     }
+    }
+   ],
+   "cast": [
+    "minsu",
+    "yuna"
+   ]
+  }
+ ],
+ "shorts": [
+  {
+   "scenes": [
+    2,
+    3
+   ],
+   "hook": "헬스장 1년 등록하고 3번 간 이유"
+  },
+  {
+   "scenes": [
+    5
+   ],
+   "hook": "습관 만드는 공식 딱 하나"
+  },
+  {
+   "scenes": [
+    9
+   ],
+   "hook": "하루 빠져도 괜찮은 이유"
+  }
+ ]
+}

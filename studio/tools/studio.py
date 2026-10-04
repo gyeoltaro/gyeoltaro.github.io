@@ -11,7 +11,8 @@
 필요: ffmpeg, Pillow, edge-tts (pip install pillow edge-tts)
 음성: Google Cloud TTS(GOOGLE_TTS_API_KEY) → edge-tts → 구글 번역 음성 → espeak-ng(오프라인) → 무음 순으로 대체됩니다.
 """
-import argparse, asyncio, hashlib, json, os, random, re, shutil, subprocess, sys
+import argparse, asyncio, hashlib, json, os, random, re, shutil, subprocess, sys, time
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -176,6 +177,7 @@ async def _tts(text, voice, rate, pitch, out):
 
 
 _warned = set()
+FAST = False  # --fast: 가변 프레임레이트(VFR)로 인코딩 2배 빠름 (미리보기용)
 
 
 def warn_once(msg):
@@ -336,8 +338,36 @@ def cast_color(spec):
     return tuple(int(spec.get("color", cartoon.DEFAULT_LOOK["color"]).lstrip("#")[i:i + 2], 16) for i in (0, 2, 4))
 
 
-def cartoon_segments(proj, sc, root, rdr, size, k, total, hook, chip):
-    """만화 장면 → [(png, 초)], [mp3]. 입모양/눈깜빡임 상태별 PNG 를 재사용"""
+_RDR = None
+
+
+def _init_worker(font_path):
+    global _RDR
+    _RDR = cartoon.Renderer(font_path)
+
+
+def _render_job(job):
+    png, kw = job
+    _RDR.frame(**kw).save(png, compress_level=1)
+
+
+def prefetch_audio(proj, root, scene_ids):
+    """모든 대사 음성을 동시에 미리 생성(캐시에 저장). 이후 speak() 는 캐시만 읽음"""
+    todo = []
+    for si in scene_ids:
+        sc = proj["scenes"][si]
+        if is_cartoon(proj, sc):
+            todo += [(ln.get("who", "narrator"), ln["text"]) for ln in scene_lines(sc)]
+        else:
+            todo.append(("narrator", sc["narration"]))
+    t0 = time.time()
+    with ThreadPoolExecutor(8) as ex:
+        list(ex.map(lambda a: speak(proj, root, *a), todo))
+    print(f"[음성] {len(todo)}줄 {time.time() - t0:.0f}초")
+
+
+def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
+    """만화 장면 → [(png, 초)], [mp3]. 입모양/눈깜빡임 상태별 PNG 는 jobs 에 모아 병렬 렌더링"""
     w, h = size
     cast = proj.get("cast", {})
     lines = scene_lines(sc)
@@ -366,9 +396,9 @@ def cartoon_segments(proj, sc, root, rdr, size, k, total, hook, chip):
         for st, (m, bl) in {"o": (True, False), "c": (False, False), "b": (False, True)}.items():
             png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_{st}.png"
             png.parent.mkdir(exist_ok=True)
-            rdr.frame(w, h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker, emotions=emos,
-                      mouth=m, blink=bl, text=ln["text"], name=name, name_color=ncol,
-                      chip=chip, hook=hook, progress=prog).save(png)
+            jobs.append((str(png), dict(w=w, h=h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker,
+                                        emotions=emos, mouth=m, blink=bl, text=ln["text"], name=name,
+                                        name_color=ncol, chip=chip, hook=hook, progress=prog)))
             states[st] = png
         rnd = random.Random(li * 31 + k)
         t, step, pattern = 0.0, 0.16, []
@@ -410,7 +440,8 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
     work = root / f"work_{w}x{h}"
     shutil.rmtree(work, ignore_errors=True)
     work.mkdir()
-    rdr = cartoon.Renderer(font_path)
+    prefetch_audio(proj, root, scene_ids)
+    jobs = []
     frames, audios = [], []
     total = len(scene_ids)
     for k, si in enumerate(scene_ids):
@@ -418,11 +449,17 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         print(f"[장면] {k + 1}/{total} {sc.get('title', '')}")
         chip = sc.get("title")
         if is_cartoon(proj, sc):
-            f, a = cartoon_segments(proj, sc, root, rdr, size, k, total, hook if k == 0 else hook, chip)
+            f, a = cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip)
         else:
             f, a = slide_segments(proj, sc, root, size, k, total, THEMES[(si + theme_shift) % len(THEMES)], font_path, hook)
         frames += f
         audios += a
+    if jobs:
+        t0 = time.time()
+        workers = max(1, (os.cpu_count() or 2))
+        with ProcessPoolExecutor(workers, initializer=_init_worker, initargs=(font_path,)) as ex:
+            list(ex.map(_render_job, jobs, chunksize=4))
+        print(f"[프레임] {len(jobs)}장 {time.time() - t0:.0f}초 (병렬 {workers})")
     lst = work / "frames.txt"
     with open(lst, "w") as fh:
         for png, secs in frames:
@@ -433,9 +470,11 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
     print(f"[인코딩] {out.name}")
     sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
         "-f", "concat", "-safe", "0", "-i", str(alst),
-        "-vf", "fps=30,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+        *(["-vf", "format=yuv420p", "-fps_mode", "vfr"] if FAST else ["-vf", "format=yuv420p,fps=30"]),
+        "-c:v", "libx264", "-preset", "veryfast", "-tune", "animation", "-crf", "20",
         "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", str(out)])
-    shutil.rmtree(work, ignore_errors=True)
+    if not os.environ.get("STUDIO_KEEP_WORK"):
+        shutil.rmtree(work, ignore_errors=True)
     total_s = sum(s for _, s in frames)
     print(f"  ✔ {out}  ({total_s / 60:.1f}분)")
     return total_s
@@ -505,7 +544,9 @@ if __name__ == "__main__":
     ap.add_argument("cmd", choices=["check", "long", "shorts", "thumb", "all"])
     ap.add_argument("project", nargs="?")
     ap.add_argument("--font")
+    ap.add_argument("--fast", action="store_true", help="미리보기용 빠른 인코딩(가변 프레임레이트)")
     a = ap.parse_args()
+    FAST = a.fast
     if a.cmd == "check":
         cmd_check()
     if not a.project:
