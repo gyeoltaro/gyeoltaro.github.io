@@ -37,7 +37,7 @@
 - 신청서: **YouTube API Services – Audit and Quota Extension Form** (https://support.google.com/youtube/contact/yt_api_form)
   - 주소가 바뀌었으면 위 이름으로 검색하세요.
 - 준비물
-  - [ ] 개인정보처리방침·약관 페이지의 `[CONTACT EMAIL]`을 실제 연락처로 교체
+  - [x] 개인정보처리방침·약관 페이지 연락처: kkjlg@naver.com
   - [ ] 데모 영상 (아래 5번 대본, 화면 녹화 2~3분, YouTube에 "일부 공개"로 올려 링크 첨부)
   - [ ] 아래 6번 영문 답변을 신청서 항목에 붙여넣기
 - 결과는 이메일로 옵니다. 추가 질문이 오면 그 메일을 Claude에게 보여 주세요. 답장 초안을 써 드립니다.
@@ -85,5 +85,5 @@ About 1 long-form video and 3–4 Shorts per day, plus a few read-only research 
 - [x] 본인 채널 외 다른 채널에 쓰기 작업(댓글, 좋아요, 구독) 없음
 - [x] API 원자료 30일 초과 보관 안 함, 저장소에 원자료 없음
 - [x] 개인정보처리방침에 YouTube 서비스 약관, Google 개인정보처리방침 링크, 권한 철회 방법 명시
-- [ ] 연락처 이메일 기입
+- [x] 연락처 이메일 기입 (kkjlg@naver.com)
 - [ ] 데모 영상 링크
