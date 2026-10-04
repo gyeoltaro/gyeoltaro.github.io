@@ -41,4 +41,4 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 `thumb` 명령이 `thumbnail.png`(A), `thumbnail_b.png`, `thumbnail_c.png` 를 만듭니다 — 유튜브 **테스트 및 비교**(썸네일 3개 A/B 테스트)용.
 - 구성: 집중선 배경 + 확대한 캐릭터(흰 스티커 테두리) + 초대형 굵은 글씨 + 강조 박스 + 배지
 - `thumbnail`: `text`(2줄은 `\n`), `highlight`(강조 단어), `badge`(좌상단 문구), `variants`(최대 3개: `palette` yellow/blue/red/green/purple, `chars` [[캐릭터, 표정], …])
-- 굵은 폰트: Noto Sans CJK KR Black 권장 (`sudo apt install fonts-noto-cjk-extra`), 없으면 일반 폰트 사용
+- 굵은 폰트: Noto Sans CJK KR Black. 클라우드 세션에서는 `.claude/hooks/session-start.sh` 가 자동 설치 (로컬은 `sudo apt install fonts-noto-cjk-extra`)
