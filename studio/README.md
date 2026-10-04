@@ -49,6 +49,7 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 python3 studio/tools/research.py topic "습관 만들기" --days 90 [--long|--shorts]   # 주제 리서치 (검색 1회=할당량 100)
 python3 studio/tools/research.py video https://youtu.be/VIDEO_ID                  # 왜 잘 됐나 (비교군 대비)
 python3 studio/tools/research.py channel @내채널                                   # 채널 회고
+python3 studio/tools/research.py trend --days 180                                 # 한국 인기 영상 종합 + 장르 10개 비교 (할당량 약 1,600)
 ```
 - 지표: 하루 조회수, **구독자 대비 조회수 배수**(떡상 지표), 참여율, 제목 패턴(길이·숫자·질문형·괄호), 영상 길이, 업로드 요일·시간, 자주 쓰인 단어·태그, 인기 댓글
 - 준비: Google Cloud 콘솔에서 **YouTube Data API v3 사용 설정** + API 키 제한사항에 추가 (키는 `GOOGLE_TTS_API_KEY` 재사용, 또는 `YOUTUBE_API_KEY`)

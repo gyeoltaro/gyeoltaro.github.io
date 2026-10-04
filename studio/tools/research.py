@@ -5,6 +5,7 @@
   python3 studio/tools/research.py topic "습관 만들기" [--days 90] [--n 50] [--shorts|--long]
   python3 studio/tools/research.py video https://youtu.be/VIDEO_ID [--peers 30]
   python3 studio/tools/research.py channel @핸들 또는 UC... [--n 30]
+  python3 studio/tools/research.py trend [--days 180] [--genres 썰 사연 ...]
 
 결과: studio/research/<이름>/report.md (사람·Claude 가 읽는 리포트) + data.json (원자료)
 API 키: 환경변수 YOUTUBE_API_KEY → GOOGLE_API_KEY → GOOGLE_TTS_API_KEY 순으로 사용
@@ -83,7 +84,7 @@ def human(n):
 def videos_detail(ids):
     out = []
     for c in chunks(ids):
-        out += call("videos", part="snippet,statistics,contentDetails", id=",".join(c)).get("items", [])
+        out += call("videos", part="snippet,statistics,contentDetails,liveStreamingDetails", id=",".join(c)).get("items", [])
     return out
 
 
@@ -133,6 +134,9 @@ def enrich(items, subs):
             "has_question": "?" in title, "has_exclaim": "!" in title,
             "has_bracket": bool(re.search(r"[\[\]【】()〈〉<>]", title)),
             "thumb": sn.get("thumbnails", {}).get("high", {}).get("url", ""),
+            "is_live": "liveStreamingDetails" in it,
+            "is_topic": sn.get("channelTitle", "").endswith(" - Topic"),
+            "korean": bool(re.search(r"[가-힣]", title)),
         })
     return rows
 
@@ -357,6 +361,117 @@ def cmd_channel(a):
     save(f"channel-{ch['snippet']['title']}", "\n".join(out), {"channel": ch, "videos": rows})
 
 
+DEFAULT_GENRES = ["썰", "사연", "애니메이션", "자기계발", "심리학", "돈 버는 법", "경제 상식", "건강 습관", "인간관계", "공부법"]
+
+
+def search_ids(pages=1, **params):
+    ids, token = [], None
+    for _ in range(pages):
+        r = call("search", part="id", type="video", maxResults=50, **params, **({"pageToken": token} if token else {}))
+        ids += [it["id"]["videoId"] for it in r.get("items", [])]
+        token = r.get("nextPageToken")
+        if not token:
+            break
+    return list(dict.fromkeys(ids))
+
+
+def clean(rows):
+    """라이브 방송·음원 자동 채널·한글 없는 제목·광고성(참여율 0.1% 미만) 영상 제외"""
+    return [r for r in rows if not r["is_live"] and not r["is_topic"] and r["korean"] and r["engagement"] >= 0.1]
+
+
+def fetch_rows(ids):
+    items = videos_detail(ids)
+    rows = enrich(items, channels_subs([it["snippet"]["channelId"] for it in items]))
+    cats = {it["id"]: it["snippet"].get("categoryId") for it in items}
+    for r in rows:
+        r["category_id"] = cats.get(r["id"])
+    return clean(rows)
+
+
+def cmd_trend(a):
+    """최근 N일 한국 인기 영상 종합 리포트 (전체 롱폼/숏폼 + 카테고리 + 장르별 수요 비교 + 현재 인기 차트)"""
+    after = (datetime.now(timezone.utc) - timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    base = dict(order="viewCount", publishedAfter=after, regionCode=a.region, relevanceLanguage="ko")
+    catmap = {c["id"]: c["snippet"]["title"] for c in
+              call("videoCategories", part="snippet", regionCode=a.region, hl="ko").get("items", [])}
+    print("[1/4] 전체 롱폼·숏폼 수집")
+    longs = fetch_rows(search_ids(2, videoDuration="medium", **base) + search_ids(1, videoDuration="long", **base))
+    longs = [r for r in longs if not r["is_short"]]
+    shorts = [r for r in fetch_rows(search_ids(2, videoDuration="short", **base)) if r["is_short"]]
+    print("[2/4] 장르별 수집")
+    genres = {}
+    for g in a.genres:
+        genres[g] = fetch_rows(search_ids(1, q=g, **base))
+    print("[3/4] 현재 인기 차트")
+    chart_items = call("videos", part="snippet,statistics,contentDetails", chart="mostPopular",
+                       regionCode=a.region, maxResults=50).get("items", [])
+    chart = enrich(chart_items, channels_subs([it["snippet"]["channelId"] for it in chart_items]))
+    for r, it in zip(chart, chart_items):
+        r["category_id"] = it["snippet"].get("categoryId")
+    chart = [r for r in chart if not r["is_topic"] and not r["is_live"]]
+    print("[4/4] 리포트 작성")
+
+    def cat_table(rows):
+        c = {}
+        for r in rows:
+            c.setdefault(catmap.get(r.get("category_id"), "기타"), []).append(r)
+        lines = ["| 카테고리 | 영상 수 | 조회 중앙값 | 하루 조회 중앙값 |", "|---|---|---|---|"]
+        for name, rs in sorted(c.items(), key=lambda kv: -len(kv[1])):
+            lines.append(f"| {name} | {len(rs)} | {human(med([r['views'] for r in rs]))} | {human(med([r['views_per_day'] for r in rs]))} |")
+        return "\n".join(lines)
+
+    def hits(rows, k=5):
+        mv = max(med([r["views"] for r in rows]), 3000)
+        return sorted([r for r in rows if r["outlier"] and r["views"] >= mv and (r["subs"] or 0) >= 100],
+                      key=lambda r: -r["outlier"])[:k]
+
+    g_lines = ["| 장르 | 롱폼 비율 | 조회 중앙값 | 하루 조회 중앙값 | 떡상 배수 중앙값* | 소형 채널(구독 10만↓) 비율 | 대표 떡상 영상 |",
+               "|---|---|---|---|---|---|---|"]
+    for g, rs in genres.items():
+        if not rs:
+            continue
+        h = hits(rs, 10)
+        small = [r for r in rs if r["subs"] is not None and r["subs"] < 100000]
+        top = h[0] if h else None
+        g_lines.append(
+            f"| {g} | {pct([not r['is_short'] for r in rs])} | {human(med([r['views'] for r in rs]))} | "
+            f"{human(med([r['views_per_day'] for r in rs]))} | {med([r['outlier'] for r in h]):.1f}배 | "
+            f"{pct([r in small for r in rs])} | "
+            + (f"[{top['title'][:28]}]({top['url']}) {top['outlier']}배" if top else "-") + " |")
+    by_l = sorted(longs, key=lambda r: -r["views"])
+    by_s = sorted(shorts, key=lambda r: -r["views"])
+    q = max(1, len(by_l) // 4)
+    out = [f"# 최근 {a.days}일 인기 영상 리포트 ({a.region})",
+           f"생성 {datetime.now(KST):%Y-%m-%d %H:%M} · 롱폼 {len(longs)}개 · 숏폼 {len(shorts)}개 · 장르 {len(genres)}개 · 현재 인기 차트 {len(chart)}개",
+           "(라이브 방송·음원 자동 채널·한글 없는 제목·광고성 영상(참여율 0.1% 미만)은 제외)",
+           "", "## 한눈에 보기",
+           f"- 롱폼 조회 중앙값 {human(med([r['views'] for r in longs]))} · 길이 중앙값 {fmt_dur(int(med([r['duration'] for r in longs])))}",
+           f"- 숏폼 조회 중앙값 {human(med([r['views'] for r in shorts]))}",
+           f"- 롱폼 상위 25% 업로드 타이밍 — {timing(by_l[:q])}",
+           "", "## 롱폼 조회수 Top 15", ""] + [video_line(r, i) for i, r in enumerate(by_l[:15], 1)]
+    out += ["", "## 롱폼 떡상 (구독자 대비) Top 10", ""] + [video_line(r, i) for i, r in enumerate(hits(longs, 10), 1)]
+    out += ["", "## 숏폼 조회수 Top 15", ""] + [video_line(r, i) for i, r in enumerate(by_s[:15], 1)]
+    out += ["", "## 숏폼 떡상 (구독자 대비) Top 10", ""] + [video_line(r, i) for i, r in enumerate(hits(shorts, 10), 1)]
+    out += ["", "## 카테고리 분포", "", "### 롱폼", cat_table(longs), "", "### 숏폼", cat_table(shorts)]
+    out += ["", "## 장르별 수요 비교 (우리 채널 후보)", "", "\n".join(g_lines),
+            "", "*떡상 배수 중앙값: 조회수 중앙값 이상·구독자 100명 이상 영상 중 구독자 대비 배수 상위 10개의 중앙값. 높을수록 작은 채널도 터질 여지가 큼"]
+    out += ["", "## 제목·형식 패턴 (롱폼 상위 25% vs 나머지)", "", pattern_table(by_l[:q], by_l[q:])]
+    tw = words(r["title"] for r in by_l[:q] + by_s[:max(1, len(by_s) // 4)]).most_common(25)
+    out += ["", "## 상위 영상 제목에 자주 나온 단어", ", ".join(f"{w}({n})" for w, n in tw)]
+    out += ["", "## 지금 이 순간 인기 차트 (YouTube 인기 급상승) Top 15", ""] + [video_line(r, i) for i, r in enumerate(chart[:15], 1)]
+    out += ["", "## 인기 차트 카테고리", "", cat_table(chart),
+            "", "## Claude 분석 가이드",
+            "1. 최근 6개월 한국 유튜브에서 '잘 나가는 영상'의 공통 공식(주제·제목·길이·형식)은?",
+            "2. 카테고리·장르별로 수요가 크고 소형 채널도 터질 수 있는 기회 영역은?",
+            "3. 퍼온 글을 만화 대화극으로 재각본하는 우리 채널에 가장 맞는 장르 1~2개와 이유",
+            "4. 그 장르의 첫 10편 주제·제목 제안, 숏폼 후크 대사 예시",
+            "5. 피해야 할 것(대형 채널 독점·저작권 위험·수익 제한 주제)"]
+    d = save(f"trend-{a.days}d-{datetime.now(KST):%Y%m%d}", "\n".join(out),
+             {"days": a.days, "longs": longs, "shorts": shorts, "genres": genres, "chart": chart, "categories": catmap})
+    return d
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="유튜브 리서치·분석 (YouTube Data API v3)")
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -374,5 +489,9 @@ if __name__ == "__main__":
     c = sp.add_parser("channel", help="채널 성과 분석")
     c.add_argument("channel")
     c.add_argument("--n", type=int, default=30)
+    tr = sp.add_parser("trend", help="최근 N일 한국 인기 영상 종합 리포트 (할당량 약 1,600)")
+    tr.add_argument("--days", type=int, default=180)
+    tr.add_argument("--region", default="KR")
+    tr.add_argument("--genres", nargs="+", default=DEFAULT_GENRES)
     a = ap.parse_args()
-    {"topic": cmd_topic, "video": cmd_video, "channel": cmd_channel}[a.cmd](a)
+    {"topic": cmd_topic, "video": cmd_video, "channel": cmd_channel, "trend": cmd_trend}[a.cmd](a)
