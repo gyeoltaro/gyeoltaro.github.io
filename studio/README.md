@@ -42,3 +42,14 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 - 구성: 집중선 배경 + 확대한 캐릭터(흰 스티커 테두리) + 초대형 굵은 글씨 + 강조 박스 + 배지
 - `thumbnail`: `text`(2줄은 `\n`), `highlight`(강조 단어), `badge`(좌상단 문구), `variants`(최대 3개: `palette` yellow/blue/red/green/purple, `chars` [[캐릭터, 표정], …])
 - 굵은 폰트: Noto Sans CJK KR Black. 클라우드 세션에서는 `.claude/hooks/session-start.sh` 가 자동 설치 (로컬은 `sudo apt install fonts-noto-cjk-extra`)
+
+## 리서치·분석 (YouTube Data API v3)
+공개 데이터로 주제 수요, 떡상 공식, SEO 를 분석합니다. 결과는 `studio/research/<이름>/report.md`(+`data.json`), 끝에 Claude 가 답할 분석 질문이 붙습니다.
+```
+python3 studio/tools/research.py topic "습관 만들기" --days 90 [--long|--shorts]   # 주제 리서치 (검색 1회=할당량 100)
+python3 studio/tools/research.py video https://youtu.be/VIDEO_ID                  # 왜 잘 됐나 (비교군 대비)
+python3 studio/tools/research.py channel @내채널                                   # 채널 회고
+```
+- 지표: 하루 조회수, **구독자 대비 조회수 배수**(떡상 지표), 참여율, 제목 패턴(길이·숫자·질문형·괄호), 영상 길이, 업로드 요일·시간, 자주 쓰인 단어·태그, 인기 댓글
+- 준비: Google Cloud 콘솔에서 **YouTube Data API v3 사용 설정** + API 키 제한사항에 추가 (키는 `GOOGLE_TTS_API_KEY` 재사용, 또는 `YOUTUBE_API_KEY`)
+- 시청 지속률·CTR·유입 경로 같은 비공개 통계는 YouTube Analytics API(OAuth) 가 필요 — 현재는 YouTube 스튜디오 수치를 붙여넣어 분석
