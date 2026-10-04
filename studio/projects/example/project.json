@@ -1,0 +1,31 @@
+{
+  "title": "월급이 사라지는 3가지 이유 (만화)",
+  "slug": "example",
+  "voice": "ko-KR-SunHiNeural",
+  "thumbnail": { "text": "월급이 사라지는 진짜 이유" },
+  "cast": {
+    "minsu": { "name": "민수", "voice": "ko-KR-InJoonNeural", "color": "#4f8cff", "hair": "short", "hair_color": "#2f2a2a", "accessory": "glasses" },
+    "yuna":  { "name": "유나", "voice": "ko-KR-SunHiNeural", "color": "#ff7a9c", "hair": "long", "hair_color": "#5a3320", "accessory": "bow", "pitch": "+8Hz" }
+  },
+  "scenes": [
+    { "title": "월급날", "bg": "cafe", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "minsu", "text": "유나야, 월급 들어온 지 3일밖에 안 됐는데 통장이 비었어!", "emotion": "surprised", "react": {"yuna": "think"} },
+      { "who": "yuna", "text": "범인은 따로 있어. 오늘 세 가지만 알려줄게.", "emotion": "happy" }
+    ]},
+    { "title": "1. 보이지 않는 구독료", "bg": "room", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "yuna", "text": "첫 번째는 구독료야. 안 쓰는 서비스가 매달 빠져나가고 있어.", "emotion": "normal" },
+      { "who": "minsu", "text": "헉, 한 달에 5만 원이나?", "emotion": "sad", "react": {"yuna": "happy"} }
+    ]},
+    { "title": "2. 할인 알림", "bg": "street", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "yuna", "text": "두 번째는 할인 알림. 필요해서가 아니라 알림이 울려서 사는 거야.", "emotion": "angry" },
+      { "who": "minsu", "text": "알림부터 꺼야겠다.", "emotion": "think" }
+    ]},
+    { "title": "3. 기록", "bg": "night", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "narrator", "text": "세 번째는 기록하지 않는 습관입니다. 일주일만 적어 보세요." },
+      { "who": "minsu", "text": "오늘부터 가계부 쓴다!", "emotion": "happy", "react": {"yuna": "happy"} }
+    ]}
+  ],
+  "shorts": [
+    { "scenes": [1, 2], "hook": "월급 3일 만에 증발하는 이유" }
+  ]
+}

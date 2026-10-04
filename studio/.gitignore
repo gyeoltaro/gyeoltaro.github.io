@@ -1,0 +1,5 @@
+projects/*/work/
+projects/*/work_*/
+projects/*/output/
+__pycache__/
+*.pyc
