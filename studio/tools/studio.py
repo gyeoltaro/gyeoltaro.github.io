@@ -11,8 +11,11 @@
 필요: ffmpeg, Pillow, edge-tts (pip install pillow edge-tts)
 TTS(edge-tts)가 안 되면 무음 + 자막 영상으로 대체되며 경고를 출력합니다.
 """
-import argparse, asyncio, json, os, re, shutil, subprocess, sys
+import argparse, asyncio, hashlib, json, os, random, re, shutil, subprocess, sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cartoon  # noqa: E402
 
 try:
     from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -154,20 +157,20 @@ def split_subs(text, max_chars=26):
     return out or [text]
 
 
-async def _tts(text, voice, rate, out):
+async def _tts(text, voice, rate, pitch, out):
     import edge_tts
-    await edge_tts.Communicate(text, voice, rate=rate).save(str(out))
+    await edge_tts.Communicate(text, voice, rate=rate, pitch=pitch).save(str(out))
 
 
-def make_audio(text, voice, rate, out):
+def make_audio(text, voice, rate, pitch, out):
     """TTS 성공 시 mp3, 실패 시 글자수 기반 길이의 무음 mp3"""
     try:
-        asyncio.run(_tts(text, voice, rate, out))
+        asyncio.run(_tts(text, voice, rate, pitch, out))
         if out.exists() and out.stat().st_size > 1000:
             return True
     except Exception as e:  # 네트워크/모듈 문제
         print(f"  ! TTS 실패({type(e).__name__}) → 무음 대체", file=sys.stderr)
-    secs = max(2.0, len(text) / 5.5)
+    secs = max(1.6, len(text) / 5.5)
     sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{secs:.2f}",
         "-q:a", "9", str(out)])
     return False
@@ -179,56 +182,138 @@ def load(path):
     return proj, path.parent
 
 
-def build_audio(proj, root):
+def speak(proj, root, who, text):
+    """화자별 목소리로 한 줄 음성 생성(캐시). 반환: (mp3 경로, 길이)"""
+    c = proj.get("cast", {}).get(who or "", {})
+    voice = c.get("voice") or proj.get("voice", "ko-KR-SunHiNeural")
+    rate = c.get("rate") or proj.get("rate", "+0%")
+    pitch = c.get("pitch", "+0Hz")
     work = root / "work"
     work.mkdir(exist_ok=True)
-    voice = proj.get("voice", "ko-KR-SunHiNeural")
-    rate = proj.get("rate", "+0%")
-    timeline = []
-    for i, sc in enumerate(proj["scenes"]):
-        mp3 = work / f"scene_{i:02d}.mp3"
-        flag = mp3.with_suffix(".silent")  # 무음 대체본은 캐시하지 않고 다음 실행에 재시도
-        if not mp3.exists() or flag.exists():
-            print(f"[음성] 장면 {i + 1}/{len(proj['scenes'])}")
-            if make_audio(sc["narration"], voice, rate, mp3):
-                flag.unlink(missing_ok=True)
-            else:
-                flag.touch()
-        timeline.append({"scene": i, "audio": str(mp3), "dur": dur(mp3)})
-    return timeline
+    key = hashlib.md5(f"{voice}|{rate}|{pitch}|{text}".encode()).hexdigest()[:12]
+    mp3 = work / f"{key}.mp3"
+    flag = mp3.with_suffix(".silent")  # 무음 대체본은 캐시하지 않고 다음 실행에 재시도
+    if not mp3.exists() or flag.exists():
+        if make_audio(text, voice, rate, pitch, mp3):
+            flag.unlink(missing_ok=True)
+        else:
+            flag.touch()
+    return str(mp3), dur(mp3)
+
+
+def scene_lines(sc):
+    """장면의 대사 목록. lines 가 없으면 narration 한 줄(해설)로 취급"""
+    if sc.get("lines"):
+        return sc["lines"]
+    return [{"who": "narrator", "text": sc["narration"]}]
+
+
+def is_cartoon(proj, sc):
+    return bool(sc.get("lines")) or bool(proj.get("cast")) or sc.get("style") == "cartoon"
+
+
+def cast_color(spec):
+    return tuple(int(spec.get("color", cartoon.DEFAULT_LOOK["color"]).lstrip("#")[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def cartoon_segments(proj, sc, root, rdr, size, k, total, hook, chip):
+    """만화 장면 → [(png, 초)], [mp3]. 입모양/눈깜빡임 상태별 PNG 를 재사용"""
+    w, h = size
+    cast = proj.get("cast", {})
+    lines = scene_lines(sc)
+    ids = sc.get("cast") or []
+    if not ids:
+        for ln in lines:
+            if ln.get("who") in cast and ln["who"] not in ids:
+                ids.append(ln["who"])
+    chars = [(i, cast[i]) for i in ids if i in cast] or [("_mascot", proj.get("mascot", cartoon.DEFAULT_LOOK))]
+    frames, audios = [], []
+    sil = None
+    for li, ln in enumerate(lines):
+        who = ln.get("who", "narrator")
+        mp3, secs = speak(proj, root, who, ln["text"])
+        audios.append(mp3)
+        speaker = who if who in dict(chars) else ("_mascot" if who == "narrator" and chars[0][0] == "_mascot" else None)
+        emo = ln.get("emotion", "normal")
+        emos = {cid: ln.get("react", {}).get(cid, "normal") for cid, _ in chars}
+        if speaker:
+            emos[speaker] = emo
+        spec = dict(cast.get(who, {}))
+        name = spec.get("name") if who != "narrator" else None
+        ncol = cast_color(spec) if spec else (200, 200, 220)
+        prog = (k + 1) / total
+        states = {}
+        for st, (m, bl) in {"o": (True, False), "c": (False, False), "b": (False, True)}.items():
+            png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_{st}.png"
+            png.parent.mkdir(exist_ok=True)
+            rdr.frame(w, h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker, emotions=emos,
+                      mouth=m, blink=bl, text=ln["text"], name=name, name_color=ncol,
+                      chip=chip, hook=hook, progress=prog).save(png)
+            states[st] = png
+        rnd = random.Random(li * 31 + k)
+        t, step, pattern = 0.0, 0.16, []
+        while t < secs:
+            r = rnd.random()
+            st = "b" if (r < .07 and pattern and pattern[-1] == "c") else ("o" if rnd.random() < .62 else "c")
+            if not speaker:
+                st = "c" if st == "o" else st
+            d_ = min(step, secs - t)
+            pattern.append(st)
+            frames.append((states[st], d_))
+            t += d_
+        gap = 0.18  # 대사 사이 여백
+        sil = sil or root / "work" / "gap.mp3"
+        if not sil.exists():
+            sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{gap}", "-q:a", "9", str(sil)])
+        frames.append((states["c"], gap))
+        audios.append(str(sil))
+    return frames, audios
+
+
+def slide_segments(proj, sc, root, size, k, total, theme, font_path, hook):
+    w, h = size
+    mp3, secs = speak(proj, root, "narrator", sc["narration"])
+    subs = split_subs(sc["narration"])
+    weights = [max(len(s), 4) for s in subs]
+    frames = []
+    for j, s in enumerate(subs):
+        png = root / f"work_{w}x{h}" / f"{k:02d}_{j:02d}.png"
+        png.parent.mkdir(exist_ok=True)
+        render_frame(w, h, sc, s, theme, font_path, k, total, root, hook=hook).save(png)
+        frames.append((png, secs * weights[j] / sum(weights)))
+    return frames, [mp3]
 
 
 def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, font=None):
     w, h = size
     font_path = find_font(font)
-    work = root / ("work_" + out.stem)
+    work = root / f"work_{w}x{h}"
     shutil.rmtree(work, ignore_errors=True)
     work.mkdir()
-    timeline = build_audio(proj, root)
-    frames, audios = [], []  # frames: (png, seconds)
+    rdr = cartoon.Renderer(font_path)
+    frames, audios = [], []
     total = len(scene_ids)
     for k, si in enumerate(scene_ids):
-        sc, tl = proj["scenes"][si], timeline[si]
-        theme = THEMES[(si + theme_shift) % len(THEMES)]
-        subs = split_subs(sc["narration"])
-        weights = [max(len(s), 4) for s in subs]
-        for j, s in enumerate(subs):
-            png = work / f"f_{k:02d}_{j:02d}.png"
-            render_frame(w, h, sc, s, theme, font_path, k, total, root,
-                         hook=hook if k == 0 or hook else None).save(png)
-            frames.append((png, tl["dur"] * weights[j] / sum(weights)))
-        audios.append(tl["audio"])
+        sc = proj["scenes"][si]
+        print(f"[장면] {k + 1}/{total} {sc.get('title', '')}")
+        chip = sc.get("title")
+        if is_cartoon(proj, sc):
+            f, a = cartoon_segments(proj, sc, root, rdr, size, k, total, hook if k == 0 else hook, chip)
+        else:
+            f, a = slide_segments(proj, sc, root, size, k, total, THEMES[(si + theme_shift) % len(THEMES)], font_path, hook)
+        frames += f
+        audios += a
     lst = work / "frames.txt"
-    with open(lst, "w") as f:
+    with open(lst, "w") as fh:
         for png, secs in frames:
-            f.write(f"file '{png.name}'\nduration {secs:.3f}\n")
-        f.write(f"file '{frames[-1][0].name}'\n")
+            fh.write(f"file '{png.name if png.parent == work else png}'\nduration {secs:.3f}\n")
+        fh.write(f"file '{frames[-1][0]}'\n")
     alst = work / "audio.txt"
     alst.write_text("".join(f"file '{a}'\n" for a in audios))
     print(f"[인코딩] {out.name}")
     sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
         "-f", "concat", "-safe", "0", "-i", str(alst),
-        "-vf", f"fps=30,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+        "-vf", "fps=30,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
         "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", str(out)])
     shutil.rmtree(work, ignore_errors=True)
     total_s = sum(s for _, s in frames)

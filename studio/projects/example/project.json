@@ -1,18 +1,29 @@
 {
-  "title": "예시: 월급이 사라지는 3가지 이유",
+  "title": "월급이 사라지는 3가지 이유 (만화)",
   "slug": "example",
   "voice": "ko-KR-SunHiNeural",
-  "rate": "+0%",
   "thumbnail": { "text": "월급이 사라지는 진짜 이유" },
+  "cast": {
+    "minsu": { "name": "민수", "voice": "ko-KR-InJoonNeural", "color": "#4f8cff", "hair": "short", "hair_color": "#2f2a2a", "accessory": "glasses" },
+    "yuna":  { "name": "유나", "voice": "ko-KR-SunHiNeural", "color": "#ff7a9c", "hair": "long", "hair_color": "#5a3320", "accessory": "bow", "pitch": "+8Hz" }
+  },
   "scenes": [
-    { "title": "월급이 사라지는 이유", "bullets": ["통장에 찍히고 3일이면 증발", "범인은 따로 있다"],
-      "narration": "월급날 통장에 찍힌 숫자가 사흘 만에 사라진 적 있으신가요? 오늘은 그 범인 세 가지를 알려드립니다." },
-    { "title": "1. 보이지 않는 구독료", "bullets": ["잊고 있던 정기결제", "한 달 평균 5만 원"],
-      "narration": "첫 번째는 보이지 않는 구독료입니다. 쓰지 않는 서비스가 매달 조용히 빠져나가고 있습니다." },
-    { "title": "2. 충동 소비의 알림", "bullets": ["할인 알림이 지갑을 연다", "알림부터 끄기"],
-      "narration": "두 번째는 할인 알림입니다. 필요해서 사는 게 아니라 알림이 울려서 사게 됩니다. 알림부터 꺼보세요." },
-    { "title": "3. 기록하지 않는 습관", "bullets": ["쓴 돈을 모르면 못 줄인다", "일주일만 기록해 보기"],
-      "narration": "세 번째는 기록하지 않는 습관입니다. 일주일만 적어보면 새는 돈이 눈에 보입니다. 구독과 좋아요 부탁드립니다." }
+    { "title": "월급날", "bg": "cafe", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "minsu", "text": "유나야, 월급 들어온 지 3일밖에 안 됐는데 통장이 비었어!", "emotion": "surprised", "react": {"yuna": "think"} },
+      { "who": "yuna", "text": "범인은 따로 있어. 오늘 세 가지만 알려줄게.", "emotion": "happy" }
+    ]},
+    { "title": "1. 보이지 않는 구독료", "bg": "room", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "yuna", "text": "첫 번째는 구독료야. 안 쓰는 서비스가 매달 빠져나가고 있어.", "emotion": "normal" },
+      { "who": "minsu", "text": "헉, 한 달에 5만 원이나?", "emotion": "sad", "react": {"yuna": "happy"} }
+    ]},
+    { "title": "2. 할인 알림", "bg": "street", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "yuna", "text": "두 번째는 할인 알림. 필요해서가 아니라 알림이 울려서 사는 거야.", "emotion": "angry" },
+      { "who": "minsu", "text": "알림부터 꺼야겠다.", "emotion": "think" }
+    ]},
+    { "title": "3. 기록", "bg": "night", "cast": ["minsu", "yuna"], "lines": [
+      { "who": "narrator", "text": "세 번째는 기록하지 않는 습관입니다. 일주일만 적어 보세요." },
+      { "who": "minsu", "text": "오늘부터 가계부 쓴다!", "emotion": "happy", "react": {"yuna": "happy"} }
+    ]}
   ],
   "shorts": [
     { "scenes": [1, 2], "hook": "월급 3일 만에 증발하는 이유" }
