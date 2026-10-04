@@ -9,7 +9,7 @@
   python3 studio/tools/studio.py all    studio/projects/<slug>/project.json
 
 필요: ffmpeg, Pillow, edge-tts (pip install pillow edge-tts)
-음성: edge-tts → 구글 번역 음성 → espeak-ng(오프라인) → 무음 순으로 대체됩니다.
+음성: Google Cloud TTS(GOOGLE_TTS_API_KEY) → edge-tts → 구글 번역 음성 → espeak-ng(오프라인) → 무음 순으로 대체됩니다.
 """
 import argparse, asyncio, hashlib, json, os, random, re, shutil, subprocess, sys
 from pathlib import Path
@@ -238,8 +238,44 @@ def google_audio(text, voice, pitch, out):
         raw.unlink(missing_ok=True)
 
 
-def make_audio(text, voice, rate, pitch, out):
-    """True=edge-tts 고품질 음성. False=대체본(구글/espeak-ng/무음, 다음 실행에 edge-tts 재시도)"""
+GCLOUD_VOICES = {"male": "ko-KR-Neural2-C", "female": "ko-KR-Neural2-A"}
+
+
+def gcloud_audio(text, voice, rate, pitch, out, gvoice=None):
+    """Google Cloud Text-to-Speech (환경변수 GOOGLE_TTS_API_KEY 필요). 성공 시 True"""
+    import base64, urllib.request
+    key = os.environ.get("GOOGLE_TTS_API_KEY")
+    if not key:
+        return False
+    male = any(k in voice for k in ("InJoon", "Hyunsu", "Male"))
+    name = gvoice or GCLOUD_VOICES["male" if male else "female"]
+    m = re.match(r"([+-]?\d+)Hz", pitch or "")
+    r = re.match(r"([+-]?\d+)%", rate or "")
+    body = {"input": {"text": text},
+            "voice": {"languageCode": "ko-KR", "name": name},
+            "audioConfig": {"audioEncoding": "MP3", "sampleRateHertz": 24000,
+                            "speakingRate": round(1 + (int(r.group(1)) / 100 if r else 0), 2),
+                            "pitch": max(-20, min(20, int(m.group(1)) / 6 if m else 0))}}
+    if "Chirp" in name:  # Chirp3-HD 음성은 pitch 미지원
+        body["audioConfig"].pop("pitch")
+    req = urllib.request.Request("https://texttospeech.googleapis.com/v1/text:synthesize?key=" + key,
+                                 data=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            out.write_bytes(base64.b64decode(json.loads(resp.read())["audioContent"]))
+        return out.stat().st_size > 1000
+    except urllib.error.HTTPError as e:
+        warn_once(f"  ! Google Cloud TTS 오류 {e.code}: {e.read()[:200].decode(errors='ignore')}")
+    except Exception as e:
+        warn_once(f"  ! Google Cloud TTS 실패({type(e).__name__})")
+    return False
+
+
+def make_audio(text, voice, rate, pitch, out, gvoice=None):
+    """True=고품질 음성(Google Cloud/edge-tts). False=대체본(구글 번역/espeak-ng/무음, 다음 실행에 재시도)"""
+    if gcloud_audio(text, voice, rate, pitch, out, gvoice):
+        warn_once("  · 음성: Google Cloud TTS")
+        return True
     try:
         asyncio.run(_tts(text, voice, rate, pitch, out))
         if out.exists() and out.stat().st_size > 1000:
@@ -271,13 +307,14 @@ def speak(proj, root, who, text):
     voice = c.get("voice") or proj.get("voice", "ko-KR-SunHiNeural")
     rate = c.get("rate") or proj.get("rate", "+0%")
     pitch = c.get("pitch", "+0Hz")
+    gvoice = c.get("gvoice")  # Google Cloud 음성 이름 직접 지정 (예: ko-KR-Neural2-B)
     work = root / "work"
     work.mkdir(exist_ok=True)
-    key = hashlib.md5(f"{voice}|{rate}|{pitch}|{text}".encode()).hexdigest()[:12]
+    key = hashlib.md5(f"{voice}|{gvoice}|{rate}|{pitch}|{text}".encode()).hexdigest()[:12]
     mp3 = work / f"{key}.mp3"
     flag = mp3.with_suffix(".silent")  # 무음 대체본은 캐시하지 않고 다음 실행에 재시도
     if not mp3.exists() or flag.exists():
-        if make_audio(text, voice, rate, pitch, mp3):
+        if make_audio(text, voice, rate, pitch, mp3, gvoice):
             flag.unlink(missing_ok=True)
         else:
             flag.touch()
@@ -458,6 +495,7 @@ def cmd_check():
         print("✔ edge-tts")
     except ImportError:
         print("! edge-tts 없음 → 대체 음성 사용 (pip install edge-tts)")
+    print(("✔" if os.environ.get("GOOGLE_TTS_API_KEY") else "!"), "GOOGLE_TTS_API_KEY (Google Cloud TTS 고품질 음성)")
     print(("✔" if shutil.which("espeak-ng") else "!"), "espeak-ng (오프라인 대체 음성)")
     sys.exit(0 if ok else 1)
 

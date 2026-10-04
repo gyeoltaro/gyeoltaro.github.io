@@ -20,6 +20,6 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 - `cast`: 캐릭터별 이름·셔츠색·머리·안경/리본·목소리(edge-tts)·피치
 - 장면 `bg`: room / street / office / cafe / park / night / plain
 - 대사 `emotion`: normal / happy / sad / angry / surprised / think (표정·팔·이펙트 변화), `react` 로 듣는 쪽 반응
-- 음성: edge-tts(최고 품질) → 구글 번역 음성(남성 캐릭터는 음높이 변환) → espeak-ng → 무음 순으로 자동 대체
+- 음성: Google Cloud TTS(환경변수 GOOGLE_TTS_API_KEY, 캐릭터별 `gvoice` 로 음성 지정 가능) → edge-tts → 구글 번역 음성(남성 캐릭터는 음높이 변환) → espeak-ng → 무음 순으로 자동 대체
 - 말하는 캐릭터는 입이 움직이고 눈을 깜빡이며, 대사는 하단 자막+이름표로 표시됩니다.
 - `lines` 없이 `narration` 만 있는 장면은 기존 슬라이드 형식으로 렌더링됩니다.
