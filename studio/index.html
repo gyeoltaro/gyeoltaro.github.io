@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>유튜브 자동화 스튜디오</title>
+<style>
+:root{--bg:#0f1220;--card:#181c30;--line:#2a3050;--tx:#e8eaf6;--mu:#8e95b8;--ac:#ffd54f;--ok:#66f0c8;--bad:#ff8a80;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 -apple-system,"Noto Sans KR","Malgun Gothic",sans-serif}
+header{padding:20px 16px 8px;max-width:1200px;margin:auto}
+h1{margin:0;font-size:22px} h1 small{color:var(--mu);font-weight:400;font-size:13px;margin-left:8px}
+nav{display:flex;gap:6px;flex-wrap:wrap;max-width:1200px;margin:8px auto;padding:0 16px;position:sticky;top:0;background:var(--bg);z-index:5;padding-top:8px;padding-bottom:8px}
+nav button{background:var(--card);color:var(--mu);border:1px solid var(--line);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit}
+nav button.on{color:#111;background:var(--ac);border-color:var(--ac);font-weight:700}
+main{max-width:1200px;margin:auto;padding:8px 16px 80px}
+section{display:none}section.on{display:block}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.card h3{margin:0 0 4px;font-size:16px}.card p{margin:0 0 8px;color:var(--mu);font-size:13px}
+.hd{display:flex;align-items:center;gap:8px;margin:22px 0 8px;font-size:17px;font-weight:700}
+.hd span{font-size:12px;color:var(--mu);font-weight:400}
+.tk{display:flex;gap:8px;align-items:flex-start;padding:3px 0;font-size:14px}
+.tk input{margin-top:5px;accent-color:var(--ok)}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--ok);width:0;transition:.3s}
+textarea,input[type=text],input[type=number],select{width:100%;background:#10142a;color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+textarea{min-height:150px;resize:vertical}
+label{display:block;font-size:12px;color:var(--mu);margin:10px 0 4px}
+.btn{background:var(--ac);color:#111;border:0;border-radius:10px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}
+.btn.g{background:var(--card);color:var(--tx);border:1px solid var(--line)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-size:11px;padding:2px 8px;border-radius:99px;background:#232a4d;color:var(--mu)}
+.pill.cmd{background:#12352c;color:var(--ok)}
+pre{background:#0a0d1c;border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;white-space:pre-wrap;word-break:break-all;font-size:13px;max-height:420px}
+.warn{border-left:4px solid var(--bad);background:#2a1a22;padding:10px 14px;border-radius:8px;margin:10px 0;font-size:14px}
+.kpi{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.big{font-size:26px;font-weight:800}
+.day{display:grid;grid-template-columns:54px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);align-items:start}
+.day b{color:var(--ac)}
+.flow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.flow div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}
+.flow em{color:var(--mu);font-style:normal}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ok);color:#111;padding:10px 18px;border-radius:99px;font-weight:700;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header><h1>🎬 유튜브 자동화 스튜디오 <small>롱폼 → 숏폼 · 부서별 AI 파이프라인 · Claude가 제작</small></h1></header>
+<nav id="nav"></nav>
+<main>
+
+<!-- 1. 작업실 -->
+<section id="s-work">
+  <div class="warn"><b>흐름</b> — 글 붙여넣기 → 아래에서 <b>부서 프롬프트</b> 복사 → Claude Code 채팅에 붙여넣기 → Claude가 <code>project.json</code> 작성·영상 렌더링 → <code>output/</code> 확인 후 업로드</div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
+    <div class="card">
+      <h3>① 원문 입력</h3><p>퍼온 글을 붙여넣으세요. (재각본 대상)</p>
+      <label>프로젝트 이름(영문 slug)</label><input type="text" id="slug" placeholder="my-first-video">
+      <label>채널/주제 메모 (톤, 타깃)</label><input type="text" id="tone" placeholder="예: 20-30대 직장인 재테크, 친근한 말투">
+      <label>목표 영상 길이(분)</label><input type="number" id="mins" value="10" min="3" max="30">
+      <label>원문</label><textarea id="src" placeholder="여기에 글을 붙여넣기…"></textarea>
+      <p id="srccount" style="margin-top:6px"></p>
+    </div>
+    <div class="card">
+      <h3>② 프롬프트 생성</h3><p>부서를 선택하면 원문이 포함된 지시서가 만들어집니다.</p>
+      <label>부서</label><select id="dept"></select>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="copy">📋 프롬프트 복사</button>
+        <button class="btn g" id="dl">⬇ source.txt 저장</button>
+      </div>
+      <pre id="out" style="margin-top:12px"></pre>
+    </div>
+  </div>
+  <div class="hd">영상 제작 명령어 <span>Claude가 실행합니다 (사람이 직접 쳐도 OK)</span></div>
+  <pre>python3 studio/tools/studio.py check                          # 환경 점검
+python3 studio/tools/studio.py long   studio/projects/&lt;slug&gt;/project.json   # 롱폼 1920x1080
+python3 studio/tools/studio.py shorts studio/projects/&lt;slug&gt;/project.json   # 숏폼 1080x1920 (shorts[] 개수만큼)
+python3 studio/tools/studio.py thumb  studio/projects/&lt;slug&gt;/project.json   # 썸네일
+python3 studio/tools/studio.py all    studio/projects/&lt;slug&gt;/project.json   # 전부</pre>
+</section>
+
+<!-- 2. 부서 -->
+<section id="s-dept"><div id="depts"></div></section>
+
+<!-- 3. 30일 로드맵 -->
+<section id="s-plan">
+  <div class="warn"><b>현실 체크</b> — 광고 수익(YPP)은 <b>구독자 1,000명 + 최근 12개월 시청 4,000시간</b> 또는 <b>구독자 1,000명 + 쇼츠 조회 1,000만(90일)</b>이 필요합니다. 30일 달성은 소수만 해내는 공격적 목표이므로, 일일 업로드량과 <b>숏폼 병행</b>으로 확률을 높이는 계획입니다. (기준은 변경될 수 있으니 YouTube 스튜디오에서 최신 조건을 확인하세요.)</div>
+  <div class="bar"><i id="planbar"></i></div><p id="plantxt" style="color:var(--mu)"></p>
+  <div id="plan"></div>
+</section>
+
+<!-- 4. 수익 트래커 -->
+<section id="s-kpi">
+  <div class="kpi" id="kpi"></div>
+  <div class="card" style="margin-top:14px">
+    <h3>필요 속도 계산기</h3><p>남은 일수 기준으로 하루에 얼마나 필요한지 계산합니다.</p>
+    <label>남은 일수</label><input type="number" id="daysleft" value="30" min="1">
+    <pre id="need" style="margin-top:10px"></pre>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>영상 기록</h3><p>업로드한 영상을 기록해 성과를 비교하세요.</p>
+    <div class="row"><input type="text" id="vt" placeholder="영상 제목" style="flex:2;min-width:160px">
+    <select id="vk" style="flex:1;min-width:90px"><option>롱폼</option><option>숏폼</option></select>
+    <input type="number" id="vv" placeholder="조회수" style="flex:1;min-width:90px">
+    <button class="btn" id="vadd">추가</button></div>
+    <div id="vlist" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<!-- 5. 설정/백업 -->
+<section id="s-set">
+  <div class="card">
+    <h3>데이터 백업</h3><p>모든 진행 상황은 이 브라우저(localStorage)에 저장됩니다. 기기를 옮길 땐 내보내기/가져오기를 쓰세요.</p>
+    <div class="row"><button class="btn" id="exp">⬇ 내보내기</button>
+    <button class="btn g" id="imp">⬆ 가져오기</button><button class="btn g" id="rst">초기화</button></div>
+    <input type="file" id="file" accept=".json" hidden>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>준수 사항 (수익 정지 방지)</h3>
+    <div class="tk">• 남의 글은 <b>사용 허락/저작권</b>을 확인하세요. 퍼온 글을 그대로 읽는 영상은 '재사용 콘텐츠'로 수익 제한 대상입니다 → 반드시 재각본·해설·관점 추가.</div>
+    <div class="tk">• 합성 음성/AI 생성 장면이 사실적이면 업로드 시 <b>'변형·합성 콘텐츠' 공개</b>를 체크하세요.</div>
+    <div class="tk">• 타인 영상·이미지·음악은 라이선스 확인 후 사용. 무료 소스(Pexels, Pixabay, YouTube 오디오 라이브러리) 권장.</div>
+    <div class="tk">• 의료·금융·정치 등은 단정적 표현 금지, 출처 표기.</div>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const KEY='yt-studio-v1';
+let S={ticks:{},plan:{},kpi:{subs:0,hours:0,shorts:0,vids:0},videos:[],form:{slug:'',tone:'',mins:10,src:'',dept:'master'}};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+/* ===== 부서 정의 ===== */
+const CTX=(p)=>`[프로젝트] slug=${p.slug||'(미정)'} / 목표 길이 ${p.mins}분 / 톤·타깃: ${p.tone||'(미지정)'}\n저장 위치: studio/projects/${p.slug||'<slug>'}/\n`;
+const SRC=(p)=>`\n===== 원문 =====\n${p.src||'(여기에 원문이 들어갑니다)'}\n===== 끝 =====\n`;
+const SCHEMA=`project.json 형식(반드시 유효 JSON):
+{"title":"","slug":"","voice":"ko-KR-SunHiNeural","rate":"+0%","thumbnail":{"text":"짧고 강한 3~8자 문구"},
+ "scenes":[{"title":"화면 제목","bullets":["화면 요점 2~4개"],"narration":"실제 읽을 나레이션(문장 단위, 구어체)"}],
+ "shorts":[{"scenes":[장면 인덱스들],"hook":"첫 3초 후크 문구"}]}`;
+const GROUPS=[
+ {g:'🧭 기획본부',teams:[
+  {id:'sourcing',n:'소재선별팀',e:'🔎',d:'원문이 수익화·정책에 적합한지 판정',t:['저작권/사용허락 확인','핵심 주제·타깃 정의','검색 수요·경쟁 판단','사실관계 의심 구간 표시'],
+   p:p=>CTX(p)+`당신은 소재선별팀장입니다. 아래 원문을 분석해 (1)핵심 주제 한 줄 (2)타깃 시청자 (3)수익화 적합도 1~10과 이유 (4)저작권·재사용 콘텐츠 정책 위험 (5)사실 확인이 필요한 문장 목록 (6)롱폼 1편으로 충분한지/시리즈로 나눌지를 보고서로 작성하세요. studio/projects/${p.slug||'<slug>'}/01_sourcing.md 로 저장.`+SRC(p)},
+  {id:'rewrite',n:'재각본팀',e:'✍️',d:'원문을 독창적 구성·관점으로 재창작',t:['원문 핵심 추출','독창적 구조로 재배열','관점/예시/비유 추가','원문 문장 복붙 0% 검수'],
+   p:p=>CTX(p)+`당신은 재각본팀장입니다. 원문의 사실과 핵심 아이디어만 추출하고 문장은 전부 새로 쓰세요. 원문 순서를 그대로 따르지 말고 시청 유지율 중심으로 재구성(후크→문제→전개 3~5막→반전/요약→CTA)하며, 우리만의 관점·예시·비유를 추가하세요. 구어체 한국어, 한 문장 40자 내외. 결과는 studio/projects/${p.slug||'<slug>'}/02_rewrite.md 에 저장.`+SRC(p)},
+ ]},
+ {g:'🎞 제작본부 (롱폼)',teams:[
+  {id:'script',n:'대본팀',e:'📜',d:'장면 단위 최종 대본 + project.json',t:['장면 분할(8~15장면)','나레이션 구어체 다듬기','화면 제목/요점 작성','길이 점검(분당 약 300자)'],
+   p:p=>CTX(p)+`당신은 대본팀장입니다. 재각본 결과(02_rewrite.md가 있으면 읽고, 없으면 아래 원문으로 직접 재각본)를 장면 단위로 나눠 studio/projects/${p.slug||'<slug>'}/project.json 을 작성하세요. 총 나레이션 분량은 목표 ${p.mins}분(약 ${p.mins*300}자)에 맞춥니다.\n${SCHEMA}\n shorts는 숏폼으로 떼어내기 좋은 장면 묶기 2~4개(각 45초 이내)를 지정하세요.`+SRC(p)},
+  {id:'hook',n:'후크·제목팀',e:'🪝',d:'첫 15초 후크, 제목 후보, 썸네일 문구',t:['첫 15초 후크 3안','제목 후보 10개(40자 이내)','썸네일 문구 5개','A/B 테스트 계획'],
+   p:p=>CTX(p)+`당신은 후크·제목팀장입니다. 02_rewrite.md/project.json 기준으로 (1)첫 15초 후크 3안 (2)클릭률 높은 제목 10개(과장·낚시 금지, 40자 이내) (3)썸네일 문구 5개(3~8자)를 제안하고 최선 1안을 project.json의 title, thumbnail.text에 반영하세요. 결과 요약은 03_hook.md.`+SRC(p)},
+  {id:'voice',n:'보이스팀 (TTS)',e:'🎙',d:'edge-tts 한국어 신경망 음성 생성',t:['음성 선택(SunHi/InJoon/Hyunsu)','속도(rate) 조정','발음 어려운 단어 표기 교정','장면별 mp3 생성'],
+   p:p=>CTX(p)+`당신은 보이스팀장입니다. project.json의 voice/rate를 채널 톤에 맞게 조정(남성: ko-KR-InJoonNeural, 여성: ko-KR-SunHiNeural, ko-KR-HyunsuMultilingualNeural 등)하고, 숫자·영문·한자어 발음이 어색한 부분은 narration을 한글 표기로 고치세요. 그 후 \`python3 studio/tools/studio.py check\` 실행해 TTS 가능 여부를 보고하세요.`},
+  {id:'visual',n:'비주얼팀',e:'🖼',d:'장면별 배경 이미지·화면 요점 설계',t:['장면별 이미지 키워드','무료 소스 확인(Pexels/Pixabay)','bullets 가독성 점검','테마 색상 선택'],
+   p:p=>CTX(p)+`당신은 비주얼팀장입니다. project.json의 각 장면에 어울리는 배경 이미지를 정하세요. 사용자가 studio/projects/${p.slug||'<slug>'}/images/ 에 넣은 파일이 있으면 scenes[].image 에 상대경로("images/01.jpg")로 지정하고, 없으면 장면별 무료 이미지 검색 키워드 목록(09_visual.md)을 작성하세요. 화면 텍스트(bullets)는 장면당 2~4개, 각 20자 이내로 다듬으세요.`},
+  {id:'edit',n:'편집팀 (렌더링)',e:'🎬',d:'ffmpeg로 롱폼 mp4 렌더링',t:['환경 점검(check)','롱폼 렌더링','길이/해상도 검증','8분↑ 미드롤 확인'],
+   p:p=>CTX(p)+`당신은 편집팀장입니다. 다음을 순서대로 실행하고 결과를 보고하세요.\n1) python3 studio/tools/studio.py check\n2) python3 studio/tools/studio.py long studio/projects/${p.slug||'<slug>'}/project.json\n3) ffprobe로 길이·해상도 확인, 프레임 1~2장 추출해 글자 잘림·가독성 점검\n문제가 있으면 project.json을 고쳐 재렌더링하세요.`},
+ ]},
+ {g:'📱 숏폼본부',teams:[
+  {id:'cut',n:'하이라이트팀',e:'✂️',d:'롱폼에서 숏폼으로 떼어낼 구간 선정',t:['후크 강한 구간 탐색','45초 이내 분할','독립적으로 이해되는지 확인','숏폼 5~10개 후보'],
+   p:p=>CTX(p)+`당신은 하이라이트팀장입니다. project.json의 장면들 중 단독으로 봐도 이해되고 후크가 강한 구간을 골라 shorts[] 를 2~5개로 채우세요(각 합계 45초 이내, hook은 12자 내외의 첫 3초 문구). 필요하면 숏폼 전용으로 narration을 압축한 새 장면을 scenes 끝에 추가해도 됩니다.`},
+  {id:'vertical',n:'세로변환팀',e:'📐',d:'1080x1920 세로 영상 렌더링',t:['shorts 렌더링','후크 문구 가독성','하단 UI 영역 피하기','파일명/순서 정리'],
+   p:p=>CTX(p)+`당신은 세로변환팀장입니다. python3 studio/tools/studio.py shorts studio/projects/${p.slug||'<slug>'}/project.json 을 실행하고 output/short_*.mp4 의 길이/해상도를 검증, 프레임을 추출해 글자 잘림을 점검하세요.`},
+  {id:'shortseo',n:'숏폼 업로드팀',e:'🚀',d:'숏폼 제목·해시태그·업로드 순서',t:['제목(후크형)','#Shorts 해시태그','롱폼 링크 고정댓글','하루 1~3개 스케줄'],
+   p:p=>CTX(p)+`당신은 숏폼 업로드팀장입니다. 각 short_XX.mp4 별 제목(40자 이내), 설명(롱폼 유도 한 줄 + #Shorts 포함 해시태그 3~5개), 고정댓글 문구, 업로드 순서/시간표를 studio/projects/${p.slug||'<slug>'}/10_shorts_upload.md 로 작성하세요.`},
+ ]},
+ {g:'📣 퍼블리싱·성장본부',teams:[
+  {id:'thumb',n:'썸네일팀',e:'🖼',d:'1280x720 썸네일 생성',t:['thumb 명령 실행','대비/가독성 점검','모바일 축소 확인','대체안 2개'],
+   p:p=>CTX(p)+`당신은 썸네일팀장입니다. python3 studio/tools/studio.py thumb studio/projects/${p.slug||'<slug>'}/project.json 으로 output/thumbnail.png 을 만들고 확인하세요. 모바일 크기에서도 읽히는지 점검하고, thumbnail.text 대체안 2개로 변형본도 만들어 비교하세요.`},
+  {id:'seo',n:'SEO팀',e:'🔍',d:'제목·설명·태그·챕터',t:['제목 최종안','설명란(첫 2줄 핵심)','태그/해시태그','챕터 타임스탬프'],
+   p:p=>CTX(p)+`당신은 SEO팀장입니다. project.json 기준으로 최종 제목, 설명란(첫 2줄에 핵심 키워드, 챕터 타임스탬프 포함 — 장면 길이는 work 폴더의 mp3 길이로 계산), 태그 15개, 해시태그 3개, 고정댓글을 studio/projects/${p.slug||'<slug>'}/11_publish.md 로 작성하세요.`},
+  {id:'upload',n:'업로드·스케줄팀',e:'📅',d:'YouTube 스튜디오 업로드 체크',t:['동영상 업로드','썸네일 등록','변형/합성 콘텐츠 공개 체크','예약 게시 + 쇼츠 연계'],
+   p:p=>CTX(p)+`당신은 업로드팀장입니다. output 폴더의 결과물과 11_publish.md를 점검해 YouTube 스튜디오 업로드 체크리스트(미성년자 대상 아님, 합성 콘텐츠 공개, 카테고리, 공개 시간, 최종 화면/카드)를 채워 12_upload_checklist.md 로 저장하고 빠진 항목을 알려주세요.`},
+  {id:'analytics',n:'분석팀',e:'📈',d:'유지율·CTR 분석 후 다음 영상 개선',t:['48시간 CTR/유지율 기록','이탈 구간 분석','잘된 주제 반복','주간 회고'],
+   p:p=>CTX(p)+`당신은 분석팀장입니다. 사용자가 아래에 붙여넣는 YouTube 스튜디오 수치(CTR, 평균 시청 지속, 이탈 구간)를 바탕으로 원인 가설 3개와 다음 영상에서 바꿀 점 3가지를 제시하세요.\n(수치를 이 아래에 붙여넣기)`},
+  {id:'community',n:'커뮤니티팀',e:'💬',d:'댓글·구독 전환',t:['댓글 답글 초안','구독 유도 멘트','커뮤니티 게시글','다음 영상 예고'],
+   p:p=>CTX(p)+`당신은 커뮤니티팀장입니다. 영상 주제에 맞는 고정댓글, 댓글 답글 템플릿 5개, 커뮤니티 탭 게시글 2개(투표 포함), 구독 전환용 영상 내 멘트 2안을 12_community.md 로 작성하세요.`},
+ ]},
+ {g:'🛡 컴플라이언스·총괄',teams:[
+  {id:'qa',n:'검수·정책팀',e:'🛡',d:'재사용 콘텐츠·저작권 최종 검수',t:['원문과 문장 유사도 점검','출처/사실 확인','음악·이미지 라이선스','AI 합성 공개 여부'],
+   p:p=>CTX(p)+`당신은 검수·정책팀장입니다. 원문과 project.json의 narration을 비교해 문장 단위로 과도하게 유사한 부분이 있으면 표시·수정하고, 사실 확인 필요 문장·출처 표기·이미지/음악 라이선스·AI 합성 공개 필요성·YouTube 수익 정책(재사용 콘텐츠) 위험을 13_qa.md 로 보고하세요. 문제는 project.json을 직접 수정하세요.`+SRC(p)},
+  {id:'master',n:'총괄 PD (전체 자동 실행)',e:'👑',d:'모든 부서를 순서대로 실행',t:['전 부서 순차 실행','부서 간 산출물 연결','최종 output 검증','결과 요약 보고'],
+   p:p=>CTX(p)+`당신은 총괄 PD입니다. 아래 원문으로 다음 부서를 순서대로 모두 실행하세요. 각 부서의 산출물은 studio/projects/${p.slug||'<slug>'}/ 에 저장합니다.\n1 소재선별 → 2 재각본(원문 문장 복붙 금지, 구조·관점 새로) → 3 대본(project.json) → 4 후크·제목 → 5 보이스 설정 → 6 비주얼 → 7 검수·정책 → 8 편집(롱폼 렌더) → 9 하이라이트(shorts 지정) → 10 세로변환(숏폼 렌더) → 11 썸네일 → 12 SEO·업로드 문서 → 13 숏폼 업로드 문서.\n${SCHEMA}\n마지막에 output/ 파일 목록, 길이, 문제점, 사람이 직접 해야 할 일(업로드)을 요약 보고하세요.`+SRC(p)},
+ ]},
+];
+const TEAMS=GROUPS.flatMap(g=>g.teams);
+
+/* ===== 30일 로드맵 ===== */
+const PLAN=[
+ [1,'채널 개설·정체성 확정(주제/톤/로고), 소스 라이선스 정리, studio.py check 통과'],
+ [2,'첫 원문으로 총괄 PD 실행 → 롱폼 1 + 숏폼 3 제작'],
+ [3,'롱폼 #1 업로드 + 숏폼 3개 분산 업로드'],
+ [4,'롱폼 #2 제작, 후크·썸네일 A/B 설계'],
+ [5,'롱폼 #2 업로드 + 숏폼 3개'],
+ [6,'데이터 확인(CTR/유지율), 이탈 구간 수정 방향 도출'],
+ [7,'1주차 회고 · 상위 주제 선정 · 원문 5개 비축'],
+ [8,'롱폼 #3 + 숏폼 3'],[9,'숏폼 3개 추가 제작 · 업로드'],[10,'롱폼 #4 + 숏폼 3'],
+ [11,'썸네일/제목 개선본 적용(기존 영상 교체)'],[12,'롱폼 #5 + 숏폼 3'],[13,'커뮤니티 탭·댓글 소통, 구독 유도 멘트 보강'],[14,'2주차 회고 · 잘 된 형식 2배로'],
+ [15,'롱폼 #6 + 숏폼 3'],[16,'숏폼 5개 일괄 제작'],[17,'롱폼 #7 + 숏폼 3'],[18,'시리즈화(재생목록·연속 시청 유도)'],
+ [19,'롱폼 #8 + 숏폼 3'],[20,'분석: 시청시간 높은 영상 구조 복제'],[21,'3주차 회고 · 수익 조건 진행률 점검'],
+ [22,'롱폼 #9 + 숏폼 3'],[23,'숏폼 5개 일괄'],[24,'롱폼 #10 + 숏폼 3'],[25,'재생목록·최종화면·카드 정비'],
+ [26,'롱폼 #11 + 숏폼 3'],[27,'스퍼트: 잘 된 주제 후속편'],[28,'롱폼 #12 + 숏폼 3'],
+ [29,'YPP 조건 충족 시 수익 창출 신청 준비(AdSense 연결, 2단계 인증)'],[30,'최종 회고 · 다음 달 계획'],
+];
+
+/* ===== 렌더 ===== */
+const TABS=[['work','🛠 작업실'],['dept','🏢 부서'],['plan','🗓 30일 로드맵'],['kpi','💰 수익 트래커'],['set','⚙ 설정']];
+$('#nav').innerHTML=TABS.map(([k,v])=>`<button data-t="${k}">${v}</button>`).join('');
+function show(k){$$('section').forEach(s=>s.classList.toggle('on',s.id==='s-'+k));$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===k));try{localStorage.setItem(KEY+'-tab',k)}catch(e){}}
+$('#nav').onclick=e=>{if(e.target.dataset.t)show(e.target.dataset.t)};
+let tab='work';try{tab=localStorage.getItem(KEY+'-tab')||'work'}catch(e){}show(tab);
+
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600)};
+const copy=async txt=>{try{await navigator.clipboard.writeText(txt)}catch(e){const a=document.createElement('textarea');a.value=txt;document.body.append(a);a.select();document.execCommand('copy');a.remove()}toast('복사됨 ✔')};
+
+// 작업실
+$('#dept').innerHTML=TEAMS.map(t=>`<option value="${t.id}">${t.e} ${t.n}</option>`).join('');
+const F=S.form;$('#slug').value=F.slug;$('#tone').value=F.tone;$('#mins').value=F.mins;$('#src').value=F.src;$('#dept').value=F.dept;
+function genPrompt(){
+  F.slug=$('#slug').value.trim().replace(/[^a-z0-9-_]/gi,'-');F.tone=$('#tone').value;F.mins=+$('#mins').value||10;F.src=$('#src').value;F.dept=$('#dept').value;save();
+  $('#srccount').textContent=`원문 ${F.src.length.toLocaleString()}자 · 목표 나레이션 약 ${(F.mins*300).toLocaleString()}자`;
+  const t=TEAMS.find(x=>x.id===F.dept);$('#out').textContent=t.p(F);
+}
+['slug','tone','mins','src','dept'].forEach(i=>$('#'+i).addEventListener('input',genPrompt));
+$('#copy').onclick=()=>copy($('#out').textContent);
+$('#dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([F.src],{type:'text/plain'}));a.download='source.txt';a.click()};
+genPrompt();
+
+// 부서
+function done(id){const t=TEAMS.find(x=>x.id===id);return t.t.filter((_,i)=>S.ticks[id+i]).length}
+function renderDepts(){
+  $('#depts').innerHTML=GROUPS.map(g=>`<div class="hd">${g.g}</div><div class="grid">`+g.teams.map(t=>{
+    const n=done(t.id),pc=Math.round(n/t.t.length*100);
+    return `<div class="card"><h3>${t.e} ${t.n} <span class="pill">${n}/${t.t.length}</span></h3><p>${t.d}</p>
+    <div class="bar"><i style="width:${pc}%"></i></div>
+    ${t.t.map((x,i)=>`<label class="tk" style="margin:0;color:var(--tx);font-size:14px"><input type="checkbox" data-k="${t.id}${i}" ${S.ticks[t.id+i]?'checked':''}>${x}</label>`).join('')}
+    <div class="row" style="margin-top:10px"><button class="btn g" data-p="${t.id}">📋 프롬프트 복사</button></div></div>`}).join('')+`</div>`).join('');
+}
+$('#depts').addEventListener('change',e=>{if(e.target.dataset.k){S.ticks[e.target.dataset.k]=e.target.checked;save();renderDepts()}});
+$('#depts').addEventListener('click',e=>{const id=e.target.dataset.p;if(id){copy(TEAMS.find(t=>t.id===id).p(S.form))}});
+renderDepts();
+
+// 로드맵
+function renderPlan(){
+  const n=PLAN.filter(([d])=>S.plan[d]).length;
+  $('#planbar').style.width=n/PLAN.length*100+'%';$('#plantxt').textContent=`${n}/${PLAN.length}일 완료 · 롱폼 목표 12편 + 숏폼 약 60개`;
+  $('#plan').innerHTML=PLAN.map(([d,t])=>`<label class="day" style="margin:0"><span><b>D${d}</b></span><span class="tk" style="padding:0"><input type="checkbox" data-d="${d}" ${S.plan[d]?'checked':''}>${t}</span></label>`).join('');
+}
+$('#plan').addEventListener('change',e=>{if(e.target.dataset.d){S.plan[e.target.dataset.d]=e.target.checked;save();renderPlan()}});
+renderPlan();
+
+// KPI
+const GOALS=[['subs','구독자','명',1000],['hours','시청시간(12개월)','시간',4000],['shorts','쇼츠 조회(90일)','회',10000000]];
+function renderKpi(){
+  const K=S.kpi,A=K.subs>=1000&&(K.hours>=4000||K.shorts>=10000000);
+  $('#kpi').innerHTML=GOALS.map(([k,n,u,g])=>{const pc=Math.min(100,K[k]/g*100);return `<div class="card"><p>${n}</p><div class="big">${(+K[k]).toLocaleString()} <small style="font-size:13px;color:var(--mu)">/ ${g.toLocaleString()}${u}</small></div><div class="bar"><i style="width:${pc}%"></i></div><input type="number" data-kpi="${k}" value="${K[k]}" min="0"></div>`}).join('')+
+  `<div class="card"><p>수익 창출 조건</p><div class="big" style="color:${A?'var(--ok)':'var(--ac)'}">${A?'✔ 충족!':'진행 중'}</div><p>구독자 1,000 + (시청 4,000시간 또는 쇼츠 1,000만) 중 하나</p></div>`;
+  need();
+}
+function need(){
+  const K=S.kpi,d=Math.max(1,+$('#daysleft').value||1),r=(a,b)=>Math.max(0,Math.ceil((a-b)/d)).toLocaleString();
+  $('#need').textContent=`하루 필요: 구독자 +${r(1000,K.subs)}명\n하루 필요: 시청시간 +${r(4000,K.hours)}시간  (또는)  쇼츠 조회 +${r(10000000,K.shorts)}회\n\n팁: 시청시간 = 조회수 × 평균 시청 분 ÷ 60. 10분 영상 평균 4분 시청이면 1,000회 조회 ≈ 67시간.`;
+}
+$('#kpi').addEventListener('input',e=>{if(e.target.dataset.kpi){S.kpi[e.target.dataset.kpi]=+e.target.value||0;save();clearTimeout(window._t);window._t=setTimeout(renderKpi,500)}});
+$('#daysleft').addEventListener('input',need);
+function renderVids(){
+  $('#vlist').innerHTML=S.videos.length?S.videos.map((v,i)=>`<div class="tk" style="justify-content:space-between;border-bottom:1px solid var(--line)"><span><span class="pill ${v.k==='숏폼'?'cmd':''}">${v.k}</span> ${v.t}</span><span>${(+v.v).toLocaleString()}회 <a href="#" data-del="${i}" style="color:var(--bad);margin-left:8px">삭제</a></span></div>`).join(''):'<p>아직 기록이 없습니다.</p>';
+}
+$('#vadd').onclick=()=>{const t=$('#vt').value.trim();if(!t)return;S.videos.push({t,k:$('#vk').value,v:+$('#vv').value||0});$('#vt').value='';$('#vv').value='';save();renderVids()};
+$('#vlist').addEventListener('click',e=>{if(e.target.dataset.del!==undefined){e.preventDefault();S.videos.splice(+e.target.dataset.del,1);save();renderVids()}});
+renderKpi();renderVids();
+
+// 설정
+$('#exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='yt-studio-backup.json';a.click()};
+$('#imp').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{try{S=Object.assign(S,JSON.parse(await e.target.files[0].text()));save();location.reload()}catch(x){toast('파일 오류')}};
+$('#rst').onclick=()=>{if(confirm('모든 진행 상황을 초기화할까요?')){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}};
+</script>
+</body>
+</html>
