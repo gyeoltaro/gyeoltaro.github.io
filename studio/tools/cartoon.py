@@ -341,7 +341,7 @@ class Renderer:
             bounce = (.025 * s * SS) if talking and mouth else 0
             draw_char(d, cx, base * SS, s * SS, spec, emotions.get(cid, "normal"),
                       talking and mouth, blink, bounce, lambda z: self.font(z))
-        layer = Image.alpha_composite(layer, ch).resize((w, h), Image.LANCZOS).convert("RGB")
+        layer = Image.alpha_composite(layer, ch).reduce(SS).convert("RGB")  # 2배→1배 박스 축소(빠름)
         d = ImageDraw.Draw(layer)
 
         u = w / 1080 if vertical else w / 1920
@@ -354,7 +354,12 @@ class Renderer:
         if hook and vertical:
             f = self.font(68 * u)
             y = int(130 * u)
-            for ln in wrap(d, hook, f, w - pad * 2)[:3]:
+            hl = wrap(d, hook, f, w - pad * 2)
+            if len(hl) == 2 and " " in hook:  # 두 줄이면 가운데 가까운 공백에서 균형 있게 나눔
+                sp = [i for i, ch in enumerate(hook) if ch == " "]
+                cut = min(sp, key=lambda i: abs(i - len(hook) / 2))
+                hl = [hook[:cut], hook[cut + 1:]]
+            for ln in hl[:3]:
                 tw = d.textlength(ln, font=f)
                 d.text(((w - tw) / 2, y), ln, font=f, fill=accent, stroke_width=int(7 * u), stroke_fill=OUT)
                 y += int(f.size * 1.25)
