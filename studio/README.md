@@ -31,3 +31,8 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 
 ## 시뮬레이션 예시
 `projects/sim-habit/` — 퍼온 글(source.txt)부터 부서별 산출물(01 소재선별, 02 재각본, project.json, 10 숏폼 업로드, 11 SEO, 13 검수)까지 실제 파이프라인 결과 예시.
+
+## 숏폼 (3초 후크 + 배속)
+- 첫 장면에 **후크 카드**가 자동으로 붙습니다: 큰 글씨 + 폭발 배경 + 캐릭터가 `hook_line` 을 외침 (약 1~2초) → 바로 본론
+- 기본 **1.25배속** (`shorts_speed`, 숏폼별 `speed` 로 변경). 음높이는 유지됩니다.
+- `shorts[]`: `scenes`, `hook`(상단 고정 문구), `hook_line`(후크 대사, 없으면 hook 사용), `hook_who`, `hook_emotion`, `speed`

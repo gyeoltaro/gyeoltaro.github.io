@@ -2,6 +2,7 @@
 
 외부 이미지 없이 동작합니다. 모든 도형을 2배 해상도로 그린 뒤 축소해 선이 매끄럽습니다.
 """
+import math
 import random
 from PIL import Image, ImageDraw, ImageFont
 
@@ -321,8 +322,8 @@ class Renderer:
         return self._bg[key]
 
     def frame(self, w, h, *, bg, chars, speaker, emotions, mouth, blink, text, name, name_color,
-              chip=None, hook=None, progress=0.0, accent=(255, 213, 79)):
-        """chars: [(id, spec)] / emotions: {id: emo}"""
+              chip=None, hook=None, progress=0.0, accent=(255, 213, 79), hook_big=False):
+        """chars: [(id, spec)] / emotions: {id: emo} / hook_big: 숏폼 첫 3초 후크 카드(큰 글씨+폭발 배경)"""
         vertical = h > w
         horizon = .54 if vertical else .70
         n = max(1, len(chars))
@@ -335,6 +336,15 @@ class Renderer:
         layer = self.bg(w, h, bg, horizon).copy().convert("RGBA")
         ch = Image.new("RGBA", layer.size, (0, 0, 0, 0))
         d = ImageDraw.Draw(ch)
+        if hook_big and vertical:  # 캐릭터 뒤 폭발(집중선) 배경
+            bx, by_, W2 = w / 2 * SS, h * .21 * SS, w * SS
+            pts = []
+            for k in range(36):
+                a = math.pi * 2 * k / 36
+                r = W2 * (.62 if k % 2 == 0 else .44)
+                pts.append((bx + math.cos(a) * r, by_ + math.sin(a) * r * .85))
+            d.polygon(pts, fill=(255, 72, 72, 255))
+            d.line(pts + [pts[0]], fill=OUT + (255,), width=int(6 * SS))
         for i, (cid, spec) in enumerate(chars):
             cx = w * (i + 1) / (n + 1) * SS
             talking = cid == speaker
@@ -352,8 +362,8 @@ class Renderer:
             d.rounded_rectangle([pad, int(46 * u), pad + tw + int(50 * u), int(46 * u) + int(66 * u)], radius=int(33 * u), fill=(20, 20, 40))
             d.text((pad + int(25 * u), int(46 * u) + int(10 * u)), chip, font=f, fill=accent)
         if hook and vertical:
-            f = self.font(68 * u)
-            y = int(130 * u)
+            f = self.font((104 if hook_big else 68) * u)
+            y = int((150 if hook_big else 130) * u)
             hl = wrap(d, hook, f, w - pad * 2)
             if len(hl) == 2 and " " in hook:  # 두 줄이면 가운데 가까운 공백에서 균형 있게 나눔
                 sp = [i for i, ch in enumerate(hook) if ch == " "]
@@ -361,9 +371,10 @@ class Renderer:
                 hl = [hook[:cut], hook[cut + 1:]]
             for ln in hl[:3]:
                 tw = d.textlength(ln, font=f)
-                d.text(((w - tw) / 2, y), ln, font=f, fill=accent, stroke_width=int(7 * u), stroke_fill=OUT)
+                d.text(((w - tw) / 2, y), ln, font=f, fill=(255, 240, 90) if hook_big else accent,
+                       stroke_width=int((10 if hook_big else 7) * u), stroke_fill=OUT)
                 y += int(f.size * 1.25)
-        if text:
+        if text and not (hook_big and vertical):  # 후크 카드는 큰 글씨가 자막 역할
             f = self.font((56 if vertical else 50) * u)
             lines = wrap(d, text, f, w - pad * 2 - int(40 * u))
             lh = int(f.size * 1.36)
