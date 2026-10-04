@@ -9,7 +9,7 @@
   python3 studio/tools/studio.py all    studio/projects/<slug>/project.json
 
 필요: ffmpeg, Pillow, edge-tts (pip install pillow edge-tts)
-TTS(edge-tts)가 안 되면 espeak-ng(오프라인), 그것도 없으면 무음으로 대체됩니다.
+음성: edge-tts → 구글 번역 음성 → espeak-ng(오프라인) → 무음 순으로 대체됩니다.
 """
 import argparse, asyncio, hashlib, json, os, random, re, shutil, subprocess, sys
 from pathlib import Path
@@ -190,17 +190,56 @@ def espeak_audio(text, voice, pitch, out):
         wav.unlink(missing_ok=True)
 
 
+def google_audio(text, voice, pitch, out):
+    """구글 번역 음성(네트워크 필요, 자연스러운 한국어 1종). 남성/피치는 음높이 변환으로 구분"""
+    import urllib.parse, urllib.request
+    chunks, cur = [], ""
+    for part in re.split(r"(?<=[.!?,])\s+", text):
+        if len(cur) + len(part) > 180 and cur:
+            chunks.append(cur)
+            cur = part
+        else:
+            cur = (cur + " " + part).strip()
+    if cur:
+        chunks.append(cur)
+    raw = out.with_suffix(".raw.mp3")
+    try:
+        with open(raw, "wb") as fh:
+            for i, c in enumerate(chunks):
+                q = urllib.parse.urlencode({"client": "gtx", "ie": "UTF-8", "tl": "ko", "q": c,
+                                            "total": len(chunks), "idx": i, "textlen": len(c)})
+                req = urllib.request.Request("https://translate.googleapis.com/translate_tts?" + q,
+                                             headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    fh.write(r.read())
+        male = any(k in voice for k in ("InJoon", "Hyunsu", "Male"))
+        m = re.match(r"([+-]?\d+)Hz", pitch or "")
+        semi = (-4.0 if male else 0.0) + (int(m.group(1)) / 6 if m else 0)
+        k = 2 ** (semi / 12)
+        af = f"asetrate=24000*{k:.4f},aresample=24000,atempo={1.12 / k:.4f}"  # 음높이만 변경 + 약간 빠르게
+        sh(["ffmpeg", "-y", "-i", str(raw), "-af", af, "-ac", "1", "-q:a", "3", str(out)])
+        return out.exists() and out.stat().st_size > 1000
+    except Exception:
+        return False
+    finally:
+        raw.unlink(missing_ok=True)
+
+
 def make_audio(text, voice, rate, pitch, out):
-    """True=edge-tts 고품질 음성. False=대체본(espeak-ng 또는 무음, 다음 실행에 edge-tts 재시도)"""
+    """True=edge-tts 고품질 음성. False=대체본(구글/espeak-ng/무음, 다음 실행에 edge-tts 재시도)"""
     try:
         asyncio.run(_tts(text, voice, rate, pitch, out))
         if out.exists() and out.stat().st_size > 1000:
             return True
     except Exception as e:  # 네트워크/모듈 문제
-        warn_once(f"  ! edge-tts 사용 불가({type(e).__name__}) → 오프라인 대체 음성 사용 (네트워크 되는 PC에서 다시 렌더링하면 고품질 음성)")
-    if espeak_audio(text, voice, pitch, out):
+        warn_once(f"  ! edge-tts 사용 불가({type(e).__name__}) → 대체 음성 사용")
+    if google_audio(text, voice, pitch, out):
+        warn_once("  · 대체 음성: 구글 번역 음성")
         return False
-    warn_once("  ! espeak-ng 도 없음 → 무음 (sudo apt install espeak-ng)")
+    if espeak_audio(text, voice, pitch, out):
+        warn_once("  · 대체 음성: espeak-ng (로봇 음성)")
+        return False
+    warn_once("  ! 사용 가능한 음성 없음 → 무음 (sudo apt install espeak-ng)")
     secs = max(1.6, len(text) / 5.5)
     sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{secs:.2f}",
         "-q:a", "9", str(out)])
