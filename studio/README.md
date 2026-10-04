@@ -44,7 +44,7 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 - 굵은 폰트: Noto Sans CJK KR Black. 클라우드 세션에서는 `.claude/hooks/session-start.sh` 가 자동 설치 (로컬은 `sudo apt install fonts-noto-cjk-extra`)
 
 ## 리서치·분석 (YouTube Data API v3)
-공개 데이터로 주제 수요, 떡상 공식, SEO 를 분석합니다. 결과는 `studio/research/<이름>/report.md`(+`data.json`), 끝에 Claude 가 답할 분석 질문이 붙습니다.
+공개 데이터로 주제 수요, 떡상 공식, SEO 를 분석합니다. 결과는 `studio/research/<이름>/report.md`(+`data.json`), 끝에 Claude 가 답할 분석 질문이 붙습니다. 원자료는 YouTube API 개발자 정책에 따라 git 에 올리지 않고 30일 뒤 자동 삭제합니다.
 ```
 python3 studio/tools/research.py topic "습관 만들기" --days 90 [--long|--shorts]   # 주제 리서치 (검색 1회=할당량 100)
 python3 studio/tools/research.py video https://youtu.be/VIDEO_ID                  # 왜 잘 됐나 (비교군 대비)
@@ -54,3 +54,18 @@ python3 studio/tools/research.py trend --days 180                               
 - 지표: 하루 조회수, **구독자 대비 조회수 배수**(떡상 지표), 참여율, 제목 패턴(길이·숫자·질문형·괄호), 영상 길이, 업로드 요일·시간, 자주 쓰인 단어·태그, 인기 댓글
 - 준비: Google Cloud 콘솔에서 **YouTube Data API v3 사용 설정** + API 키 제한사항에 추가 (키는 `GOOGLE_TTS_API_KEY` 재사용, 또는 `YOUTUBE_API_KEY`)
 - 시청 지속률·CTR·유입 경로 같은 비공개 통계는 YouTube Analytics API(OAuth) 가 필요 — 현재는 YouTube 스튜디오 수치를 붙여넣어 분석
+
+## 업로드
+**지금 (심사 전): 업로드 키트**
+`python3 studio/tools/studio.py kit studio/projects/<slug>/project.json` → `output/upload.html`
+- 휴대폰에서 열어 제목, 설명(챕터 자동 계산), 태그, 고정 댓글을 **복사 버튼**으로 붙여넣고 YouTube 앱으로 올립니다. 영상 1편에 1~2분.
+- 업로드 정보는 `project.json` 의 `publish`(롱폼)와 `shorts[]`의 `title`, `publish_at`.
+
+**심사 통과 후: 자동 업로드** (`studio/tools/upload.py`)
+```
+python3 studio/tools/upload.py auth                       # 최초 1회 계정 연결 (google.com/device 에 코드 입력)
+python3 studio/tools/upload.py upload <project.json> --dry-run
+python3 studio/tools/upload.py upload <project.json>      # 예약 업로드 + 썸네일 + 재생목록, 중복 업로드 방지
+```
+- 2020년 7월 28일 이후 만든 프로젝트는 **YouTube API 심사 전에는 업로드 영상이 비공개로 잠깁니다.** 심사 준비는 `studio/api-audit/README.md`.
+- 개인정보처리방침과 약관 페이지: `studio/legal/privacy.html`, `studio/legal/terms.html`
