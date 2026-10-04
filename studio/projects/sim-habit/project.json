@@ -3,7 +3,9 @@
  "slug": "sim-habit",
  "voice": "ko-KR-SunHiNeural",
  "thumbnail": {
-  "text": "작심삼일 끝내는 법"
+  "text": "작심삼일\n끝내는 법",
+  "highlight": "작심삼일",
+  "badge": "2월에 무너지는 이유 4가지"
  },
  "cast": {
   "minsu": {
@@ -59,6 +61,16 @@
      "who": "minsu",
      "text": "왜 그렇게 단정해? 나 의지력 강하거든!",
      "emotion": "angry"
+    },
+    {
+     "who": "minsu",
+     "text": "작년엔 매일 영어 단어 백 개였는데, 그것도 일주일 만에 끝났지.",
+     "emotion": "sad"
+    },
+    {
+     "who": "yuna",
+     "text": "그것도 기억하고 있었구나. 그럼 올해도 비슷하게 될 확률이 높아.",
+     "emotion": "think"
     },
     {
      "who": "yuna",
@@ -503,6 +515,118 @@
    ]
   },
   {
+   "title": "보너스 1. 의지보다 환경",
+   "bg": "room",
+   "cast": [
+    "minsu",
+    "yuna"
+   ],
+   "lines": [
+    {
+     "who": "minsu",
+     "text": "근데 유나야, 나는 집에만 오면 유튜브부터 켜게 돼.",
+     "emotion": "sad"
+    },
+    {
+     "who": "yuna",
+     "text": "그건 네 의지가 약해서가 아니라 환경이 그렇게 돼 있어서야.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "환경? 내 방이 뭐가 어때서?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "침대 옆에 휴대폰 충전기, 책상 위엔 게임기. 맞지?",
+     "emotion": "think",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "어떻게 알았어? 혹시 우리 집 와 봤어?",
+     "emotion": "surprised"
+    },
+    {
+     "who": "yuna",
+     "text": "대부분 사람 방이 다 그래. 하고 싶은 건 가까이, 해야 할 건 멀리.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "듣고 보니 운동화는 신발장 맨 안쪽에 있네.",
+     "emotion": "sad"
+    },
+    {
+     "who": "narrator",
+     "text": "사람은 생각보다 눈앞에 보이는 것에 크게 좌우됩니다."
+    }
+   ]
+  },
+  {
+   "title": "해결: 좋은 습관은 가까이",
+   "bg": "room",
+   "cast": [
+    "minsu",
+    "yuna"
+   ],
+   "lines": [
+    {
+     "who": "yuna",
+     "text": "방법은 간단해. 좋은 습관은 눈앞에, 나쁜 습관은 멀리.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "운동하고 싶으면 운동복을 전날 밤에 침대 옆에 꺼내 둬.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "책을 읽고 싶으면 휴대폰 대신 베개 위에 책을 올려 두고.",
+     "emotion": "normal"
+    },
+    {
+     "who": "minsu",
+     "text": "그럼 휴대폰은 어디 둬?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "잘 때는 거실에서 충전해. 손이 안 닿게.",
+     "emotion": "normal",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "그럼 알람은 어떻게 꺼?",
+     "emotion": "surprised"
+    },
+    {
+     "who": "yuna",
+     "text": "알람 끄러 거실까지 걸어가면, 그게 벌써 아침 운동이야.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "오, 일석이조네! 오늘 밤에 바로 해볼게.",
+     "emotion": "happy",
+     "react": {
+      "yuna": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "의지력을 쓰는 대신 환경을 바꾸면, 좋은 선택이 자연스러운 선택이 됩니다."
+    }
+   ]
+  },
+  {
    "title": "진짜 비밀: 정체성",
    "bg": "park",
    "lines": [
@@ -538,6 +662,16 @@
      "who": "minsu",
      "text": "아, 뒤의 말이 훨씬 단단하게 들린다.",
      "emotion": "surprised"
+    },
+    {
+     "who": "minsu",
+     "text": "그럼 나는 오늘부터 '책 읽는 사람'도 해볼까?",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "좋아. 대신 하루에 한 쪽부터. 정체성은 작은 증거가 쌓여서 만들어져.",
+     "emotion": "happy"
     },
     {
      "who": "yuna",
@@ -598,6 +732,124 @@
    ]
   },
   {
+   "title": "한 달 뒤 민수",
+   "bg": "park",
+   "cast": [
+    "minsu",
+    "yuna"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그리고 한 달 뒤."
+    },
+    {
+     "who": "yuna",
+     "text": "민수야, 요즘 운동은 어때?",
+     "emotion": "think"
+    },
+    {
+     "who": "minsu",
+     "text": "놀라지 마. 달력에 X 표시가 스물여섯 개야!",
+     "emotion": "happy",
+     "react": {
+      "yuna": "surprised"
+     }
+    },
+    {
+     "who": "yuna",
+     "text": "스물여섯 개? 대단한데? 빠진 날은?",
+     "emotion": "surprised"
+    },
+    {
+     "who": "minsu",
+     "text": "야근한 날 나흘. 그래도 이틀 연속으로는 한 번도 안 빠졌어.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "요즘은 스쿼트 열 개가 서른 개로 늘었어.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "거봐. 작게 시작하면 저절로 커진다니까.",
+     "emotion": "happy",
+     "react": {
+      "minsu": "happy"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "신기하게 이제는 안 하면 오히려 찝찝해.",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "그게 바로 습관이 됐다는 신호야.",
+     "emotion": "happy"
+    }
+   ]
+  },
+  {
+   "title": "자주 묻는 질문",
+   "bg": "office",
+   "cast": [
+    "minsu",
+    "yuna"
+   ],
+   "lines": [
+    {
+     "who": "minsu",
+     "text": "유나야, 시청자분들이 궁금해할 것 같은 거 몇 개만 물어볼게.",
+     "emotion": "think"
+    },
+    {
+     "who": "minsu",
+     "text": "습관 하나 만드는 데 보통 얼마나 걸려?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "사람마다, 습관마다 달라. 몇 주 만에 되는 것도 있고 몇 달 걸리는 것도 있어.",
+     "emotion": "normal"
+    },
+    {
+     "who": "yuna",
+     "text": "그러니까 날짜보다 '연속으로 했나'를 보는 게 좋아.",
+     "emotion": "happy"
+    },
+    {
+     "who": "minsu",
+     "text": "그럼 습관 여러 개를 한꺼번에 시작해도 돼?",
+     "emotion": "think"
+    },
+    {
+     "who": "yuna",
+     "text": "추천하지 않아. 하나가 자리 잡으면 그다음 걸 붙여.",
+     "emotion": "normal",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "마지막! 2분 넘게 하고 싶으면 더 해도 돼?",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "물론이지. 2분은 최소한이지 최대가 아니야.",
+     "emotion": "happy"
+    },
+    {
+     "who": "yuna",
+     "text": "다만 너무 무리해서 다음 날 하기 싫어질 정도는 피하고.",
+     "emotion": "normal"
+    }
+   ]
+  },
+  {
    "title": "정리",
    "bg": "cafe",
    "lines": [
@@ -620,6 +872,10 @@
     {
      "who": "narrator",
      "text": "넷, 하루는 괜찮지만 이틀 연속으로는 빠지지 않기."
+    },
+    {
+     "who": "narrator",
+     "text": "다섯, 좋은 습관은 눈앞에, 나쁜 습관은 멀리 두기."
     },
     {
      "who": "narrator",
@@ -654,6 +910,19 @@
      "emotion": "normal"
     },
     {
+     "who": "yuna",
+     "text": "제일 좋은 댓글은 다음 영상에서 민수가 직접 따라 해 볼 거예요.",
+     "emotion": "happy",
+     "react": {
+      "minsu": "surprised"
+     }
+    },
+    {
+     "who": "minsu",
+     "text": "엥? 나 허락한 적 없는데? 좋아, 해볼게!",
+     "emotion": "surprised"
+    },
+    {
      "who": "minsu",
      "text": "도움이 됐다면 구독이랑 좋아요도 2분 습관에 넣어 주세요.",
      "emotion": "happy"
@@ -679,19 +948,35 @@
     2,
     3
    ],
-   "hook": "헬스장 1년 등록하고 3번 간 이유"
+   "hook": "헬스장 1년 끊고 3번 간 사람",
+   "hook_line": "헬스장 1년 끊고 세 번 간 사람?",
+   "hook_who": "yuna"
   },
   {
    "scenes": [
     5
    ],
-   "hook": "습관 만드는 공식 딱 하나"
+   "hook": "습관 만드는 공식 딱 하나",
+   "hook_line": "습관 만드는 공식, 딱 하나만 기억해!",
+   "hook_who": "yuna"
+  },
+  {
+   "scenes": [
+    10,
+    11
+   ],
+   "hook": "의지력 없어도 되는 방법",
+   "hook_line": "의지력 없어도 습관 만드는 법!",
+   "hook_who": "yuna"
   },
   {
    "scenes": [
     9
    ],
-   "hook": "하루 빠져도 괜찮은 이유"
+   "hook": "하루 빠져도 괜찮은 이유",
+   "hook_line": "하루 빠져도 괜찮아, 진짜로!",
+   "hook_who": "yuna"
   }
- ]
+ ],
+ "shorts_speed": 1.25
 }

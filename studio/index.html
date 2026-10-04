@@ -138,11 +138,12 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const CTX=(p)=>`[프로젝트] slug=${p.slug||'(미정)'} / 목표 길이 ${p.mins}분 / 톤·타깃: ${p.tone||'(미지정)'}\n저장 위치: studio/projects/${p.slug||'<slug>'}/\n`;
 const SRC=(p)=>`\n===== 원문 =====\n${p.src||'(여기에 원문이 들어갑니다)'}\n===== 끝 =====\n`;
 const SCHEMA=`project.json 형식 (자막 들어간 만화, 반드시 유효 JSON):
-{"title":"","slug":"","voice":"ko-KR-SunHiNeural","thumbnail":{"text":"짧고 강한 3~8자"},
+{"title":"","slug":"","voice":"ko-KR-SunHiNeural","thumbnail":{"text":"1줄\\n2줄 (줄당 4~6자)","highlight":"빨간 박스로 강조할 단어","badge":"좌상단 작은 문구(선택)","variants":[{"palette":"yellow|blue|red|green|purple","chars":[["minsu","surprised"],["yuna","happy"]]}]},
  "cast":{"minsu":{"name":"민수","voice":"ko-KR-InJoonNeural","color":"#4f8cff","hair":"short|long|bun|spiky|none","hair_color":"#2f2a2a","accessory":"glasses|bow|none","pitch":"+0Hz"}},
  "scenes":[{"title":"장면 제목(좌상단 칩)","bg":"room|street|office|cafe|park|night|plain","cast":["minsu","yuna"],
    "lines":[{"who":"minsu|yuna|narrator","text":"자막이자 대사(40자 이내 구어체)","emotion":"normal|happy|sad|angry|surprised|think","react":{"yuna":"think"}}]}],
- "shorts":[{"scenes":[장면 인덱스들],"hook":"첫 3초 후크 문구"}]}
+ "shorts_speed":1.25,
+ "shorts":[{"scenes":[장면 인덱스들],"hook":"화면 상단 고정 문구(15자 내외)","hook_line":"첫 1~2초에 캐릭터가 외칠 후크 대사(질문·반전형)","hook_who":"yuna"}]}
 규칙: 등장인물 2~3명 고정, narrator 는 해설(캐릭터 말풍선 없이 자막만), 대사마다 감정을 지정해 표정이 바뀌게 하세요.`;
 const GROUPS=[
  {g:'🧭 기획본부',teams:[
@@ -164,16 +165,16 @@ const GROUPS=[
    p:p=>CTX(p)+`당신은 편집팀장입니다. 다음을 순서대로 실행하고 결과를 보고하세요.\n1) python3 studio/tools/studio.py check\n2) python3 studio/tools/studio.py long studio/projects/${p.slug||'<slug>'}/project.json\n3) ffprobe로 길이·해상도 확인, ffmpeg로 프레임 3~4장 추출해 표정·자막 잘림·캐릭터 겹침 점검\n문제가 있으면 project.json을 고쳐 재렌더링하세요.`},
  ]},
  {g:'📱 숏폼본부',teams:[
-  {id:'cut',n:'하이라이트팀',e:'✂️',d:'롱폼에서 숏폼으로 떼어낼 구간 선정',t:['후크 강한 구간 탐색','45초 이내 분할','독립적으로 이해되는지 확인','숏폼 5~10개 후보'],
-   p:p=>CTX(p)+`당신은 하이라이트팀장입니다. project.json의 장면들 중 단독으로 봐도 이해되고 후크가 강한 구간을 골라 shorts[] 를 2~5개로 채우세요(각 합계 45초 이내, hook은 12자 내외의 첫 3초 문구). 필요하면 숏폼 전용으로 narration을 압축한 새 장면을 scenes 끝에 추가해도 됩니다.`},
+  {id:'cut',n:'하이라이트팀',e:'✂️',d:'롱폼에서 숏폼으로 떼어낼 구간 선정',t:['후크 강한 구간 탐색','첫 3초 후크 대사(hook_line)','1.25배속 기준 60초 이내','독립적으로 이해되는지 확인'],
+   p:p=>CTX(p)+`당신은 하이라이트팀장입니다. project.json의 장면들 중 단독으로 봐도 이해되고 후크가 강한 구간을 골라 shorts[] 를 3~5개로 채우세요. 숏폼은 기본 1.25배속(shorts_speed)이라 원래 길이 75초(대사 약 500자) 이내면 60초 안에 들어갑니다. 첫 3초에 시청자를 잡도록 hook_line(캐릭터가 첫 1~2초에 외치는 대사, 20자 이내의 질문·반전·숫자형 예: '헬스장 1년 끊고 세 번 간 사람?')과 hook(화면 상단 고정 문구, 15자 내외), hook_who(외칠 캐릭터)를 지정하세요. 영상은 후크 카드(큰 글씨+폭발 배경)로 시작해 바로 본론으로 들어갑니다. 필요하면 숏폼 전용으로 narration을 압축한 새 장면을 scenes 끝에 추가해도 됩니다.`},
   {id:'vertical',n:'세로변환팀',e:'📐',d:'1080x1920 세로 영상 렌더링',t:['shorts 렌더링','후크 문구 가독성','하단 UI 영역 피하기','파일명/순서 정리'],
    p:p=>CTX(p)+`당신은 세로변환팀장입니다. python3 studio/tools/studio.py shorts studio/projects/${p.slug||'<slug>'}/project.json 을 실행하고 output/short_*.mp4 의 길이/해상도를 검증, 프레임을 추출해 글자 잘림을 점검하세요.`},
   {id:'shortseo',n:'숏폼 업로드팀',e:'🚀',d:'숏폼 제목·해시태그·업로드 순서',t:['제목(후크형)','#Shorts 해시태그','롱폼 링크 고정댓글','하루 1~3개 스케줄'],
    p:p=>CTX(p)+`당신은 숏폼 업로드팀장입니다. 각 short_XX.mp4 별 제목(40자 이내), 설명(롱폼 유도 한 줄 + #Shorts 포함 해시태그 3~5개), 고정댓글 문구, 업로드 순서/시간표를 studio/projects/${p.slug||'<slug>'}/10_shorts_upload.md 로 작성하세요.`},
  ]},
  {g:'📣 퍼블리싱·성장본부',teams:[
-  {id:'thumb',n:'썸네일팀',e:'🖼',d:'1280x720 썸네일 생성',t:['thumb 명령 실행','대비/가독성 점검','모바일 축소 확인','대체안 2개'],
-   p:p=>CTX(p)+`당신은 썸네일팀장입니다. python3 studio/tools/studio.py thumb studio/projects/${p.slug||'<slug>'}/project.json 으로 output/thumbnail.png 을 만들고 확인하세요. 모바일 크기에서도 읽히는지 점검하고, thumbnail.text 대체안 2개로 변형본도 만들어 비교하세요.`},
+  {id:'thumb',n:'썸네일팀',e:'🖼',d:'1280x720 썸네일 A/B/C 3종 생성',t:['문구 2줄(줄당 4~6자)','강조 단어·배지 선정','표정/색 A·B·C 3종','모바일 축소 확인'],
+   p:p=>CTX(p)+`당신은 썸네일팀장입니다. python3 studio/tools/studio.py thumb studio/projects/${p.slug||'<slug>'}/project.json 으로 썸네일 3종(thumbnail.png, thumbnail_b.png, thumbnail_c.png)을 만드세요. 먼저 project.json 의 thumbnail 을 채웁니다: text 는 2줄(\\n 으로 구분, 줄당 4~6자, 호기심·숫자·반전), highlight 는 빨간 박스로 강조할 핵심 단어, badge 는 좌상단 보조 문구(예: '이유 4가지'), variants 3개는 배경색(palette)과 캐릭터 표정(chars: [[id, emotion]] 첫 번째가 주인공)을 서로 다르게. 렌더링 후 이미지를 직접 보고 글자 잘림·캐릭터 잘림·320px 축소 시 가독성을 점검하세요. 3종은 유튜브 '테스트 및 비교'에 올립니다.`},
   {id:'seo',n:'SEO팀',e:'🔍',d:'제목·설명·태그·챕터',t:['제목 최종안','설명란(첫 2줄 핵심)','태그/해시태그','챕터 타임스탬프'],
    p:p=>CTX(p)+`당신은 SEO팀장입니다. project.json 기준으로 최종 제목, 설명란(첫 2줄에 핵심 키워드, 챕터 타임스탬프 포함 — 장면 길이는 work 폴더의 mp3 길이로 계산), 태그 15개, 해시태그 3개, 고정댓글을 studio/projects/${p.slug||'<slug>'}/11_publish.md 로 작성하세요.`},
   {id:'upload',n:'업로드·스케줄팀',e:'📅',d:'YouTube 스튜디오 업로드 체크',t:['동영상 업로드','썸네일 등록','변형/합성 콘텐츠 공개 체크','예약 게시 + 쇼츠 연계'],

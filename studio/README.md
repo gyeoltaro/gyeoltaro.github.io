@@ -31,3 +31,14 @@ Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏�
 
 ## 시뮬레이션 예시
 `projects/sim-habit/` — 퍼온 글(source.txt)부터 부서별 산출물(01 소재선별, 02 재각본, project.json, 10 숏폼 업로드, 11 SEO, 13 검수)까지 실제 파이프라인 결과 예시.
+
+## 숏폼 (3초 후크 + 배속)
+- 첫 장면에 **후크 카드**가 자동으로 붙습니다: 큰 글씨 + 폭발 배경 + 캐릭터가 `hook_line` 을 외침 (약 1~2초) → 바로 본론
+- 기본 **1.25배속** (`shorts_speed`, 숏폼별 `speed` 로 변경). 음높이는 유지됩니다.
+- `shorts[]`: `scenes`, `hook`(상단 고정 문구), `hook_line`(후크 대사, 없으면 hook 사용), `hook_who`, `hook_emotion`, `speed`
+
+## 썸네일 (A/B/C 3종)
+`thumb` 명령이 `thumbnail.png`(A), `thumbnail_b.png`, `thumbnail_c.png` 를 만듭니다 — 유튜브 **테스트 및 비교**(썸네일 3개 A/B 테스트)용.
+- 구성: 집중선 배경 + 확대한 캐릭터(흰 스티커 테두리) + 초대형 굵은 글씨 + 강조 박스 + 배지
+- `thumbnail`: `text`(2줄은 `\n`), `highlight`(강조 단어), `badge`(좌상단 문구), `variants`(최대 3개: `palette` yellow/blue/red/green/purple, `chars` [[캐릭터, 표정], …])
+- 굵은 폰트: Noto Sans CJK KR Black. 클라우드 세션에서는 `.claude/hooks/session-start.sh` 가 자동 설치 (로컬은 `sudo apt install fonts-noto-cjk-extra`)

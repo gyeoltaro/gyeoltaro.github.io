@@ -399,7 +399,8 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
             png.parent.mkdir(exist_ok=True)
             jobs.append((str(png), dict(w=w, h=h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker,
                                         emotions=emos, mouth=m, blink=bl, text=ln["text"], name=name,
-                                        name_color=ncol, chip=chip, hook=hook, progress=prog)))
+                                        name_color=ncol, chip=None if sc.get("_hook_card") else chip,
+                                        hook=hook, progress=prog, hook_big=bool(sc.get("_hook_card")))))
             states[st] = png
         rnd = random.Random(li * 31 + k)
         t, step, pattern = 0.0, 0.16, []
@@ -412,8 +413,8 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
             pattern.append(st)
             frames.append((states[st], d_))
             t += d_
-        gap = 0.18  # 대사 사이 여백
-        sil = sil or root / "work" / "gap.mp3"
+        gap = 0.06 if sc.get("_hook_card") else 0.18  # 대사 사이 여백 (후크 카드는 바로 본론으로)
+        sil = root / "work" / f"gap{int(gap * 1000)}.mp3"
         if not sil.exists():
             sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{gap}", "-q:a", "9", str(sil)])
         frames.append((states["c"], gap))
@@ -435,7 +436,7 @@ def slide_segments(proj, sc, root, size, k, total, theme, font_path, hook):
     return frames, [mp3]
 
 
-def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, font=None):
+def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, font=None, speed=1.0):
     w, h = size
     font_path = find_font(font)
     work = root / f"work_{w}x{h}"
@@ -461,6 +462,8 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         with ProcessPoolExecutor(workers, initializer=_init_worker, initargs=(font_path,)) as ex:
             list(ex.map(_render_job, jobs, chunksize=4))
         print(f"[프레임] {len(jobs)}장 {time.time() - t0:.0f}초 (병렬 {workers})")
+    if speed != 1.0:  # 배속: 화면 길이는 줄이고 음성은 atempo(음높이 유지)로 빠르게
+        frames = [(png, secs / speed) for png, secs in frames]
     lst = work / "frames.txt"
     with open(lst, "w") as fh:
         for png, secs in frames:
@@ -473,6 +476,7 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         "-f", "concat", "-safe", "0", "-i", str(alst),
         *(["-vf", "format=yuv420p", "-fps_mode", "vfr"] if FAST else ["-vf", "format=yuv420p,fps=30"]),
         "-c:v", "libx264", "-preset", "veryfast", "-tune", "animation", "-crf", "20",
+        *(["-af", f"atempo={speed}"] if speed != 1.0 else []),
         "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", str(out)])
     if not os.environ.get("STUDIO_KEEP_WORK"):
         shutil.rmtree(work, ignore_errors=True)
@@ -492,33 +496,53 @@ def cmd_long(proj, root, font):
 
 
 def cmd_shorts(proj, root, font):
+    """숏폼: 첫 장면에 후크 카드(후크 대사+큰 글씨) 추가, 기본 1.25배속"""
     out = root / "output"
     out.mkdir(exist_ok=True)
+    cast = proj.get("cast", {})
     for n, sh_ in enumerate(proj.get("shorts", []), 1):
-        secs = render_video(proj, root, sh_["scenes"], (1080, 1920), out / f"short_{n:02d}.mp4",
-                            hook=sh_.get("hook", ""), theme_shift=n, font=font)
-        if secs > 180:
-            print("  ! 쇼츠는 3분 이내여야 합니다 (60초 이내 권장)")
+        p2 = dict(proj, scenes=list(proj["scenes"]))
+        ids = list(sh_["scenes"])
+        hook = sh_.get("hook", "")
+        hook_line = sh_.get("hook_line") or hook
+        first = proj["scenes"][ids[0]]
+        if hook_line and is_cartoon(proj, first):
+            members = first.get("cast") or [ln["who"] for ln in scene_lines(first) if ln.get("who") in cast]
+            who = sh_.get("hook_who") or next((m for m in members if m in cast), "narrator")
+            p2["scenes"].append(dict(first, _hook_card=True, lines=[{
+                "who": who, "text": hook_line, "emotion": sh_.get("hook_emotion", "surprised"),
+                "react": {m: "surprised" for m in members if m != who}}]))
+            ids = [len(p2["scenes"]) - 1] + ids
+        speed = float(sh_.get("speed", proj.get("shorts_speed", 1.25)))
+        secs = render_video(p2, root, ids, (1080, 1920), out / f"short_{n:02d}.mp4",
+                            hook=hook, theme_shift=n, font=font, speed=speed)
+        print(f"    {speed}배속 · 후크 카드 {'O' if len(ids) > len(sh_['scenes']) else 'X'}")
+        if secs > 60:
+            print("  ! 60초 초과: 쇼츠는 3분까지 가능하지만 60초 이내가 완주율에 유리합니다")
 
 
 def cmd_thumb(proj, root, font):
+    """썸네일 A/B/C 3종 (유튜브 '테스트 및 비교'용). thumbnail.png 가 기본(A)"""
     out = root / "output"
     out.mkdir(exist_ok=True)
     font_path = find_font(font)
     t = proj.get("thumbnail", {})
     text = t.get("text") or proj["title"]
-    w, h = 1280, 720
-    img = gradient(w, h, (20, 20, 60), (120, 30, 90))
-    d = ImageDraw.Draw(img)
-    f = ImageFont.truetype(font_path, 130)
-    y = 130
-    for ln in wrap(d, text, f, w - 140)[:3]:
-        for dx, dy in [(-4, -4), (4, 4), (-4, 4), (4, -4)]:
-            d.text((70 + dx, y + dy), ln, font=f, fill="black")
-        d.text((70, y), ln, font=f, fill=(255, 224, 70) if y == 130 else "white")
-        y += 165
-    img.save(out / "thumbnail.png")
-    print(f"  ✔ {out / 'thumbnail.png'}")
+    cast = proj.get("cast", {}) or {"_mascot": proj.get("mascot", cartoon.DEFAULT_LOOK)}
+    ids = list(cast)
+    variants = t.get("variants") or [
+        {"palette": "yellow", "chars": [[ids[0], "surprised"]] + ([[ids[1], "happy"]] if len(ids) > 1 else [])},
+        {"palette": "blue", "chars": ([[ids[1], "happy"]] if len(ids) > 1 else []) + [[ids[0], "think"]]},
+        {"palette": "red", "chars": [[ids[0], "sad"]] + ([[ids[1], "angry"]] if len(ids) > 1 else [])},
+    ]
+    for i, v in enumerate(variants[:3]):
+        chars = [(cast[c], e) for c, e in v["chars"] if c in cast]
+        img = cartoon.render_thumbnail(v.get("text", text), chars, font_path, palette=v.get("palette", "yellow"),
+                                       highlight=v.get("highlight", t.get("highlight")),
+                                       badge=v.get("badge", t.get("badge")))
+        name = "thumbnail.png" if i == 0 else f"thumbnail_{'abc'[i]}.png"
+        img.save(out / name)
+        print(f"  ✔ {out / name}")
 
 
 def cmd_check():
