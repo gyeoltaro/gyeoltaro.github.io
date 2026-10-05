@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 SS = 2                    # 슈퍼샘플링 배율
 OUT = (43, 34, 51)        # 외곽선 색
-EMOTIONS = ("normal", "happy", "sad", "angry", "surprised", "think")
+EMOTIONS = ("normal", "happy", "sad", "angry", "surprised", "think", "cry", "shock")
 BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "office", "classroom": "office",
             "company": "office", "bar": "cafe", "restaurant": "cafe", "outside": "park", "city": "street",
             "road": "street", "evening": "night"}
@@ -237,7 +237,8 @@ def draw_char(d, cx, base, s, spec, emo, mouth, blink, bounce, fnt):
     # 팔
     arms = {"happy": ((-.28, -.10), (.28, -.10)), "surprised": ((-.32, -.02), (.32, -.02)),
             "angry": ((-.2, .22), (.2, .22)), "sad": ((-.17, .3), (.17, .3)),
-            "think": ((-.24, .26), (.12, -.14)), "normal": ((-.25, .28), (.25, .28))}[emo]
+            "think": ((-.24, .26), (.12, -.14)), "normal": ((-.25, .28), (.25, .28)),
+            "cry": ((-.21, -.22), (.21, -.22)), "shock": ((-.34, -.16), (.34, -.16))}.get(emo, ((-.25, .28), (.25, .28)))
     for sx, (hx, hy_) in zip((-1, 1), arms):
         thick((cx + sx * .15 * s, top + .06 * s), (cx + hx * s, top + .06 * s + (hy_ + .02) * s if hy_ < 0 else top + hy_ * s), .06 * s, shirt)
         px, py = cx + hx * s, (top + .06 * s + (hy_ + .02) * s if hy_ < 0 else top + hy_ * s)
@@ -265,15 +266,20 @@ def draw_char(d, cx, base, s, spec, emo, mouth, blink, bounce, fnt):
     for sx in (-1, 1):
         ex = cx + sx * .115 * s
         by_ = ey - .095 * s
-        if emo == "sad":
+        if emo in ("sad", "cry"):
             d.line([(ex - sx * .06 * s, by_ - .03 * s), (ex + sx * .06 * s, by_ + .02 * s)], fill=OUT, width=int(lw * 1.4))  # 안쪽 끝이 올라감
         elif emo == "angry":
             d.line([(ex - sx * .06 * s, by_ + .03 * s), (ex + sx * .06 * s, by_ - .02 * s)], fill=OUT, width=int(lw * 1.6))  # 안쪽 끝이 내려감
         elif emo == "think" and sx == 1:
             d.line([(ex - .06 * s, by_ - .02 * s), (ex + .06 * s, by_ - .06 * s)], fill=OUT, width=int(lw * 1.3))
         else:
-            d.line([(ex - .055 * s, by_ + (0 if emo != "happy" else -.02 * s)), (ex + .055 * s, by_ + (0 if emo != "happy" else -.02 * s))], fill=OUT, width=int(lw * 1.2))
-        if blink and emo != "happy":
+            lift = {"happy": -.02, "shock": -.045}.get(emo, 0) * s
+            d.line([(ex - .055 * s, by_ + lift), (ex + .055 * s, by_ + lift)], fill=OUT, width=int(lw * 1.2))
+        if emo == "cry":  # ㅠㅠ: 꼭 감은 눈 + 흘러내리는 눈물 줄기
+            d.line([(ex - .065 * s, ey), (ex + .065 * s, ey)], fill=OUT, width=int(lw * 1.8))
+            for tx in (ex - .03 * s, ex + .03 * s):
+                d.rounded_rectangle([tx - .016 * s, ey + .01 * s, tx + .016 * s, hy + .3 * s], radius=int(.016 * s), fill=(120, 190, 255), outline=OUT, width=max(2, lw // 2))
+        elif blink and emo != "happy":
             d.line([(ex - .055 * s, ey), (ex + .055 * s, ey)], fill=OUT, width=int(lw * 1.4))
         elif emo == "happy":
             d.arc([ex - .06 * s, ey - .045 * s, ex + .06 * s, ey + .075 * s], 200, 340, fill=OUT, width=int(lw * 1.6))
@@ -283,6 +289,8 @@ def draw_char(d, cx, base, s, spec, emo, mouth, blink, bounce, fnt):
                 ry = .05
             if emo == "surprised":
                 rx, ry, pr = .07, .092, .02
+            if emo == "shock":
+                rx, ry, pr = .085, .1, .015
             ell(ex - rx * s, ey - ry * s, ex + rx * s, ey + ry * s, (255, 255, 255))
             ox, oy = 0, 0
             if emo == "sad":
@@ -299,7 +307,17 @@ def draw_char(d, cx, base, s, spec, emo, mouth, blink, bounce, fnt):
     my = hy + .19 * s
     dark = (96, 32, 44)
     tongue = (255, 130, 140)
-    if emo == "surprised":
+    if emo == "cry":  # 엉엉 우는 입
+        if mouth:
+            ell(cx - .085 * s, my - .03 * s, cx + .085 * s, my + .08 * s, dark)
+            d.ellipse([cx - .045 * s, my + .03 * s, cx + .045 * s, my + .075 * s], fill=tongue)
+        else:
+            pts = [(cx - .07 * s + i * .028 * s, my + (.01 if i % 2 else .04) * s) for i in range(6)]
+            d.line(pts, fill=OUT, width=int(lw * 1.4))
+    elif emo == "shock":
+        k = 1 if mouth else .75
+        ell(cx - .05 * s * k, my - .05 * s * k, cx + .05 * s * k, my + .09 * s * k, dark)
+    elif emo == "surprised":
         k = 1 if mouth else .6
         ell(cx - .04 * s * k, my - .04 * s * k, cx + .04 * s * k, my + .06 * s * k, dark)
     elif mouth:
@@ -331,6 +349,14 @@ def draw_char(d, cx, base, s, spec, emo, mouth, blink, bounce, fnt):
     if emo == "surprised":
         d.rounded_rectangle([ex_ - .02 * s, ey_ - .14 * s, ex_ + .02 * s, ey_ - .03 * s], radius=int(.02 * s), fill=(255, 70, 70))
         d.ellipse([ex_ - .022 * s, ey_, ex_ + .022 * s, ey_ + .044 * s], fill=(255, 70, 70))
+    elif emo == "shock":  # 이마의 파란 그늘선 + 느낌표 두 개
+        for k in range(-2, 3):
+            x = cx + k * .07 * s
+            d.line([(x, hy - .16 * s), (x, hy - .04 * s)], fill=(80, 100, 210), width=int(lw * 1.2))
+        for j in (0, 1):
+            x = ex_ + j * .07 * s
+            d.rounded_rectangle([x - .02 * s, ey_ - .14 * s, x + .02 * s, ey_ - .03 * s], radius=int(.02 * s), fill=(255, 70, 70))
+            d.ellipse([x - .022 * s, ey_, x + .022 * s, ey_ + .044 * s], fill=(255, 70, 70))
     elif emo == "think":
         f = fnt(int(.26 * s))
         d.text((ex_ - .05 * s, ey_ - .22 * s), "?", font=f, fill=(255, 255, 255), stroke_width=lw, stroke_fill=OUT)
@@ -391,6 +417,7 @@ class Renderer:
         lying: 병원 침대에 누운 캐릭터 id 목록 (hospital 배경의 침대 위에 머리+이불로 그림)"""
         vertical = h > w
         horizon = .54 if vertical else .70
+        hook = hook.replace("\n", " ") if hook else hook  # 상단 고정 문구는 한 덩어리로 (줄바꿈은 후크 카드에서만)
         lie = [(cid, spec) for cid, spec in chars if cid in lying]
         chars = [(cid, spec) for cid, spec in chars if cid not in lying]
         n = max(1, len(chars))
@@ -607,3 +634,191 @@ def render_thumbnail(text, chars, font_path, *, palette="yellow", highlight=None
                stroke_width=sw, stroke_fill=(0, 0, 0))
         y += lh
     return img
+
+
+# ───────────────────────── 소품 · 강조 표시 (썸네일·후크 카드용) ─────────────────────────
+def _fit_font(d, text, max_w, size, font_path):
+    while size > 10:
+        f = heavy_font(size, font_path)
+        if d.textlength(text, font=f) <= max_w:
+            return f
+        size *= .92
+    return heavy_font(size, font_path)
+
+
+def prop_image(kind, size, text, font_path):
+    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo"""
+    W, H = int(size), int(size * .72)
+    im = Image.new("RGBA", (W + 20, H + 20), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    lw = max(3, int(size * .018))
+    o = 10
+    if kind == "bankbook":
+        d.rounded_rectangle([o, o, o + W, o + H], radius=int(size * .05), fill=(36, 112, 86), outline=OUT, width=lw)
+        d.rounded_rectangle([o + W * .06, o + H * .26, o + W * .94, o + H * .92], radius=int(size * .02), fill=(255, 255, 250), outline=OUT, width=max(2, lw // 2))
+        hf = _fit_font(d, "통장", W * .3, H * .17, font_path)
+        d.text((o + W * .07, o + H * .04), "통장", font=hf, fill=(255, 255, 255))
+        for k in range(3):
+            y = o + H * (.42 + k * .15)
+            d.line([(o + W * .1, y), (o + W * .9, y)], fill=(200, 205, 210), width=max(2, lw // 2))
+        if text:
+            f = _fit_font(d, text, W * .8, H * .24, font_path)
+            tw = d.textlength(text, font=f)
+            d.text((o + (W - tw) / 2, o + H * .5), text, font=f, fill=(220, 30, 40), stroke_width=max(1, lw // 3), stroke_fill=(255, 255, 255))
+    elif kind == "letter":
+        d.polygon([(o, o + H * .08), (o + W * .9, o), (o + W, o + H * .9), (o + W * .08, o + H)], fill=(250, 244, 222), outline=OUT)
+        d.line([(o, o + H * .08), (o + W * .9, o), (o + W, o + H * .9), (o + W * .08, o + H), (o, o + H * .08)], fill=OUT, width=lw)
+        for k in range(4):
+            y = o + H * (.55 + k * .1)
+            d.line([(o + W * .14, y + k * 2), (o + W * .84, y - H * .06 + k * 2)], fill=(180, 160, 130), width=max(2, lw // 2))
+        if text:
+            f = _fit_font(d, text, W * .72, H * .26, font_path)
+            d.text((o + W * .14, o + H * .18), text, font=f, fill=(90, 50, 30))
+    elif kind == "money":
+        for k in range(3):
+            y = o + H * (.12 + k * .2)
+            d.rounded_rectangle([o + k * W * .03, y, o + W * .9 + k * W * .03, y + H * .5], radius=int(size * .02), fill=(150, 196, 120), outline=OUT, width=lw)
+            d.ellipse([o + W * .38 + k * W * .03, y + H * .1, o + W * .52 + k * W * .03, y + H * .4], outline=(60, 110, 60), width=lw)
+        d.rectangle([o + W * .62, o + H * .5, o + W * .72, o + H * .98], fill=(255, 250, 240), outline=OUT, width=max(2, lw // 2))
+        if text:
+            f = _fit_font(d, text, W * .9, H * .26, font_path)
+            tw = d.textlength(text, font=f)
+            d.text((o + (W - tw) / 2, o + H * .02), text, font=f, fill=(255, 255, 255), stroke_width=lw, stroke_fill=OUT)
+    elif kind == "phone":
+        pw = W * .5
+        d.rounded_rectangle([o + (W - pw) / 2, o, o + (W + pw) / 2, o + H], radius=int(size * .06), fill=(30, 30, 36), outline=OUT, width=lw)
+        d.rounded_rectangle([o + (W - pw) / 2 + lw * 2, o + H * .08, o + (W + pw) / 2 - lw * 2, o + H * .9], radius=int(size * .03), fill=(235, 240, 250))
+        if text:
+            f = _fit_font(d, text, pw * .8, H * .14, font_path)
+            tw = d.textlength(text, font=f)
+            d.text((o + (W - tw) / 2, o + H * .42), text, font=f, fill=(220, 30, 40))
+    else:  # photo
+        d.rectangle([o, o, o + W, o + H], fill=(255, 255, 255), outline=OUT, width=lw)
+        d.rectangle([o + W * .06, o + H * .08, o + W * .94, o + H * .78], fill=(190, 210, 230))
+        if text:
+            f = _fit_font(d, text, W * .86, H * .16, font_path)
+            d.text((o + W * .07, o + H * .8), text, font=f, fill=OUT)
+    return im
+
+
+def draw_mark(d, box, src, scale=1.0):
+    """빨간 원(소품 주위) + 빨간 화살표(src → 원)"""
+    x0, y0, x1, y1 = box
+    px, py = (x1 - x0) * .14, (y1 - y0) * .18
+    lw = int(max(6, (x1 - x0) * .035) * scale)
+    d.ellipse([x0 - px, y0 - py, x1 + px, y1 + py], outline=(235, 30, 40), width=lw)
+    tx, ty = (x0 + x1) / 2, (y0 + y1) / 2
+    ang = math.atan2(ty - src[1], tx - src[0])
+    rx, ry = (x1 - x0) / 2 + px, (y1 - y0) / 2 + py
+    ex, ey = tx - math.cos(ang) * rx * 1.08, ty - math.sin(ang) * ry * 1.08
+    d.line([src, (ex, ey)], fill=(235, 30, 40), width=int(lw * 1.4))
+    hl = lw * 3.2
+    d.polygon([(ex + math.cos(ang) * hl * .4, ey + math.sin(ang) * hl * .4),
+               (ex - math.cos(ang - .5) * hl, ey - math.sin(ang - .5) * hl),
+               (ex - math.cos(ang + .5) * hl, ey - math.sin(ang + .5) * hl)], fill=(235, 30, 40))
+
+
+def drama_bg(w, h, tone="red"):
+    """어두운 드라마 배경: 가운데 붉은(또는 푸른) 빛 + 옅은 집중선 + 가장자리 어둡게"""
+    from PIL import ImageFilter
+    core = {"red": (120, 26, 34), "blue": (34, 52, 120), "gold": (130, 90, 20)}.get(tone, (120, 26, 34))
+    img = Image.new("RGB", (w, h), (12, 10, 16))
+    glow = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(glow).ellipse([w * .3, h * .05, w * 1.15, h * 1.1], fill=255)
+    glow = glow.filter(ImageFilter.GaussianBlur(min(w, h) * .18))
+    img = Image.composite(Image.new("RGB", (w, h), core), img, glow)
+    rays = Image.new("L", (w, h), 0)
+    rd = ImageDraw.Draw(rays)
+    ox, oy, n = w * .7, h * .45, 30
+    for k in range(0, n, 2):
+        a0, a1 = 2 * math.pi * k / n, 2 * math.pi * (k + 1) / n
+        R = max(w, h) * 1.5
+        rd.polygon([(ox, oy), (ox + math.cos(a0) * R, oy + math.sin(a0) * R), (ox + math.cos(a1) * R, oy + math.sin(a1) * R)], fill=26)
+    img = Image.composite(Image.new("RGB", (w, h), tuple(min(255, c + 60) for c in core)), img, rays)
+    return img
+
+
+def big_face(spec, emo, mouth, blink, s, font_path):
+    """캐릭터를 크게 그려 흰 스티커 테두리를 두른 RGBA (머리 중심 좌표도 반환)"""
+    from PIL import ImageFilter
+    W, H = int(s * 1.2), int(s * 1.25)
+    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    base = H * .98
+    draw_char(ImageDraw.Draw(layer), W / 2, base, s, spec, emo, mouth, blink, 0, lambda z: ImageFont.truetype(font_path, max(8, int(z))))
+    a = layer.split()[3]
+    halo = a.filter(ImageFilter.MaxFilter(15))
+    out = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    out.paste((255, 255, 255, 255), (0, 0), halo)
+    out.alpha_composite(layer)
+    return out, (W / 2, base - .66 * s)
+
+
+def render_story_thumbnail(text, main, font_path, *, tone="red", highlight=None, badge=None, prop=None, w=1280, h=720):
+    """사연형 썸네일: 어두운 드라마 배경 + 감정 폭발 얼굴 클로즈업 + 소품(빨간 원·화살표) + 초대형 2줄 문구"""
+    W, H = w * SS, h * SS
+    img = drama_bg(W, H, tone).convert("RGBA")
+    spec, emo = main
+    s = H * 1.2
+    face, (fx, fy) = big_face(spec, emo, True, False, s, font_path)
+    img.alpha_composite(face, (int(W * .74 - fx), int(H * .52 - fy)))
+    d = ImageDraw.Draw(img)
+    pad = W * .045
+    y = H * .07
+    if badge:
+        bf = heavy_font(H * .062, font_path)
+        bw = d.textlength(badge, font=bf)
+        d.rounded_rectangle([pad, y, pad + bw + H * .05, y + H * .095], radius=int(H * .025), fill=(235, 30, 40))
+        d.text((pad + H * .025, y + H * .008), badge, font=bf, fill=(255, 255, 255))
+        y += H * .13
+    lines = _split_balanced(text)[:2]
+    size = H * .2
+    while size > 20:
+        tf = heavy_font(size, font_path)
+        if max(d.textlength(ln, font=tf) for ln in lines) <= W * .6:
+            break
+        size *= .93
+    for ln in lines:
+        hl = bool(highlight and highlight in ln)
+        d.text((pad + 10, y + 10), ln, font=tf, fill=(0, 0, 0), stroke_width=int(size * .1), stroke_fill=(0, 0, 0))
+        d.text((pad, y), ln, font=tf, fill=(255, 226, 60) if hl else (255, 255, 255), stroke_width=int(size * .09), stroke_fill=(0, 0, 0))
+        y += size * 1.12
+    if prop:
+        pim = prop_image(prop.get("type", "bankbook"), H * .38, prop.get("text", ""), font_path).rotate(-8, expand=True, resample=Image.BICUBIC)
+        px = int(W * .21 - pim.width / 2)
+        py = int(max(y + H * .05, H * .93 - pim.height * 1.2))  # 빨간 원까지 화면 안에
+        img.alpha_composite(pim, (px, py))
+        draw_mark(ImageDraw.Draw(img), (px, py, px + pim.width, py + pim.height), (W * .52, H * .5), 1.4)
+    return img.convert("RGB").resize((w, h), Image.LANCZOS)
+
+
+def render_hook_card(w, h, spec, emo, mouth, blink, text, font_path, prop=None, zoom=1.0, tone="red", progress=0.0):
+    """숏폼 첫 화면: 어두운 드라마 배경 + 화면 아래 절반을 채우는 감정 얼굴 + 소품 + 초대형 후크 문구 (zoom>1 이면 확대된 상태)"""
+    img = drama_bg(w, h, tone).convert("RGBA")
+    s = w * 1.22
+    face, (fx, fy) = big_face(spec, emo, mouth, blink, s, font_path)
+    img.alpha_composite(face, (int(w * .5 - fx), int(h * .7 - fy)))
+    d = ImageDraw.Draw(img)
+    if prop:
+        pim = prop_image(prop.get("type", "bankbook"), w * .5, prop.get("text", ""), font_path).rotate(-7, expand=True, resample=Image.BICUBIC)
+        px, py = int(w * .5 - pim.width / 2), int(h * .425 - pim.height / 2)
+        img.alpha_composite(pim, (px, py))
+        draw_mark(ImageDraw.Draw(img), (px, py, px + pim.width, py + pim.height), (w * .97, h * .29), 1.0)
+    lines = _split_balanced(text)[:3]
+    size = w * .115
+    while size > 20:
+        tf = heavy_font(size, font_path)
+        if max(d.textlength(ln, font=tf) for ln in lines) <= w * .9:
+            break
+        size *= .93
+    y = h * .085
+    for i, ln in enumerate(lines):
+        tw = d.textlength(ln, font=tf)
+        col = (255, 226, 60) if i == len(lines) - 1 else (255, 255, 255)
+        d.text(((w - tw) / 2, y), ln, font=tf, fill=col, stroke_width=int(size * .1), stroke_fill=(0, 0, 0))
+        y += size * 1.15
+    out = img.convert("RGB")
+    if zoom > 1.0:
+        cw, ch = w / zoom, h / zoom
+        out = out.crop((int((w - cw) / 2), int((h - ch) / 2), int((w + cw) / 2), int((h + ch) / 2))).resize((w, h), Image.LANCZOS)
+    ImageDraw.Draw(out).rectangle([0, h - max(4, int(h * .004)), int(w * progress), h], fill=(255, 213, 79))
+    return out
