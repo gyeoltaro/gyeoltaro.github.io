@@ -697,7 +697,7 @@ def _fit_font(d, text, max_w, size, font_path):
 
 
 def prop_image(kind, size, text, font_path):
-    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo"""
+    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish"""
     W, H = int(size), int(size * .72)
     im = Image.new("RGBA", (W + 20, H + 20), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -742,6 +742,20 @@ def prop_image(kind, size, text, font_path):
             f = _fit_font(d, text, pw * .8, H * .14, font_path)
             tw = d.textlength(text, font=f)
             d.text((o + (W - tw) / 2, o + H * .42), text, font=f, fill=(220, 30, 40))
+    elif kind == "sidedish":  # 투명 반찬통 + 바닥에 붙은 쪽지
+        bx0, by0, bx1, by1 = o + W * .04, o + H * .24, o + W * .96, o + H * .9
+        d.rounded_rectangle([bx0, by0, bx1, by1], radius=int(size * .05), fill=(222, 236, 240), outline=OUT, width=lw)
+        d.rounded_rectangle([bx0 + W * .05, by0 + H * .14, bx1 - W * .05, by1 - H * .1], radius=int(size * .03), fill=(196, 62, 40))
+        for k in range(7):  # 김치 결
+            x = bx0 + W * (.1 + k * .11)
+            d.line([(x, by0 + H * .2), (x + W * .05, by1 - H * .16)], fill=(236, 120, 70), width=max(2, lw // 2))
+        d.rounded_rectangle([o, o + H * .08, o + W, o + H * .27], radius=int(size * .04), fill=(70, 140, 220), outline=OUT, width=lw)
+        nx0, ny0 = o + W * .46, o + H * .58  # 바닥에 붙은 쪽지 (비스듬히 삐져나옴)
+        d.polygon([(nx0, ny0), (o + W * .97, ny0 - H * .06), (o + W * .99, o + H * .98), (nx0 + W * .02, o + H * 1.02)], fill=(255, 246, 170), outline=OUT)
+        d.line([(nx0, ny0), (o + W * .97, ny0 - H * .06), (o + W * .99, o + H * .98), (nx0 + W * .02, o + H * 1.02), (nx0, ny0)], fill=OUT, width=lw)
+        if text:
+            f = _fit_font(d, text, W * .48, H * .2, font_path)
+            d.text((nx0 + W * .04, ny0 + H * .1), text, font=f, fill=(150, 40, 30))
     else:  # photo
         d.rectangle([o, o, o + W, o + H], fill=(255, 255, 255), outline=OUT, width=lw)
         d.rectangle([o + W * .06, o + H * .08, o + W * .94, o + H * .78], fill=(190, 210, 230))
@@ -821,7 +835,7 @@ def render_story_thumbnail(text, main, font_path, *, tone="red", highlight=None,
         d.text((pad + H * .025, y + H * .008), badge, font=bf, fill=(255, 255, 255))
         y += H * .13
     lines = _split_balanced(text)[:2]
-    size = H * .2
+    size = H * .165
     while size > 20:
         tf = heavy_font(size, font_path)
         if max(d.textlength(ln, font=tf) for ln in lines) <= W * .6:
@@ -833,11 +847,17 @@ def render_story_thumbnail(text, main, font_path, *, tone="red", highlight=None,
         d.text((pad, y), ln, font=tf, fill=(255, 226, 60) if hl else (255, 255, 255), stroke_width=int(size * .09), stroke_fill=(0, 0, 0))
         y += size * 1.12
     if prop:
-        pim = prop_image(prop.get("type", "bankbook"), H * .38, prop.get("text", ""), font_path).rotate(-8, expand=True, resample=Image.BICUBIC)
+        top, bottom = y + H * .02, H * .97  # 빨간 원(소품 위아래 18% 여백)까지 화면 안에 들어오도록 크기 조정
+        ps = H * .38
+        for _ in range(8):
+            pim = prop_image(prop.get("type", "bankbook"), ps, prop.get("text", ""), font_path).rotate(-8, expand=True, resample=Image.BICUBIC)
+            if pim.height * 1.36 <= bottom - top or ps < H * .22:
+                break
+            ps *= .9
         px = int(W * .21 - pim.width / 2)
-        py = int(max(y + H * .05, H * .93 - pim.height * 1.2))  # 빨간 원까지 화면 안에
+        py = int(max(top + pim.height * .18, bottom - pim.height * 1.18))
         img.alpha_composite(pim, (px, py))
-        draw_mark(ImageDraw.Draw(img), (px, py, px + pim.width, py + pim.height), (W * .52, H * .5), 1.4)
+        draw_mark(ImageDraw.Draw(img), (px, py, px + pim.width, py + pim.height), (W * .5, py + pim.height * .45), 1.4)  # 화살표는 글자를 가리지 않게 옆에서
     return img.convert("RGB").resize((w, h), Image.LANCZOS)
 
 
