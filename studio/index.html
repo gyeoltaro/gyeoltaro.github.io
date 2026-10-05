@@ -137,14 +137,22 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 /* ===== 부서 정의 ===== */
 const CTX=(p)=>`[채널] 잠실이(@jamsili) — 잠들기 전 사연 만화. 채널 방향과 규칙은 studio/CHANNEL.md 를 먼저 읽고 따르세요(창작/실화 표시 필수).\n[프로젝트] slug=${p.slug||'(미정)'} / 목표 길이 ${p.mins}분 / 톤·타깃: ${p.tone||'(미지정)'}\n저장 위치: studio/projects/${p.slug||'<slug>'}/\n`;
 const SRC=(p)=>`\n===== 원문 =====\n${p.src||'(여기에 원문이 들어갑니다)'}\n===== 끝 =====\n`;
-const SCHEMA=`project.json 형식 (자막 들어간 만화, 반드시 유효 JSON):
-{"title":"","slug":"","voice":"ko-KR-SunHiNeural","thumbnail":{"text":"1줄\\n2줄 (줄당 4~6자)","highlight":"빨간 박스로 강조할 단어","badge":"좌상단 작은 문구(선택)","variants":[{"palette":"yellow|blue|red|green|purple","chars":[["minsu","surprised"],["yuna","happy"]]}]},
- "cast":{"minsu":{"name":"민수","voice":"ko-KR-InJoonNeural","color":"#4f8cff","hair":"short|long|bun|spiky|none","hair_color":"#2f2a2a","accessory":"glasses|bow|none","pitch":"+0Hz"}},
- "scenes":[{"title":"장면 제목(좌상단 칩)","bg":"room|street|office|cafe|park|night|plain","cast":["minsu","yuna"],
-   "lines":[{"who":"minsu|yuna|narrator","text":"자막이자 대사(40자 이내 구어체)","emotion":"normal|happy|sad|angry|surprised|think","react":{"yuna":"think"}}]}],
+const SCHEMA=`project.json 형식 (자막 들어간 사연 만화, 반드시 유효 JSON):
+{"title":"","slug":"","narrator_gvoice":"ko-KR-Chirp3-HD-Aoede",
+ "cast":{"jieun":{"name":"지은","gvoice":"ko-KR-Chirp3-HD-Aoede","color":"#ff8a65","hair":"short|long|bun|spiky|none","hair_color":"#3b2a20","accessory":"glasses|bow|none","scale":1}},
+ "scenes":[{"title":"장면 제목(좌상단 칩)","bg":"room|living|kitchen|room_night|street|office|bank|cafe|park|night|hospital|memorial|plain","cast":["jieun","dad"],
+   "mood":"warm|sad|tense|calm|hope","lying":["dad"],"shorts_only":false,
+   "lines":[{"who":"jieun|dad|narrator","text":"자막이자 대사(45자 이내 구어체)","emotion":"normal|happy|sad|angry|surprised|think","react":{"dad":"think"},"sfx":"ding|thud|whoosh"}]}],
  "shorts_speed":1.25,
- "shorts":[{"scenes":[장면 인덱스들],"hook":"화면 상단 고정 문구(15자 내외)","hook_line":"첫 1~2초에 캐릭터가 외칠 후크 대사(질문·반전형)","hook_who":"yuna"}]}
-규칙: 등장인물 2~3명 고정, narrator 는 해설(캐릭터 말풍선 없이 자막만), 대사마다 감정을 지정해 표정이 바뀌게 하세요.`;
+ "shorts":[{"scenes":[장면 인덱스들],"hook":"화면 상단 고정 문구(15자 내외)","hook_line":"첫 1~2초에 캐릭터가 외칠 후크 대사","hook_who":"jieun"}]}
+연출 규칙:
+- 음성은 Chirp3-HD(자연스러움 최상)로 인물마다 다르게: 여성 Aoede·Gacrux·Kore·Leda·Zephyr…, 남성 Charon·Puck·Algieba·Orus… (ko-KR-Chirp3-HD-이름)
+- 회상 속 어린 시절은 같은 외형에 "scale":0.72 인 별도 캐릭터(예: jieun_kid)로
+- 장면마다 mood 지정(배경음악 자동 작곡), 반전 순간에는 sfx(ding=깨달음, thud=충격)
+- 카메라는 자동(첫 대사 전체 샷, 감정 대사 클로즈업). 병실 누운 인물은 lying
+- 같은 배경이 3장면 이상 연속되지 않게, 장면마다 배경·구도를 다양하게 (대량생산 인상 방지)
+- 숏폼용 "결말은 본편에서" 장면은 shorts_only:true 로 만들고 각 shorts 끝에 붙이기
+- 창작 사연은 마지막 해설과 설명란에 "창작 사연" 표시`;
 const GROUPS=[
  {g:'🧭 기획본부',teams:[
   {id:'research',n:'리서치·분석팀',e:'📊',d:'YouTube 데이터로 주제 수요·떡상 공식·SEO 분석',t:['핵심 키워드 2~3개 리서치','떡상 영상(구독자 대비) 공통점','제목·길이·타이밍 패턴','댓글 속 시청자 욕구'],

@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 SS = 2                    # 슈퍼샘플링 배율
 OUT = (43, 34, 51)        # 외곽선 색
 EMOTIONS = ("normal", "happy", "sad", "angry", "surprised", "think")
-BG_ALIAS = {"funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "office", "classroom": "office",
+BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "office", "classroom": "office",
             "company": "office", "bar": "cafe", "restaurant": "cafe", "outside": "park", "city": "street",
             "road": "street", "evening": "night"}
 DEFAULT_LOOK = {"color": "#ff8a65", "skin": "#ffdcb8", "hair": "short", "hair_color": "#3b2a20"}
@@ -113,6 +113,40 @@ def draw_bg(w, h, kind, horizon):
             tw = int(W * .02 * sc)
             d.rectangle([x - tw, hz - int(H * .12 * sc), x + tw, hz + int(H * .02)], fill=(146, 98, 64), outline=OUT, width=lw)
             d.ellipse([x - int(W * .07 * sc), hz - int(H * .38 * sc), x + int(W * .07 * sc), hz - int(H * .08 * sc)], fill=(96, 176, 96), outline=OUT, width=lw)
+    elif kind in ("living", "room_night"):
+        night = kind == "room_night"
+        grad(d, W, H, 0, hz, (70, 74, 110) if night else (236, 228, 214), (52, 54, 88) if night else (222, 210, 192))
+        d.rectangle([0, hz, W, H], fill=(96, 78, 70) if night else (184, 146, 108))
+        for i in range(1, 8):
+            d.line([(0, hz + (H - hz) * i // 8), (W, hz + (H - hz) * i // 8)], fill=(84, 68, 60) if night else (166, 130, 96), width=lw)
+        window(int(W * .06), int(hz * .14), int(W * .24), int(hz * .6), sky=(30, 36, 80) if night else (160, 210, 245))
+        if night:
+            d.ellipse([int(W * .17), int(hz * .2), int(W * .21), int(hz * .2) + int(W * .04)], fill=(255, 245, 200))
+            d.polygon([(int(W * .84), int(hz * .32)), (int(W * .92), int(hz * .32)), (int(W * .9), int(hz * .18)), (int(W * .86), int(hz * .18))], fill=(255, 220, 140), outline=OUT)  # 스탠드
+            d.line([(int(W * .88), int(hz * .32)), (int(W * .88), hz)], fill=OUT, width=lw * 2)
+            d.pieslice([int(W * .76), int(hz * .1), int(W * 1.0), int(hz * .9)], 60, 120, fill=(255, 230, 160))
+        else:
+            d.rounded_rectangle([int(W * .64), int(hz * .48), int(W * .97), int(hz * .86)], radius=int(W * .02), fill=(120, 140, 170), outline=OUT, width=lw)  # 소파
+            d.rounded_rectangle([int(W * .66), int(hz * .32), int(W * .95), int(hz * .58)], radius=int(W * .02), fill=(132, 152, 182), outline=OUT, width=lw)
+            d.rectangle([int(W * .32), int(hz * .2), int(W * .52), int(hz * .5)], fill=(30, 32, 40), outline=OUT, width=lw * 2)  # TV
+            d.rectangle([int(W * .3), int(hz * .5), int(W * .54), int(hz * .58)], fill=(150, 110, 80), outline=OUT, width=lw)
+        d.ellipse([int(W * .25), hz + int((H - hz) * .2), int(W * .75), hz + int((H - hz) * .7)], fill=(150, 90, 90) if night else (200, 120, 110))  # 러그
+    elif kind == "kitchen":
+        grad(d, W, H, 0, hz, (244, 240, 230), (230, 224, 210))
+        for x in range(0, W, int(W * .03)):  # 타일
+            d.line([(x, int(hz * .45)), (x, int(hz * .72))], fill=(214, 206, 192), width=lw)
+        for y in range(int(hz * .45), int(hz * .72), int(W * .03)):
+            d.line([(0, y), (W, y)], fill=(214, 206, 192), width=lw)
+        d.rectangle([0, int(hz * .06), W, int(hz * .4)], fill=(170, 196, 170), outline=OUT, width=lw)  # 상부장
+        for x in range(int(W * .1), W, int(W * .18)):
+            d.line([(x, int(hz * .06)), (x, int(hz * .4))], fill=OUT, width=lw)
+        d.rectangle([0, int(hz * .72), W, hz], fill=(150, 176, 150), outline=OUT, width=lw)  # 하부장·조리대
+        d.rectangle([0, int(hz * .7), W, int(hz * .76)], fill=(236, 236, 236), outline=OUT, width=lw)
+        d.rectangle([int(W * .86), int(hz * .1), int(W * .98), hz], fill=(225, 230, 235), outline=OUT, width=lw * 2)  # 냉장고
+        d.line([(int(W * .86), int(hz * .45)), (int(W * .98), int(hz * .45))], fill=OUT, width=lw)
+        d.rectangle([0, hz, W, H], fill=(206, 196, 180))
+        for i in range(1, 6):
+            d.line([(W * i // 6, hz), (W * i // 6, H)], fill=(190, 180, 164), width=lw)
     elif kind == "hospital":
         grad(d, W, H, 0, hz, (232, 246, 244), (214, 236, 234))
         d.rectangle([0, hz, W, H], fill=(196, 214, 218))
@@ -352,7 +386,7 @@ class Renderer:
         return self._bg[key]
 
     def frame(self, w, h, *, bg, chars, speaker, emotions, mouth, blink, text, name, name_color,
-              chip=None, hook=None, progress=0.0, accent=(255, 213, 79), hook_big=False, lying=()):
+              chip=None, hook=None, progress=0.0, accent=(255, 213, 79), hook_big=False, lying=(), shot="wide"):
         """chars: [(id, spec)] / emotions: {id: emo} / hook_big: 숏폼 첫 3초 후크 카드(큰 글씨+폭발 배경)
         lying: 병원 침대에 누운 캐릭터 id 목록 (hospital 배경의 침대 위에 머리+이불로 그림)"""
         vertical = h > w
@@ -381,12 +415,16 @@ class Renderer:
         span = .54 if lie else 1.0  # 누운 사람이 있으면 침대 왼쪽에만 섬
         if lie:
             s = min(s, w * span * .9 / n) if not vertical else min(w * span * .9 / n, h * .34)
+        focus = None
         for i, (cid, spec) in enumerate(chars):
             cx = w * span * (i + 1) / (n + 1) * SS
+            si = s * float(spec.get("scale", 1))  # 어린이 등은 scale < 1
             talking = cid == speaker
-            bounce = (.025 * s * SS) if talking and mouth else 0
-            draw_char(d, cx, base * SS, s * SS, spec, emotions.get(cid, "normal"),
+            bounce = (.025 * si * SS) if talking and mouth else 0
+            draw_char(d, cx, base * SS, si * SS, spec, emotions.get(cid, "normal"),
                       talking and mouth, blink, bounce, lambda z: self.font(z))
+            if talking:
+                focus = (cx, (base - .66 * si) * SS, si * SS)  # 클로즈업 중심(머리)
         for cid, spec in lie:  # 침대에 누운 캐릭터: 머리만 그려 90도 눕히고 이불을 덮음
             hz = h * horizon
             bx0, bx1, top = w * .60, w * .98, hz * .80
@@ -402,7 +440,17 @@ class Renderer:
             ch.alpha_composite(head, (max(0, hx), max(0, hy2)))
             d.rounded_rectangle([hx + head.width * .93, top * SS - hs * .2, bx1 * SS, top * SS + hs * .08],
                                 radius=int(hs * .08), fill=(170, 205, 235, 255), outline=OUT + (255,), width=max(3, int(hs * .012)))
-        layer = Image.alpha_composite(layer, ch).reduce(SS).convert("RGB")  # 2배→1배 박스 축소(빠름)
+        layer = Image.alpha_composite(layer, ch)
+        if shot == "close" and focus:  # 말하는 사람 클로즈업 (2배 해상도에서 잘라 선명함 유지)
+            fx, fy, fs = focus
+            z = 1.6 if vertical else 1.5
+            cw, chh = layer.width / z, layer.height / z
+            cy = fy + (.05 if vertical else -.07) * fs  # 머리 위(올림머리 포함)가 잘리지 않게
+            x0 = min(max(0, fx - cw / 2), layer.width - cw)
+            y0 = min(max(0, cy - chh / 2), layer.height - chh)
+            layer = layer.crop((int(x0), int(y0), int(x0 + cw), int(y0 + chh))).resize((w, h), Image.LANCZOS).convert("RGB")
+        else:
+            layer = layer.reduce(SS).convert("RGB")  # 2배→1배 박스 축소(빠름)
         d = ImageDraw.Draw(layer)
 
         u = w / 1080 if vertical else w / 1920

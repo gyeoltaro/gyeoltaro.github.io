@@ -12,6 +12,16 @@
    "hair_color": "#3b2a20",
    "skin": "#ffdcc0"
   },
+  "jieun_kid": {
+   "name": "어린 지은",
+   "gvoice": "ko-KR-Chirp3-HD-Leda",
+   "color": "#ffb74d",
+   "hair": "long",
+   "hair_color": "#3b2a20",
+   "skin": "#ffdcc0",
+   "accessory": "bow",
+   "scale": 0.72
+  },
   "minho": {
    "name": "민호",
    "gvoice": "ko-KR-Chirp3-HD-Puck",
@@ -83,19 +93,21 @@
      "react": {
       "minho": "surprised",
       "mom": "sad"
-     }
+     },
+     "sfx": "thud"
     },
     {
      "who": "narrator",
      "text": "이 이야기를 하려면, 우리 아빠가 얼마나 지독한 짠돌이였는지부터 말씀드려야 할 것 같아요."
     }
-   ]
+   ],
+   "mood": "calm"
   },
   {
    "title": "우리 아빠는 짠돌이",
-   "bg": "room",
+   "bg": "living",
    "cast": [
-    "jieun",
+    "jieun_kid",
     "dad",
     "mom"
    ],
@@ -109,11 +121,11 @@
      "text": "누가 방에 불 켜 놨어? 사람 없는 방에 불 켜면 전기세가 얼만데.",
      "emotion": "angry",
      "react": {
-      "jieun": "sad"
+      "jieun_kid": "sad"
      }
     },
     {
-     "who": "jieun",
+     "who": "jieun_kid",
      "text": "아빠, 나 숙제하다 잠깐 화장실 간 거야.",
      "emotion": "sad"
     },
@@ -143,13 +155,14 @@
      "who": "narrator",
      "text": "그때는 몰랐어요. 왜 아빠는 그렇게까지 아껴야 했는지."
     }
-   ]
+   ],
+   "mood": "warm"
   },
   {
    "title": "생일 케이크 대신 붕어빵",
    "bg": "street",
    "cast": [
-    "jieun",
+    "jieun_kid",
     "dad"
    ],
    "lines": [
@@ -158,7 +171,7 @@
      "text": "제 열 살 생일이었어요. 친구들은 생일마다 큰 케이크에 초를 꽂았거든요."
     },
     {
-     "who": "jieun",
+     "who": "jieun_kid",
      "text": "아빠, 오늘 내 생일인데 케이크 사 오는 거지?",
      "emotion": "happy",
      "react": {
@@ -171,7 +184,7 @@
      "emotion": "happy"
     },
     {
-     "who": "jieun",
+     "who": "jieun_kid",
      "text": "이거… 붕어빵이잖아.",
      "emotion": "sad",
      "react": {
@@ -188,15 +201,16 @@
      "text": "저는 그날 붕어빵을 한 입도 안 먹고 방에 들어가 울었어요. 그 뒤로 매년 제 생일엔 붕어빵이 왔습니다."
     },
     {
-     "who": "jieun",
+     "who": "jieun_kid",
      "text": "다른 애들 아빠는 케이크 사 주는데, 우리 아빠는 왜 맨날 이래.",
      "emotion": "angry"
     }
-   ]
+   ],
+   "mood": "warm"
   },
   {
    "title": "수학여행",
-   "bg": "room",
+   "bg": "kitchen",
    "cast": [
     "jieun",
     "dad",
@@ -246,11 +260,12 @@
      "who": "narrator",
      "text": "그 초콜릿을 아빠한테 내밀었을 때, 아빠가 웃었던 것 같기도 해요. 그땐 그것도 짜증이 났지만요."
     }
-   ]
+   ],
+   "mood": "calm"
   },
   {
    "title": "핸드폰 전쟁",
-   "bg": "room",
+   "bg": "room_night",
    "cast": [
     "jieun",
     "dad",
@@ -295,7 +310,8 @@
      "who": "narrator",
      "text": "저는 고등학교를 졸업할 때까지 핸드폰을 갖지 못했어요."
     }
-   ]
+   ],
+   "mood": "tense"
   },
   {
    "title": "등록금은 내가 번다",
@@ -343,11 +359,12 @@
      "who": "narrator",
      "text": "그때부터 저는 아빠를 미워하기로 마음먹었던 것 같아요."
     }
-   ]
+   ],
+   "mood": "sad"
   },
   {
    "title": "결혼자금 100만 원",
-   "bg": "room",
+   "bg": "living",
    "cast": [
     "jieun",
     "dad",
@@ -408,7 +425,8 @@
      "who": "narrator",
      "text": "저는 그 봉투를 식탁에 던져 놓고 나와 버렸어요. 그게 아빠 얼굴을 제대로 본 마지막 날이 될 줄도 모르고요."
     }
-   ]
+   ],
+   "mood": "tense"
   },
   {
    "title": "멀어진 우리",
@@ -434,7 +452,8 @@
      "who": "narrator",
      "text": "그 부재중 전화들이, 아빠가 할 수 있는 최선의 표현이었다는 걸 그땐 몰랐어요."
     }
-   ]
+   ],
+   "mood": "sad"
   },
   {
    "title": "엄마의 전화",
@@ -450,7 +469,8 @@
      "emotion": "sad",
      "react": {
       "jieun": "surprised"
-     }
+     },
+     "sfx": "thud"
     },
     {
      "who": "jieun",
@@ -475,7 +495,8 @@
      "text": "수술비 아깝다고, 조금만 더 버티면 된다고 미루셨어.",
      "emotion": "sad"
     }
-   ]
+   ],
+   "mood": "tense"
   },
   {
    "title": "병실에서",
@@ -521,6 +542,7 @@
      "text": "그게 아빠의 마지막 말이었습니다. 저는 끝내 고맙다는 말도, 미안하다는 말도 하지 못했어요."
     }
    ],
+   "mood": "sad",
    "lying": [
     "dad"
    ]
@@ -559,7 +581,8 @@
       "jieun": "sad"
      }
     }
-   ]
+   ],
+   "mood": "sad"
   },
   {
    "title": "서랍 속 통장",
@@ -602,7 +625,8 @@
      "emotion": "surprised",
      "react": {
       "jieun": "surprised"
-     }
+     },
+     "sfx": "ding"
     },
     {
      "who": "narrator",
@@ -617,7 +641,8 @@
      "who": "narrator",
      "text": "등록금 반만 내 준다던 아빠. 결혼할 때 100만 원만 주던 아빠. 그 아빠의 통장이었어요."
     }
-   ]
+   ],
+   "mood": "calm"
   },
   {
    "title": "은행에서",
@@ -679,11 +704,12 @@
      "who": "narrator",
      "text": "저는 은행 창구 앞에서, 다 큰 어른이 아이처럼 엉엉 울었어요."
     }
-   ]
+   ],
+   "mood": "hope"
   },
   {
    "title": "엄마의 고백",
-   "bg": "room",
+   "bg": "kitchen",
    "cast": [
     "jieun",
     "minho",
@@ -705,7 +731,8 @@
      "react": {
       "jieun": "surprised",
       "minho": "surprised"
-     }
+     },
+     "sfx": "thud"
     },
     {
      "who": "mom",
@@ -744,11 +771,12 @@
      "text": "바보 같아. 진짜 바보 같아, 아빠.",
      "emotion": "sad"
     }
-   ]
+   ],
+   "mood": "sad"
   },
   {
    "title": "통장 사이의 편지",
-   "bg": "room",
+   "bg": "room_night",
    "cast": [
     "jieun",
     "dad"
@@ -764,7 +792,8 @@
      "emotion": "sad",
      "react": {
       "jieun": "sad"
-     }
+     },
+     "sfx": "ding"
     },
     {
      "who": "dad",
@@ -794,7 +823,8 @@
      "text": "아빠… 나 이제야 알았어. 미안해. 정말 미안해.",
      "emotion": "sad"
     }
-   ]
+   ],
+   "mood": "sad"
   },
   {
    "title": "아빠 생일",
@@ -843,7 +873,8 @@
      "who": "narrator",
      "text": "아빠가 평생 아껴서 남긴 건, 돈이 아니라 우리를 향한 마음이었어요."
     }
-   ]
+   ],
+   "mood": "hope"
   },
   {
    "title": "여러분께",
@@ -869,7 +900,8 @@
      "who": "narrator",
      "text": "이 이야기는 실제 사연을 바탕으로 한 것이 아닌, 창작 사연입니다. 구독과 좋아요는 다음 이야기에 큰 힘이 됩니다."
     }
-   ]
+   ],
+   "mood": "warm"
   },
   {
    "title": "본편 안내",
@@ -884,6 +916,7 @@
      "emotion": "sad"
     }
    ],
+   "mood": "calm",
    "shorts_only": true
   }
  ],
