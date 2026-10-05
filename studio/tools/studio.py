@@ -552,7 +552,7 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
     alst.write_text("".join(f"file '{a}'\n" for a in audios))
     if FAST:
         vflags = ["-vf", "format=yuv420p", "-fps_mode", "vfr"]
-    elif proj.get("drift", True):  # 천천히 떠다니는 카메라: 정지 화면 느낌을 없앰 (쇼츠는 조금 더 크게)
+    elif proj.get("drift", False):  # 천천히 떠다니는 카메라 (기본 꺼짐 — 켜려면 project.json 에 "drift": true)
         zf = 1.07 if h > w else 1.04
         sw, sh_ = int(w * zf) // 2 * 2, int(h * zf) // 2 * 2
         vflags = ["-vf", f"fps=30,scale={sw}:{sh_},crop={w}:{h}:x='(iw-ow)/2*(1+0.85*sin(t*0.55))':"
