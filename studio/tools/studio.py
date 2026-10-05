@@ -311,7 +311,7 @@ def speak(proj, root, who, text):
     voice = c.get("voice") or proj.get("voice", "ko-KR-SunHiNeural")
     rate = c.get("rate") or proj.get("rate", "+0%")
     pitch = c.get("pitch", "+0Hz")
-    gvoice = c.get("gvoice")  # Google Cloud 음성 이름 직접 지정 (예: ko-KR-Neural2-B)
+    gvoice = c.get("gvoice") or (proj.get("narrator_gvoice") if (who or "narrator") == "narrator" else None)  # Google Cloud 음성 이름 (예: ko-KR-Chirp3-HD-Aoede)
     work = root / "work"
     work.mkdir(exist_ok=True)
     key = hashlib.md5(f"{voice}|{gvoice}|{rate}|{pitch}|{text}".encode()).hexdigest()[:12]
@@ -401,7 +401,8 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
             jobs.append((str(png), dict(w=w, h=h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker,
                                         emotions=emos, mouth=m, blink=bl, text=ln["text"], name=name,
                                         name_color=ncol, chip=None if sc.get("_hook_card") else chip,
-                                        hook=hook, progress=prog, hook_big=bool(sc.get("_hook_card")))))
+                                        hook=hook, progress=prog, hook_big=bool(sc.get("_hook_card")),
+                                        lying=tuple(sc.get("lying", ())))))
             states[st] = png
         rnd = random.Random(li * 31 + k)
         t, step, pattern = 0.0, 0.16, []
@@ -489,7 +490,7 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
 def cmd_long(proj, root, font):
     out = root / "output"
     out.mkdir(exist_ok=True)
-    ids = list(range(len(proj["scenes"])))
+    ids = [i for i, sc in enumerate(proj["scenes"]) if not sc.get("shorts_only")]  # 숏폼 전용 장면 제외
     secs = render_video(proj, root, ids, (1920, 1080), out / "longform.mp4", font=font)
     if secs < 8 * 60:
         need = int((480 - secs) / 60 * CHARS_PER_MIN) + 1
@@ -550,6 +551,8 @@ def chapters_text(proj, root):
     """롱폼 챕터 타임스탬프 (실제 음성 길이 + 대사 간 여백 기준)"""
     t, out = 0.0, []
     for sc in proj["scenes"]:
+        if sc.get("shorts_only"):
+            continue
         out.append(f"{int(t // 60)}:{int(t % 60):02d} {sc.get('title', '')}".rstrip())
         if is_cartoon(proj, sc):
             for ln in scene_lines(sc):

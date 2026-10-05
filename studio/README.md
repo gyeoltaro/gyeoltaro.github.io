@@ -69,3 +69,10 @@ python3 studio/tools/upload.py upload <project.json>      # 예약 업로드 + �
 ```
 - 2020년 7월 28일 이후 만든 프로젝트는 **YouTube API 심사 전에는 업로드 영상이 비공개로 잠깁니다.** 심사 준비는 `studio/api-audit/README.md`.
 - 개인정보처리방침과 약관 페이지: `studio/legal/privacy.html`, `studio/legal/terms.html`
+
+## 사연 만화 기능
+- 음성: 캐릭터별 `gvoice` 에 Google **Chirp3-HD** 음성(예: `ko-KR-Chirp3-HD-Aoede`, `-Charon`, `-Puck`, `-Gacrux`, `-Kore`)을 지정하면 가장 자연스럽습니다. 해설 목소리는 `narrator_gvoice`.
+- 배경: `hospital`(병실), `memorial`(추모·장례식장) 추가. 별칭 `funeral`, `bank`(=office)
+- 장면 `lying: ["dad"]`: hospital 배경의 침대에 누운 모습으로 그림
+- 장면 `shorts_only: true`: 롱폼·챕터에서는 빠지고 숏폼에만 쓰는 장면 (예: "결말은 본편에서")
+- 예시: `projects/dad-bankbook/` (창작 사연, `build_script.py` 가 대본 원본)
