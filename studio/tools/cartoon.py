@@ -395,7 +395,7 @@ def wrap(d, text, font, max_w):
 
 class Renderer:
     def __init__(self, font_path):
-        self.font_path = font_path
+        self.font_path = font_path  # 굵은 글씨(heavy_font)의 대체 폰트로도 사용
         self._bg = {}
         self._fonts = {}
 
@@ -412,12 +412,14 @@ class Renderer:
         return self._bg[key]
 
     def frame(self, w, h, *, bg, chars, speaker, emotions, mouth, blink, text, name, name_color,
-              chip=None, hook=None, progress=0.0, accent=(255, 213, 79), hook_big=False, lying=(), shot="wide"):
+              chip=None, hook=None, progress=0.0, accent=(255, 213, 79), hook_big=False, lying=(), shot="wide",
+              caption="box", hook_overlay=False, end_text=None):
         """chars: [(id, spec)] / emotions: {id: emo} / hook_big: 숏폼 첫 3초 후크 카드(큰 글씨+폭발 배경)
         lying: 병원 침대에 누운 캐릭터 id 목록 (hospital 배경의 침대 위에 머리+이불로 그림)"""
         vertical = h > w
         horizon = .54 if vertical else .70
-        hook = hook.replace("\n", " ") if hook else hook  # 상단 고정 문구는 한 덩어리로 (줄바꿈은 후크 카드에서만)
+        hook_raw = hook  # 큰 후크 문구는 지정한 줄바꿈 그대로
+        hook = hook.replace("\n", " ") if hook else hook  # 상단 작은 문구는 한 덩어리로
         lie = [(cid, spec) for cid, spec in chars if cid in lying]
         chars = [(cid, spec) for cid, spec in chars if cid not in lying]
         n = max(1, len(chars))
@@ -487,7 +489,19 @@ class Renderer:
             tw = d.textlength(chip, font=f)
             d.rounded_rectangle([pad, int(46 * u), pad + tw + int(50 * u), int(46 * u) + int(66 * u)], radius=int(33 * u), fill=(20, 20, 40))
             d.text((pad + int(25 * u), int(46 * u) + int(10 * u)), chip, font=f, fill=accent)
-        if hook and vertical:
+        if hook and vertical and hook_overlay:  # 쇼츠 첫 대사: 화면 위쪽에 큰 후크 문구 (영상은 움직이는 채로)
+            hl = _split_balanced(hook_raw)[:3]
+            hs = 104 * u
+            while hs > 30 and max(d.textlength(x, font=heavy_font(hs, self.font_path)) for x in hl) > w * .9:
+                hs *= .93
+            hf = heavy_font(hs, self.font_path)
+            y = int(120 * u)
+            for i, ln in enumerate(hl):
+                tw = d.textlength(ln, font=hf)
+                d.text(((w - tw) / 2, y), ln, font=hf, fill=(255, 226, 60) if i == len(hl) - 1 else (255, 255, 255),
+                       stroke_width=int(hs * .1), stroke_fill=OUT)
+                y += int(hs * 1.15)
+        elif hook and vertical:
             f = self.font((104 if hook_big else 68) * u)
             y = int((150 if hook_big else 130) * u)
             hl = wrap(d, hook, f, w - pad * 2)
@@ -500,6 +514,42 @@ class Renderer:
                 d.text(((w - tw) / 2, y), ln, font=f, fill=(255, 240, 90) if hook_big else accent,
                        stroke_width=int((10 if hook_big else 7) * u), stroke_fill=OUT)
                 y += int(f.size * 1.25)
+        if end_text and vertical:  # 쇼츠 마지막: 본편 안내
+            ef = heavy_font(58 * u, self.font_path)
+            ew = d.textlength(end_text, font=ef)
+            ey = int(h * .3)
+            d.rounded_rectangle([(w - ew) / 2 - 36 * u, ey - 16 * u, (w + ew) / 2 + 36 * u, ey + 92 * u], radius=int(26 * u),
+                                fill=(255, 213, 60), outline=OUT, width=max(3, int(5 * u)))
+            d.text(((w - ew) / 2, ey), end_text, font=ef, fill=(20, 20, 28))
+        if text and vertical and caption == "pop":  # 쇼츠 자막: 크고 굵은 구절, 상자 없이 테두리, 숫자는 노랑
+            cf = heavy_font(80 * u, self.font_path)
+            words = text.split()
+            lines_, cur = [], []
+            for wd_ in words:
+                if cur and d.textlength(" ".join(cur + [wd_]), font=cf) > w * .78:
+                    lines_.append(cur)
+                    cur = [wd_]
+                else:
+                    cur.append(wd_)
+            if cur:
+                lines_.append(cur)
+            y = int(h * .655)
+            if name:
+                nf = self.font(34 * u)
+                nw = d.textlength(name, font=nf) + int(40 * u)
+                d.rounded_rectangle([(w - nw) / 2, y - int(62 * u), (w + nw) / 2, y - int(14 * u)], radius=int(24 * u),
+                                    fill=name_color, outline=OUT, width=max(2, int(3 * u)))
+                lum = .3 * name_color[0] + .59 * name_color[1] + .11 * name_color[2]
+                d.text(((w - nw) / 2 + int(20 * u), y - int(60 * u)), name, font=nf, fill=(20, 20, 30) if lum > 150 else "white")
+            for ws in lines_[:3]:
+                line = " ".join(ws)
+                x = (w - d.textlength(line, font=cf)) / 2
+                for wd_ in ws:
+                    col = (255, 226, 60) if any(ch.isdigit() for ch in wd_) else (255, 255, 255)
+                    d.text((x, y), wd_, font=cf, fill=col, stroke_width=int(9 * u), stroke_fill=OUT)
+                    x += d.textlength(wd_ + " ", font=cf)
+                y += int(cf.size * 1.18)
+            text = None
         if text and not (hook_big and vertical):  # 후크 카드는 큰 글씨가 자막 역할
             f = self.font((56 if vertical else 50) * u)
             lines = wrap(d, text, f, w - pad * 2 - int(40 * u))

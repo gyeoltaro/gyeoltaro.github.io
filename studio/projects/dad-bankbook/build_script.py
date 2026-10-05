@@ -186,14 +186,19 @@ proj = {
     "scenes": S,
     "shorts_speed": 1.25,
     "shorts": [
-        {"scenes": [s_open, s_book, s_cta], "hook": "아빠 통장 열어보고\n주저앉았습니다", "hook_line": "아빠 통장을 열어 본 날, 저는 주저앉았습니다.",
-         "hook_who": J, "hook_emotion": "shock", "hook_tone": "red", "hook_prop": {"type": "bankbook", "text": "1억 2천만 원"}},
-        {"scenes": [s_bank, s_cta], "hook": "은행 직원의 한마디에\n눈물이 터졌다", "hook_line": "은행 직원의 한마디에, 눈물이 터졌어요.",
-         "hook_who": J, "hook_emotion": "cry", "hook_tone": "blue", "hook_prop": {"type": "bankbook", "text": "매달 30만 원"}},
-        {"scenes": [s_wed, s_cta], "hook": "딸 결혼에\n100만 원만 준 아빠", "hook_line": "딸 결혼에 100만 원만 준 아빠, 진짜 이유는?",
-         "hook_who": J, "hook_emotion": "shock", "hook_tone": "gold", "hook_prop": {"type": "money", "text": "100만 원"}},
-        {"scenes": [s_letter, s_cta], "hook": "통장 맨 뒤에\n숨겨진 편지", "hook_line": "통장 맨 뒤에, 아빠 편지가 있었어요.",
-         "hook_who": J, "hook_emotion": "cry", "hook_tone": "blue", "hook_prop": {"type": "letter", "text": "미안하다"}},
+        # clips: [장면, 시작줄, 끝줄(제외)] — 느린 해설은 빼고 결정적인 대사부터
+        {"clips": [[s_open, 1, 5], [s_book, 2, 7]], "hook": "아빠 통장 열어보고\n주저앉았습니다",
+         "hook_who": J, "hook_emotion": "shock", "hook_tone": "red", "hook_prop": {"type": "bankbook", "text": "1억 2천만 원"},
+         "end_text": "통장의 비밀은 본편에서 ▶"},
+        {"clips": [[s_bank, 1, 8]], "hook": "은행 직원의 한마디에\n눈물이 터졌다",
+         "hook_who": J, "hook_emotion": "cry", "hook_tone": "blue", "hook_prop": {"type": "bankbook", "text": "매달 30만 원"},
+         "end_text": "전체 이야기는 본편에서 ▶"},
+        {"clips": [[s_wed, 1, 8]], "hook": "딸 결혼에\n100만 원만 준 아빠",
+         "hook_who": J, "hook_emotion": "shock", "hook_tone": "gold", "hook_prop": {"type": "money", "text": "100만 원"},
+         "end_text": "100만 원의 진실은 본편에서 ▶"},
+        {"clips": [[s_letter, 1, 7]], "hook": "통장 맨 뒤에\n숨겨진 편지",
+         "hook_who": J, "hook_emotion": "cry", "hook_tone": "blue", "hook_prop": {"type": "letter", "text": "미안하다"},
+         "end_text": "아빠의 30년은 본편에서 ▶"},
     ],
     "thumbnail": {
         "text": "짠돌이 아빠\n통장 열어보니",
@@ -221,11 +226,11 @@ proj = {
 }
 times = ["2026-10-10T12:00:00+09:00", "2026-10-11T19:00:00+09:00", "2026-10-12T12:00:00+09:00", "2026-10-13T19:00:00+09:00"]
 for s, t in zip(proj["shorts"], times):
-    s["title"] = s["hook"].replace("\n", " ")
+    s["title"] = s["hook"].replace("\n", " ") + " #감동사연 #가족"
     s["publish_at"] = t
 json.dump(proj, open("project.json", "w"), ensure_ascii=False, indent=1)
 lines = [l for s in S if not s.get("shorts_only") for l in s["lines"]]
 print("scenes", len(S), "lines", len(lines), "chars", sum(len(l["text"]) for l in lines))
 for i, sh in enumerate(proj["shorts"], 1):
-    print("short", i, sum(len(l["text"]) for k in sh["scenes"] for l in S[k]["lines"]), "chars")
+    print("short", i, sum(len(l["text"]) for c in sh["clips"] for l in S[c[0]]["lines"][c[1]:c[2]]), "chars")
 print("40자 초과:", [l["text"] for l in lines if len(l["text"]) > 45])

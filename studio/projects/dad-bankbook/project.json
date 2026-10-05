@@ -923,13 +923,19 @@
  "shorts_speed": 1.25,
  "shorts": [
   {
-   "scenes": [
-    0,
-    11,
-    17
+   "clips": [
+    [
+     0,
+     1,
+     5
+    ],
+    [
+     11,
+     2,
+     7
+    ]
    ],
    "hook": "아빠 통장 열어보고\n주저앉았습니다",
-   "hook_line": "아빠 통장을 열어 본 날, 저는 주저앉았습니다.",
    "hook_who": "jieun",
    "hook_emotion": "shock",
    "hook_tone": "red",
@@ -937,16 +943,19 @@
     "type": "bankbook",
     "text": "1억 2천만 원"
    },
-   "title": "아빠 통장 열어보고 주저앉았습니다",
+   "end_text": "통장의 비밀은 본편에서 ▶",
+   "title": "아빠 통장 열어보고 주저앉았습니다 #감동사연 #가족",
    "publish_at": "2026-10-10T12:00:00+09:00"
   },
   {
-   "scenes": [
-    12,
-    17
+   "clips": [
+    [
+     12,
+     1,
+     8
+    ]
    ],
    "hook": "은행 직원의 한마디에\n눈물이 터졌다",
-   "hook_line": "은행 직원의 한마디에, 눈물이 터졌어요.",
    "hook_who": "jieun",
    "hook_emotion": "cry",
    "hook_tone": "blue",
@@ -954,16 +963,19 @@
     "type": "bankbook",
     "text": "매달 30만 원"
    },
-   "title": "은행 직원의 한마디에 눈물이 터졌다",
+   "end_text": "전체 이야기는 본편에서 ▶",
+   "title": "은행 직원의 한마디에 눈물이 터졌다 #감동사연 #가족",
    "publish_at": "2026-10-11T19:00:00+09:00"
   },
   {
-   "scenes": [
-    6,
-    17
+   "clips": [
+    [
+     6,
+     1,
+     8
+    ]
    ],
    "hook": "딸 결혼에\n100만 원만 준 아빠",
-   "hook_line": "딸 결혼에 100만 원만 준 아빠, 진짜 이유는?",
    "hook_who": "jieun",
    "hook_emotion": "shock",
    "hook_tone": "gold",
@@ -971,16 +983,19 @@
     "type": "money",
     "text": "100만 원"
    },
-   "title": "딸 결혼에 100만 원만 준 아빠",
+   "end_text": "100만 원의 진실은 본편에서 ▶",
+   "title": "딸 결혼에 100만 원만 준 아빠 #감동사연 #가족",
    "publish_at": "2026-10-12T12:00:00+09:00"
   },
   {
-   "scenes": [
-    14,
-    17
+   "clips": [
+    [
+     14,
+     1,
+     7
+    ]
    ],
    "hook": "통장 맨 뒤에\n숨겨진 편지",
-   "hook_line": "통장 맨 뒤에, 아빠 편지가 있었어요.",
    "hook_who": "jieun",
    "hook_emotion": "cry",
    "hook_tone": "blue",
@@ -988,7 +1003,8 @@
     "type": "letter",
     "text": "미안하다"
    },
-   "title": "통장 맨 뒤에 숨겨진 편지",
+   "end_text": "아빠의 30년은 본편에서 ▶",
+   "title": "통장 맨 뒤에 숨겨진 편지 #감동사연 #가족",
    "publish_at": "2026-10-13T19:00:00+09:00"
   }
  ],

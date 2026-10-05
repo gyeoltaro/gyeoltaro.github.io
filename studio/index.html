@@ -144,7 +144,7 @@ const SCHEMA=`project.json 형식 (자막 들어간 사연 만화, 반드시 유
    "mood":"warm|sad|tense|calm|hope","lying":["dad"],"shorts_only":false,
    "lines":[{"who":"jieun|dad|narrator","text":"자막이자 대사(45자 이내 구어체)","emotion":"normal|happy|sad|angry|surprised|think|cry|shock","react":{"dad":"think"},"sfx":"ding|thud|whoosh"}]}],
  "shorts_speed":1.25,
- "shorts":[{"scenes":[장면 인덱스들],"hook":"첫 화면 큰 문구 2줄(\\n, 줄당 10자 내외)","hook_line":"첫 1~2초에 캐릭터가 외칠 후크 대사","hook_who":"jieun","hook_emotion":"shock|cry","hook_tone":"red|blue|gold","hook_prop":{"type":"bankbook|letter|money|phone|photo","text":"소품에 적힐 핵심 숫자·단어"}}],
+ "shorts":[{"clips":[[장면,시작줄,끝줄]],"end_text":"결말은 본편에서 ▶","hook":"첫 화면 큰 문구 2줄(\\n, 줄당 10자 내외)","hook_line":"첫 1~2초에 캐릭터가 외칠 후크 대사","hook_who":"jieun","hook_emotion":"shock|cry","hook_tone":"red|blue|gold","hook_prop":{"type":"bankbook|letter|money|phone|photo","text":"소품에 적힐 핵심 숫자·단어"}}],
  "thumbnail":{"text":"2줄","highlight":"노란 강조 줄","badge":"좌상단 빨간 배지","variants":[{"style":"story","tone":"red|blue|gold","face":["jieun","cry|shock|sad"],"prop":{"type":"bankbook","text":"1억 2천만 원"}}]}}
 연출 규칙:
 - 음성은 Chirp3-HD(자연스러움 최상)로 인물마다 다르게: 여성 Aoede·Gacrux·Kore·Leda·Zephyr…, 남성 Charon·Puck·Algieba·Orus… (ko-KR-Chirp3-HD-이름)
@@ -177,7 +177,7 @@ const GROUPS=[
  ]},
  {g:'📱 숏폼본부',teams:[
   {id:'cut',n:'하이라이트팀',e:'✂️',d:'롱폼에서 숏폼으로 떼어낼 구간 선정',t:['후크 강한 구간 탐색','첫 3초 후크 대사(hook_line)','1.25배속 기준 60초 이내','독립적으로 이해되는지 확인'],
-   p:p=>CTX(p)+`당신은 하이라이트팀장입니다. project.json의 장면들 중 단독으로 봐도 이해되고 후크가 강한 구간을 골라 shorts[] 를 3~5개로 채우세요. 숏폼은 기본 1.25배속(shorts_speed)이라 원래 길이 75초(대사 약 500자) 이내면 60초 안에 들어갑니다. 첫 3초에 시청자를 잡도록 hook_line(캐릭터가 첫 1~2초에 외치는 대사, 20자 이내의 질문·반전·숫자형 예: '헬스장 1년 끊고 세 번 간 사람?')과 hook(첫 화면 큰 문구 2줄, \\n 으로 구분), hook_who(외칠 캐릭터), hook_emotion(shock|cry), hook_tone(red|blue|gold), hook_prop(해당 숏폼의 반전을 상징하는 소품과 문구)를 지정하세요. 첫 화면은 어두운 드라마 배경 + 감정 얼굴 + 소품(빨간 원·화살표) + 큰 문구이며, 첫 프레임이 표지 역할을 한 뒤 0.1초에 펀치 줌으로 시선을 잡습니다. 필요하면 숏폼 전용으로 narration을 압축한 새 장면을 scenes 끝에 추가해도 됩니다.`},
+   p:p=>CTX(p)+`당신은 하이라이트팀장입니다. project.json의 장면들 중 단독으로 봐도 이해되고 후크가 강한 구간을 골라 shorts[] 를 3~5개로 채우세요. 데이터상 사연 쇼츠 상위권 길이는 28~50초이므로, 1.25배속 기준 25~45초(대사 약 180~300자)를 목표로 하세요. 느린 해설로 시작하지 말고 clips=[[장면, 시작줄, 끝줄], ...] 로 결정적인 대사부터 잘라 붙이고(결론·충격부터), 반전 직전에서 끝낸 뒤 end_text(예: '결말은 본편에서 ▶')를 지정하세요. 표지(0.35초)가 지나면 곧바로 이야기가 시작되고 첫 대사 위에 hook 이 크게 겹쳐 나옵니다. 제목은 35자 이내 + 해시태그 2개. 첫 3초에 시청자를 잡도록 hook_line(캐릭터가 첫 1~2초에 외치는 대사, 20자 이내의 질문·반전·숫자형 예: '헬스장 1년 끊고 세 번 간 사람?')과 hook(첫 화면 큰 문구 2줄, \\n 으로 구분), hook_who(외칠 캐릭터), hook_emotion(shock|cry), hook_tone(red|blue|gold), hook_prop(해당 숏폼의 반전을 상징하는 소품과 문구)를 지정하세요. 첫 화면은 어두운 드라마 배경 + 감정 얼굴 + 소품(빨간 원·화살표) + 큰 문구이며, 첫 프레임이 표지 역할을 한 뒤 0.1초에 펀치 줌으로 시선을 잡습니다. 필요하면 숏폼 전용으로 narration을 압축한 새 장면을 scenes 끝에 추가해도 됩니다.`},
   {id:'vertical',n:'세로변환팀',e:'📐',d:'1080x1920 세로 영상 렌더링',t:['shorts 렌더링','후크 문구 가독성','하단 UI 영역 피하기','파일명/순서 정리'],
    p:p=>CTX(p)+`당신은 세로변환팀장입니다. python3 studio/tools/studio.py shorts studio/projects/${p.slug||'<slug>'}/project.json 을 실행하고 output/short_*.mp4 의 길이/해상도를 검증, 프레임을 추출해 글자 잘림을 점검하세요.`},
   {id:'shortseo',n:'숏폼 업로드팀',e:'🚀',d:'숏폼 제목·해시태그·업로드 순서',t:['제목(후크형)','#Shorts 해시태그','롱폼 링크 고정댓글','하루 1~3개 스케줄'],
