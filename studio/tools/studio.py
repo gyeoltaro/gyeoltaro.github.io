@@ -351,7 +351,10 @@ def _init_worker(font_path):
 
 def _render_job(job):
     png, kw = job
-    _RDR.frame(**kw).save(png, compress_level=1)
+    if "_hook" in kw:  # 숏폼 첫 화면(후크 카드)
+        cartoon.render_hook_card(font_path=_RDR.font_path, **kw["_hook"]).save(png, compress_level=1)
+    else:
+        _RDR.frame(**kw).save(png, compress_level=1)
 
 
 def prefetch_audio(proj, root, scene_ids):
@@ -414,7 +417,21 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
         prog = (k + 1) / total
         states = {}
         shot = pick_shot(sc, li, ln, speaker)
-        for st, (m, bl) in {"o": (True, False), "c": (False, False), "b": (False, True)}.items():
+        punch = []
+        if sc.get("_hook_card"):
+            hk = dict(w=w, h=h, spec=cast.get(who) or chars[0][1], emo=emo, text=hook or ln["text"],
+                      prop=sc.get("_hook_prop"), tone=sc.get("_hook_tone", "red"), progress=(k + 1) / total)
+            for st, (m, bl) in {"o": (True, False), "c": (False, False), "b": (False, True)}.items():
+                png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_{st}.png"
+                png.parent.mkdir(exist_ok=True)
+                jobs.append((str(png), {"_hook": dict(hk, mouth=m, blink=bl, zoom=1.0)}))
+                states[st] = png
+            # 첫 프레임은 온전한 화면(피드·표지용) → 0.1초 뒤 '툭' 다가왔다가 자리 잡는 펀치 줌
+            for zi, (z, dur_) in enumerate(((1.0, .12), (1.12, .07), (1.07, .07), (1.03, .07))):
+                png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_p{zi}.png"
+                jobs.append((str(png), {"_hook": dict(hk, mouth=zi > 0, blink=False, zoom=z)}))
+                punch.append((png, dur_))
+        for st, (m, bl) in ({} if sc.get("_hook_card") else {"o": (True, False), "c": (False, False), "b": (False, True)}).items():
             png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_{st}.png"
             png.parent.mkdir(exist_ok=True)
             jobs.append((str(png), dict(w=w, h=h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker,
@@ -424,7 +441,8 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
                                         lying=tuple(sc.get("lying", ())), shot=shot)))
             states[st] = png
         rnd = random.Random(li * 31 + k)
-        t, step, pattern = 0.0, 0.16, []
+        frames += punch
+        t, step, pattern = sum(d for _, d in punch), 0.16, []
         while t < secs:
             r = rnd.random()
             st = "b" if (r < .07 and pattern and pattern[-1] == "c") else ("o" if rnd.random() < .62 else "c")
@@ -555,8 +573,9 @@ def cmd_shorts(proj, root, font):
         if hook_line and is_cartoon(proj, first):
             members = first.get("cast") or [ln["who"] for ln in scene_lines(first) if ln.get("who") in cast]
             who = sh_.get("hook_who") or next((m for m in members if m in cast), "narrator")
-            p2["scenes"].append(dict(first, _hook_card=True, lines=[{
-                "who": who, "text": hook_line, "emotion": sh_.get("hook_emotion", "surprised"),
+            p2["scenes"].append(dict(first, _hook_card=True, _hook_prop=sh_.get("hook_prop"), _hook_tone=sh_.get("hook_tone", "red"),
+                                     mood="tense", lines=[{
+                "who": who, "text": hook_line, "emotion": sh_.get("hook_emotion", "shock"),
                 "react": {m: "surprised" for m in members if m != who}}]))
             ids = [len(p2["scenes"]) - 1] + ids
         speed = float(sh_.get("speed", proj.get("shorts_speed", 1.25)))
@@ -582,6 +601,15 @@ def cmd_thumb(proj, root, font):
         {"palette": "red", "chars": [[ids[0], "sad"]] + ([[ids[1], "angry"]] if len(ids) > 1 else [])},
     ]
     for i, v in enumerate(variants[:3]):
+        if v.get("style") == "story":
+            fc, fe = v.get("face", [ids[0], "cry"])
+            img = cartoon.render_story_thumbnail(v.get("text", text), (cast[fc], fe), font_path, tone=v.get("tone", "red"),
+                                                 highlight=v.get("highlight", t.get("highlight")),
+                                                 badge=v.get("badge", t.get("badge")), prop=v.get("prop", t.get("prop")))
+            name = "thumbnail.png" if i == 0 else f"thumbnail_{'abc'[i]}.png"
+            img.save(out / name)
+            print(f"  ✔ {out / name}")
+            continue
         chars = [(cast[c], e) for c, e in v["chars"] if c in cast]
         img = cartoon.render_thumbnail(v.get("text", text), chars, font_path, palette=v.get("palette", "yellow"),
                                        highlight=v.get("highlight", t.get("highlight")),

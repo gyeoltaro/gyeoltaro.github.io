@@ -84,3 +84,9 @@ python3 studio/tools/upload.py upload <project.json>      # 예약 업로드 + �
 - **캐릭터 크기**: `"scale": 0.72` (회상 속 어린 시절)
 - **배경 추가**: `living`(거실), `kitchen`(부엌), `room_night`(밤 방)
 - **음량**: 최종 단계에서 loudnorm 으로 약 -14~-16 LUFS 표준화
+
+## 후킹 (썸네일 · 숏폼 첫 화면)
+- **감정 표정 추가**: `cry`(ㅠㅠ 눈물 줄기·우는 입), `shock`(큰 흰 눈·이마 그늘선·느낌표)
+- **소품**: `bankbook`(통장+금액), `letter`(편지), `money`(돈다발), `phone`(휴대폰), `photo` — 빨간 원과 화살표로 시선을 끔
+- **사연형 썸네일**: `thumbnail.variants[]` 에 `"style": "story"`, `tone`(red/blue/gold), `face`([캐릭터, 감정]), `prop`
+- **숏폼 첫 화면(후크 카드)**: `shorts[]` 에 `hook`(2줄 큰 문구), `hook_emotion`, `hook_tone`, `hook_prop`. 첫 프레임은 온전한 표지, 0.1초 뒤 펀치 줌, 충격음
