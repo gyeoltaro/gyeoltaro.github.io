@@ -7,7 +7,7 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
 fi
 
 # 파이썬 패키지 (Pillow: 그림, edge-tts: 음성)
-python3 -c "import PIL, edge_tts" 2>/dev/null || pip install -q pillow edge-tts
+python3 -c "import PIL, edge_tts, numpy" 2>/dev/null || pip install -q pillow edge-tts numpy
 
 # apt 패키지: 썸네일용 굵은 한글 폰트(Noto Sans CJK Black), 오프라인 대체 음성(espeak-ng)
 need=()

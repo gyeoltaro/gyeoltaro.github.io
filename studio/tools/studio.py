@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import cartoon  # noqa: E402
+import sound  # noqa: E402
 
 try:
     from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -368,6 +369,19 @@ def prefetch_audio(proj, root, scene_ids):
     print(f"[음성] {len(todo)}줄 {time.time() - t0:.0f}초")
 
 
+def pick_shot(sc, li, ln, speaker):
+    """카메라: 장면 첫 대사·해설은 전체 샷, 감정이 큰 대사는 말하는 사람 클로즈업, 나머지는 번갈아"""
+    if sc.get("shots") == "wide" or sc.get("_hook_card") or not speaker or speaker in sc.get("lying", ()):
+        return "wide"
+    if ln.get("shot"):
+        return ln["shot"]
+    if li == 0:
+        return "wide"
+    if ln.get("emotion") in ("sad", "surprised", "angry"):
+        return "close"
+    return "close" if li % 2 else "wide"
+
+
 def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
     """만화 장면 → [(png, 초)], [mp3]. 입모양/눈깜빡임 상태별 PNG 는 jobs 에 모아 병렬 렌더링"""
     w, h = size
@@ -379,11 +393,15 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
             if ln.get("who") in cast and ln["who"] not in ids:
                 ids.append(ln["who"])
     chars = [(i, cast[i]) for i in ids if i in cast] or [("_mascot", proj.get("mascot", cartoon.DEFAULT_LOOK))]
-    frames, audios = [], []
-    sil = None
+    frames, audios, events = [], [], []
+    t_scene = 0.0
+    if sc.get("_hook_card"):
+        events.append((0.0, "thud"))
     for li, ln in enumerate(lines):
         who = ln.get("who", "narrator")
         mp3, secs = speak(proj, root, who, ln["text"])
+        if ln.get("sfx"):
+            events.append((t_scene, ln["sfx"]))
         audios.append(mp3)
         speaker = who if who in dict(chars) else ("_mascot" if who == "narrator" and chars[0][0] == "_mascot" else None)
         emo = ln.get("emotion", "normal")
@@ -395,6 +413,7 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
         ncol = cast_color(spec) if spec else (200, 200, 220)
         prog = (k + 1) / total
         states = {}
+        shot = pick_shot(sc, li, ln, speaker)
         for st, (m, bl) in {"o": (True, False), "c": (False, False), "b": (False, True)}.items():
             png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_{st}.png"
             png.parent.mkdir(exist_ok=True)
@@ -402,7 +421,7 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
                                         emotions=emos, mouth=m, blink=bl, text=ln["text"], name=name,
                                         name_color=ncol, chip=None if sc.get("_hook_card") else chip,
                                         hook=hook, progress=prog, hook_big=bool(sc.get("_hook_card")),
-                                        lying=tuple(sc.get("lying", ())))))
+                                        lying=tuple(sc.get("lying", ())), shot=shot)))
             states[st] = png
         rnd = random.Random(li * 31 + k)
         t, step, pattern = 0.0, 0.16, []
@@ -421,7 +440,8 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
             sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{gap}", "-q:a", "9", str(sil)])
         frames.append((states["c"], gap))
         audios.append(str(sil))
-    return frames, audios
+        t_scene += secs + gap
+    return frames, audios, events
 
 
 def slide_segments(proj, sc, root, size, k, total, theme, font_path, hook):
@@ -435,7 +455,7 @@ def slide_segments(proj, sc, root, size, k, total, theme, font_path, hook):
         png.parent.mkdir(exist_ok=True)
         render_frame(w, h, sc, s, theme, font_path, k, total, root, hook=hook).save(png)
         frames.append((png, secs * weights[j] / sum(weights)))
-    return frames, [mp3]
+    return frames, [mp3], []
 
 
 def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, font=None, speed=1.0):
@@ -447,17 +467,25 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
     prefetch_audio(proj, root, scene_ids)
     jobs = []
     frames, audios = [], []
+    sections, events = [], []  # 배경음악 구간(시작, 끝, 분위기), 효과음(시각, 종류) — 원래 속도 기준
     total = len(scene_ids)
     for k, si in enumerate(scene_ids):
         sc = proj["scenes"][si]
         print(f"[장면] {k + 1}/{total} {sc.get('title', '')}")
         chip = sc.get("title")
+        start = sum(s for _, s in frames)
         if is_cartoon(proj, sc):
-            f, a = cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip)
+            f, a, ev = cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip)
         else:
-            f, a = slide_segments(proj, sc, root, size, k, total, THEMES[(si + theme_shift) % len(THEMES)], font_path, hook)
+            f, a, ev = slide_segments(proj, sc, root, size, k, total, THEMES[(si + theme_shift) % len(THEMES)], font_path, hook)
         frames += f
         audios += a
+        end = sum(s for _, s in frames)
+        mood = sc.get("mood") or ("tense" if sc.get("_hook_card") else sound.auto_mood(scene_lines(sc)))
+        sections.append((start, end, mood))
+        events += [(start + o, kind) for o, kind in ev]
+        if k > 0 and not sc.get("_hook_card") and not proj["scenes"][scene_ids[k - 1]].get("_hook_card"):
+            events.append((max(0, start - .25), "whoosh"))
     if jobs:
         t0 = time.time()
         workers = max(1, (os.cpu_count() or 2))
@@ -473,13 +501,29 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         fh.write(f"file '{frames[-1][0]}'\n")
     alst = work / "audio.txt"
     alst.write_text("".join(f"file '{a}'\n" for a in audios))
+    vflags = ["-vf", "format=yuv420p", "-fps_mode", "vfr"] if FAST else ["-vf", "format=yuv420p,fps=30"]
+    venc = ["-c:v", "libx264", "-preset", "veryfast", "-tune", "animation", "-crf", "20"]
     print(f"[인코딩] {out.name}")
-    sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
-        "-f", "concat", "-safe", "0", "-i", str(alst),
-        *(["-vf", "format=yuv420p", "-fps_mode", "vfr"] if FAST else ["-vf", "format=yuv420p,fps=30"]),
-        "-c:v", "libx264", "-preset", "veryfast", "-tune", "animation", "-crf", "20",
-        *(["-af", f"atempo={speed}"] if speed != 1.0 else []),
-        "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", str(out)])
+    if proj.get("music", True):
+        dur_final = sum(s for _, s in frames)  # 배속 반영된 최종 길이
+        sec_f = [(s / speed, e / speed, m) for s, e, m in sections]
+        ev_f = [(a / speed, kd) for a, kd in events]
+        music, fx = sound.build(dur_final, sec_f, ev_f, float(proj.get("music_volume", 1.0)))
+        sound.write_wav(work / "music.wav", music)
+        sound.write_wav(work / "fx.wav", fx)
+        tempo = f",atempo={speed}" if speed != 1.0 else ""
+        fc = (f"[1:a]aresample=44100{tempo},asplit=2[va][vb];[2:a]aresample=44100[m];"
+              "[m][va]sidechaincompress=threshold=0.015:ratio=10:attack=15:release=450[md];"
+              "[3:a]aresample=44100[fx];[vb][md][fx]amix=inputs=3:duration=first:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[aout]")  # 유튜브 기준 음량
+        sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
+            "-f", "concat", "-safe", "0", "-i", str(alst), "-i", str(work / "music.wav"), "-i", str(work / "fx.wav"),
+            "-filter_complex", fc, "-map", "0:v", "-map", "[aout]", *vflags, *venc,
+            "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(out)])
+    else:
+        sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
+            "-f", "concat", "-safe", "0", "-i", str(alst), *vflags, *venc,
+            "-af", (f"atempo={speed}," if speed != 1.0 else "") + "loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100",
+            "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", str(out)])
     if not os.environ.get("STUDIO_KEEP_WORK"):
         shutil.rmtree(work, ignore_errors=True)
     total_s = sum(s for _, s in frames)
