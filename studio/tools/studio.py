@@ -327,14 +327,16 @@ def speak(proj, root, who, text):
 
 
 def scene_lines(sc):
-    """장면의 대사 목록. lines 가 없으면 narration 한 줄(해설)로 취급"""
+    """장면의 대사 목록. lines 가 없으면 narration 한 줄(해설)로 취급 (쇼츠 표지는 대사 없음)"""
+    if sc.get("_cover"):
+        return []
     if sc.get("lines"):
         return sc["lines"]
     return [{"who": "narrator", "text": sc["narration"]}]
 
 
 def is_cartoon(proj, sc):
-    return bool(sc.get("lines")) or bool(proj.get("cast")) or sc.get("style") == "cartoon"
+    return bool(sc.get("lines")) or bool(sc.get("_cover")) or bool(proj.get("cast")) or sc.get("style") == "cartoon"
 
 
 def cast_color(spec):
@@ -372,22 +374,53 @@ def prefetch_audio(proj, root, scene_ids):
     print(f"[음성] {len(todo)}줄 {time.time() - t0:.0f}초")
 
 
-def pick_shot(sc, li, ln, speaker):
-    """카메라: 장면 첫 대사·해설은 전체 샷, 감정이 큰 대사는 말하는 사람 클로즈업, 나머지는 번갈아"""
+def pick_shot(sc, li, ln, speaker, vertical=False):
+    """카메라: 장면 첫 대사·해설은 전체 샷, 감정이 큰 대사는 말하는 사람 클로즈업, 나머지는 번갈아
+    쇼츠(세로)는 인물이 작아 보이지 않게 클로즈업 위주 (홀수 대사만 전체 샷)"""
     if sc.get("shots") == "wide" or sc.get("_hook_card") or not speaker or speaker in sc.get("lying", ()):
         return "wide"
     if ln.get("shot"):
         return ln["shot"]
+    if vertical:
+        return "wide" if (li % 2 and ln.get("emotion") not in ("sad", "surprised", "angry", "cry", "shock")) else "close"
     if li == 0:
         return "wide"
-    if ln.get("emotion") in ("sad", "surprised", "angry"):
+    if ln.get("emotion") in ("sad", "surprised", "angry", "cry", "shock"):
         return "close"
     return "close" if li % 2 else "wide"
 
 
+def phrases(text, max_chars=12):
+    """쇼츠 자막: 문장을 짧은 구절로 나눔 (공백 기준, 구절당 max_chars 내외)"""
+    words, out, cur = text.split(), [], ""
+    for wd in words:
+        if cur and len(cur) + 1 + len(wd) > max_chars:
+            out.append(cur)
+            cur = wd
+        else:
+            cur = (cur + " " + wd).strip()
+    if cur:
+        out.append(cur)
+    if len(out) > 1 and len(out[-1]) <= 3:  # 꼬리 한두 글자는 앞 구절에 붙임
+        out[-2] += " " + out.pop()
+    return out or [text]
+
+
+def silence(root, secs):
+    sil = root / "work" / f"sil{int(secs * 1000)}.mp3"
+    sil.parent.mkdir(exist_ok=True)
+    if not sil.exists():
+        sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{secs}", "-q:a", "9", str(sil)])
+    return str(sil)
+
+
 def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
-    """만화 장면 → [(png, 초)], [mp3]. 입모양/눈깜빡임 상태별 PNG 는 jobs 에 모아 병렬 렌더링"""
+    """만화 장면 → [(png, 초)], [mp3], [(시각, 효과음)]. 입모양/눈깜빡임 상태별 PNG 는 jobs 에 모아 병렬 렌더링
+    세로(쇼츠)는 큰 구절 자막이 말에 맞춰 바뀌고, 롱폼은 하단 자막 상자"""
     w, h = size
+    vertical = h > w
+    wd = root / f"work_{size[0]}x{size[1]}"
+    wd.mkdir(exist_ok=True)
     cast = proj.get("cast", {})
     lines = scene_lines(sc)
     ids = sc.get("cast") or []
@@ -397,9 +430,18 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
                 ids.append(ln["who"])
     chars = [(i, cast[i]) for i in ids if i in cast] or [("_mascot", proj.get("mascot", cartoon.DEFAULT_LOOK))]
     frames, audios, events = [], [], []
+    prog = (k + 1) / total
+
+    if sc.get("_cover"):  # 쇼츠 표지: 0.35초 — 첫 프레임은 온전한 표지, 이어서 펀치 줌, 소리는 '쿵'만
+        hk = dict(w=w, h=h, spec=sc["_cover"]["spec"], emo=sc["_cover"]["emo"], text=hook or "",
+                  prop=sc["_cover"].get("prop"), tone=sc["_cover"].get("tone", "red"), progress=prog)
+        for zi, (z, d_) in enumerate(((1.0, .12), (1.12, .07), (1.07, .07), (1.03, .09))):
+            png = wd / f"{k:02d}_cover{zi}.png"
+            jobs.append((str(png), {"_hook": dict(hk, mouth=False, blink=False, zoom=z)}))
+            frames.append((png, d_))
+        return frames, [silence(root, .35)], [(0.0, "thud")]
+
     t_scene = 0.0
-    if sc.get("_hook_card"):
-        events.append((0.0, "thud"))
     for li, ln in enumerate(lines):
         who = ln.get("who", "narrator")
         mp3, secs = speak(proj, root, who, ln["text"])
@@ -408,56 +450,44 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
         audios.append(mp3)
         speaker = who if who in dict(chars) else ("_mascot" if who == "narrator" and chars[0][0] == "_mascot" else None)
         emo = ln.get("emotion", "normal")
-        emos = {cid: ln.get("react", {}).get(cid, "normal") for cid, _ in chars}
+        listen = "sad" if sc.get("mood") == "sad" else "normal"  # 슬픈 장면에서 듣는 사람이 웃고 있지 않게
+        emos = {cid: ln.get("react", {}).get(cid, listen) for cid, _ in chars}
         if speaker:
             emos[speaker] = emo
         spec = dict(cast.get(who, {}))
         name = spec.get("name") if who != "narrator" else None
         ncol = cast_color(spec) if spec else (200, 200, 220)
-        prog = (k + 1) / total
-        states = {}
-        shot = pick_shot(sc, li, ln, speaker)
-        punch = []
-        if sc.get("_hook_card"):
-            hk = dict(w=w, h=h, spec=cast.get(who) or chars[0][1], emo=emo, text=hook or ln["text"],
-                      prop=sc.get("_hook_prop"), tone=sc.get("_hook_tone", "red"), progress=(k + 1) / total)
-            for st, (m, bl) in {"o": (True, False), "c": (False, False), "b": (False, True)}.items():
-                png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_{st}.png"
-                png.parent.mkdir(exist_ok=True)
-                jobs.append((str(png), {"_hook": dict(hk, mouth=m, blink=bl, zoom=1.0)}))
-                states[st] = png
-            # 첫 프레임은 온전한 화면(피드·표지용) → 0.1초 뒤 '툭' 다가왔다가 자리 잡는 펀치 줌
-            for zi, (z, dur_) in enumerate(((1.0, .12), (1.12, .07), (1.07, .07), (1.03, .07))):
-                png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_p{zi}.png"
-                jobs.append((str(png), {"_hook": dict(hk, mouth=zi > 0, blink=False, zoom=z)}))
-                punch.append((png, dur_))
-        for st, (m, bl) in ({} if sc.get("_hook_card") else {"o": (True, False), "c": (False, False), "b": (False, True)}).items():
-            png = root / f"work_{size[0]}x{size[1]}" / f"{k:02d}_{li:02d}_{st}.png"
-            png.parent.mkdir(exist_ok=True)
-            jobs.append((str(png), dict(w=w, h=h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker,
-                                        emotions=emos, mouth=m, blink=bl, text=ln["text"], name=name,
-                                        name_color=ncol, chip=None if sc.get("_hook_card") else chip,
-                                        hook=hook, progress=prog, hook_big=bool(sc.get("_hook_card")),
-                                        lying=tuple(sc.get("lying", ())), shot=shot)))
-            states[st] = png
+        shot = pick_shot(sc, li, ln, speaker, vertical)
+        # 자막 조각: 쇼츠는 구절 단위로 넘어감, 롱폼은 문장 통째
+        chunks = phrases(ln["text"]) if vertical else [ln["text"]]
+        weights = [max(len(c), 3) for c in chunks]
         rnd = random.Random(li * 31 + k)
-        frames += punch
-        t, step, pattern = sum(d for _, d in punch), 0.16, []
-        while t < secs:
-            r = rnd.random()
-            st = "b" if (r < .07 and pattern and pattern[-1] == "c") else ("o" if rnd.random() < .62 else "c")
-            if not speaker:
-                st = "c" if st == "o" else st
-            d_ = min(step, secs - t)
-            pattern.append(st)
-            frames.append((states[st], d_))
-            t += d_
-        gap = 0.06 if sc.get("_hook_card") else 0.18  # 대사 사이 여백 (후크 카드는 바로 본론으로)
-        sil = root / "work" / f"gap{int(gap * 1000)}.mp3"
-        if not sil.exists():
-            sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", f"{gap}", "-q:a", "9", str(sil)])
+        for ci, chunk in enumerate(chunks):
+            cdur = secs * weights[ci] / sum(weights)
+            states = {}
+            for st, (m, bl) in {"o": (True, False), "c": (False, False), "b": (False, True)}.items():
+                png = wd / f"{k:02d}_{li:02d}_{ci:02d}_{st}.png"
+                jobs.append((str(png), dict(w=w, h=h, bg=sc.get("bg", "plain"), chars=chars, speaker=speaker,
+                                            emotions=emos, mouth=m, blink=bl, text=chunk, name=name,
+                                            name_color=ncol, chip=chip, hook=hook, progress=prog,
+                                            lying=tuple(sc.get("lying", ())), shot=shot,
+                                            caption="pop" if vertical else "box",
+                                            hook_overlay=bool(ln.get("_hook_overlay")),
+                                            end_text=ln.get("_end_text"))))
+                states[st] = png
+            t, step, pattern = 0.0, 0.16, []
+            while t < cdur - 1e-6:
+                r = rnd.random()
+                st = "b" if (r < .07 and pattern and pattern[-1] == "c") else ("o" if rnd.random() < .62 else "c")
+                if not speaker:
+                    st = "c" if st == "o" else st
+                d_ = min(step, cdur - t)
+                pattern.append(st)
+                frames.append((states[st], d_))
+                t += d_
+        gap = 0.06 if vertical else 0.18  # 대사 사이 여백 (쇼츠는 촘촘하게)
         frames.append((states["c"], gap))
-        audios.append(str(sil))
+        audios.append(silence(root, gap))
         t_scene += secs + gap
     return frames, audios, events
 
@@ -499,10 +529,11 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         frames += f
         audios += a
         end = sum(s for _, s in frames)
-        mood = sc.get("mood") or ("tense" if sc.get("_hook_card") else sound.auto_mood(scene_lines(sc)))
+        mood = sc.get("mood") or ("tense" if sc.get("_hook_card") else sound.auto_mood(scene_lines(sc) if sc.get("lines") or sc.get("narration") else []))
         sections.append((start, end, mood))
         events += [(start + o, kind) for o, kind in ev]
-        if k > 0 and not sc.get("_hook_card") and not proj["scenes"][scene_ids[k - 1]].get("_hook_card"):
+        if k > 0 and not sc.get("_hook_card") and not proj["scenes"][scene_ids[k - 1]].get("_hook_card") \
+                and not proj["scenes"][scene_ids[k - 1]].get("_cover"):
             events.append((max(0, start - .25), "whoosh"))
     if jobs:
         t0 = time.time()
@@ -519,8 +550,16 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         fh.write(f"file '{frames[-1][0]}'\n")
     alst = work / "audio.txt"
     alst.write_text("".join(f"file '{a}'\n" for a in audios))
-    vflags = ["-vf", "format=yuv420p", "-fps_mode", "vfr"] if FAST else ["-vf", "format=yuv420p,fps=30"]
-    venc = ["-c:v", "libx264", "-preset", "veryfast", "-tune", "animation", "-crf", "20"]
+    if FAST:
+        vflags = ["-vf", "format=yuv420p", "-fps_mode", "vfr"]
+    elif proj.get("drift", True):  # 천천히 떠다니는 카메라: 정지 화면 느낌을 없앰 (쇼츠는 조금 더 크게)
+        zf = 1.07 if h > w else 1.04
+        sw, sh_ = int(w * zf) // 2 * 2, int(h * zf) // 2 * 2
+        vflags = ["-vf", f"fps=30,scale={sw}:{sh_},crop={w}:{h}:x='(iw-ow)/2*(1+0.85*sin(t*0.55))':"
+                         f"y='(ih-oh)/2*(1+0.85*cos(t*0.41))',format=yuv420p"]
+    else:
+        vflags = ["-vf", "format=yuv420p,fps=30"]
+    venc = ["-c:v", "libx264", "-preset", "veryfast", "-tune", "animation", "-crf", "20" if h > w else "25"]  # 롱폼 9분 ≈ 25~30MB
     print(f"[인코딩] {out.name}")
     if proj.get("music", True):
         dur_final = sum(s for _, s in frames)  # 배속 반영된 최종 길이
@@ -536,7 +575,7 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
             "-f", "concat", "-safe", "0", "-i", str(alst), "-i", str(work / "music.wav"), "-i", str(work / "fx.wav"),
             "-filter_complex", fc, "-map", "0:v", "-map", "[aout]", *vflags, *venc,
-            "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(out)])
+            "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", str(out)])
     else:
         sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst),
             "-f", "concat", "-safe", "0", "-i", str(alst), *vflags, *venc,
@@ -560,30 +599,40 @@ def cmd_long(proj, root, font):
 
 
 def cmd_shorts(proj, root, font):
-    """숏폼: 첫 장면에 후크 카드(후크 대사+큰 글씨) 추가, 기본 1.25배속"""
+    """쇼츠: 0.35초 표지(후크 카드) → 곧바로 이야기의 결정적 대사부터 시작(clips 로 장면 일부만) → 끝 안내는 화면에 겹쳐 표시
+    shorts[]: clips=[[장면, 시작줄, 끝줄(제외, 생략 시 끝까지)], ...] 또는 scenes=[장면, ...]
+              hook(표지·첫 대사 위 큰 문구), hook_who/hook_emotion/hook_tone/hook_prop(표지), end_text, speed"""
     out = root / "output"
     out.mkdir(exist_ok=True)
     cast = proj.get("cast", {})
     for n, sh_ in enumerate(proj.get("shorts", []), 1):
         p2 = dict(proj, scenes=list(proj["scenes"]))
-        ids = list(sh_["scenes"])
+        clips = sh_.get("clips") or [[i] for i in sh_["scenes"]]
+        ids = []
+        for clip in clips:
+            sc = proj["scenes"][clip[0]]
+            lines = scene_lines(sc)
+            a_, b_ = (clip[1] if len(clip) > 1 else 0), (clip[2] if len(clip) > 2 else None)
+            p2["scenes"].append(dict(sc, lines=[dict(x) for x in lines[a_:b_]]))
+            ids.append(len(p2["scenes"]) - 1)
+        first, last = p2["scenes"][ids[0]], p2["scenes"][ids[-1]]
         hook = sh_.get("hook", "")
-        hook_line = sh_.get("hook_line") or hook
-        first = proj["scenes"][ids[0]]
-        if hook_line and is_cartoon(proj, first):
-            members = first.get("cast") or [ln["who"] for ln in scene_lines(first) if ln.get("who") in cast]
-            who = sh_.get("hook_who") or next((m for m in members if m in cast), "narrator")
-            p2["scenes"].append(dict(first, _hook_card=True, _hook_prop=sh_.get("hook_prop"), _hook_tone=sh_.get("hook_tone", "red"),
-                                     mood="tense", lines=[{
-                "who": who, "text": hook_line, "emotion": sh_.get("hook_emotion", "shock"),
-                "react": {m: "surprised" for m in members if m != who}}]))
+        if hook:
+            first["lines"][0]["_hook_overlay"] = True
+        last["lines"][-1]["_end_text"] = sh_.get("end_text", "결말은 본편에서 ▶")
+        if sh_.get("cover", True) and is_cartoon(proj, first):
+            who = sh_.get("hook_who") or next((x for x in (first.get("cast") or []) if x in cast), None)
+            spec = cast.get(who) or cartoon.DEFAULT_LOOK
+            p2["scenes"].append({"title": "", "bg": first.get("bg"), "mood": "tense", "lines": [],
+                                 "_cover": {"spec": spec, "emo": sh_.get("hook_emotion", "shock"),
+                                            "prop": sh_.get("hook_prop"), "tone": sh_.get("hook_tone", "red")}})
             ids = [len(p2["scenes"]) - 1] + ids
         speed = float(sh_.get("speed", proj.get("shorts_speed", 1.25)))
         secs = render_video(p2, root, ids, (1080, 1920), out / f"short_{n:02d}.mp4",
                             hook=hook, theme_shift=n, font=font, speed=speed)
-        print(f"    {speed}배속 · 후크 카드 {'O' if len(ids) > len(sh_['scenes']) else 'X'}")
-        if secs > 60:
-            print("  ! 60초 초과: 쇼츠는 3분까지 가능하지만 60초 이내가 완주율에 유리합니다")
+        print(f"    {speed}배속 · 표지 0.35초 · {len(clips)}개 구간")
+        if secs > 50:
+            print("  ! 50초 초과: 사연 쇼츠 상위권 길이 중앙값은 28~50초입니다. 구간을 줄여 보세요")
 
 
 def cmd_thumb(proj, root, font):
@@ -710,7 +759,8 @@ def cmd_kit(proj, root, font):
     short_blocks = "".join(
         f'<section><h2>숏폼 {i} <small>{s["file"]}</small></h2>' + field("제목", s["title"])
         + field("설명", s["description"], 4)
-        + f'<ul class="set"><li>공개: <b>예약</b> · {H.escape(when_ko(s["publish_at"]) or "롱폼 다음 날부터 하루 1개")}</li><li>시청자층: <b>아동용 아님</b> · 합성 콘텐츠: <b>예</b></li></ul></section>'
+        + f'<ul class="set"><li>공개: <b>예약</b> · {H.escape(when_ko(s["publish_at"]) or "롱폼 다음 날부터 하루 1개")}</li><li>시청자층: <b>아동용 아님</b> · 합성 콘텐츠: <b>예</b></li>'
+        f'<li><b>관련 동영상</b>: 롱폼을 연결 (쇼츠 → 본편 유입)</li><li>표지: <b>첫 프레임(0초)</b> 그대로</li></ul></section>'
         for i, s in enumerate(shorts, 1))
     page = f"""<title>업로드 키트 · {H.escape(pub['title'][:30])}</title>
 <style>
