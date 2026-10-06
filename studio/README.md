@@ -72,10 +72,10 @@ python3 studio/tools/upload.py upload <project.json>      # 예약 업로드 + �
 
 ## 사연 만화 기능
 - 음성: 캐릭터별 `gvoice` 에 Google **Chirp3-HD** 음성(예: `ko-KR-Chirp3-HD-Aoede`, `-Charon`, `-Puck`, `-Gacrux`, `-Kore`)을 지정하면 가장 자연스럽습니다. 해설 목소리는 `narrator_gvoice`.
-- 배경: `hospital`(병실), `memorial`(추모·장례식장) 추가. 별칭 `funeral`, `bank`(=office)
+- 배경: `hospital`(병실), `memorial`(추모·장례식장) 추가. 별칭 `funeral`, `bank`(=office), `hoesik`(회식 고깃집: 메뉴패·홍등·불판, 별칭 `restaurant`·`bar`·`bbq`)
 - 장면 `lying: ["dad"]`: hospital 배경의 침대에 누운 모습으로 그림
 - 장면 `shorts_only: true`: 롱폼·챕터에서는 빠지고 숏폼에만 쓰는 장면 (예: "결말은 본편에서")
-- 예시: `projects/dad-bankbook/` (창작 사연, `build_script.py` 가 대본 원본) · `projects/mil-sidedish/`
+- 예시: `projects/dad-bankbook/` (창작 사연, `build_script.py` 가 대본 원본) · `projects/mil-sidedish/` · `projects/newbie-ceo/`
 
 ## 연출 (자동 작곡·효과음·카메라)
 - **배경음악**: 장면 `mood`(warm/sad/tense/calm/hope)에 맞춰 `tools/sound.py` 가 코드로 작곡 — 저작권 없음. 대사가 나오면 자동으로 작아짐(사이드체인). `music: false` 로 끄기, `music_volume` 로 크기 조절. mood 가 없으면 대사 감정으로 추정
