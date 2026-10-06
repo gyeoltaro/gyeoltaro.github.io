@@ -10,7 +10,7 @@ SS = 2                    # 슈퍼샘플링 배율
 OUT = (43, 34, 51)        # 외곽선 색
 EMOTIONS = ("normal", "happy", "sad", "angry", "surprised", "think", "cry", "shock")
 BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "office", "classroom": "office",
-            "company": "office", "bar": "cafe", "restaurant": "cafe", "outside": "park", "city": "street",
+            "company": "office", "bar": "hoesik", "restaurant": "hoesik", "bbq": "hoesik", "pub": "hoesik", "outside": "park", "city": "street",
             "road": "street", "evening": "night"}
 DEFAULT_LOOK = {"color": "#ff8a65", "skin": "#ffdcb8", "hair": "short", "hair_color": "#3b2a20"}
 
@@ -102,6 +102,34 @@ def draw_bg(w, h, kind, horizon):
         for k in range(3):
             d.line([(int(W * .69), int(hz * (.34 + k * .08))), (int(W * (.78 + k * .03)), int(hz * (.34 + k * .08)))], fill=(235, 235, 235), width=lw)
         window(int(W * .08), int(hz * .12), int(W * .3), int(hz * .55), sky=(255, 224, 170))
+    elif kind == "hoesik":  # 회식 고깃집: 주황 벽, 메뉴 나무패, 홍등, 불판 놓인 긴 식탁
+        grad(d, W, H, 0, hz, (255, 204, 150), (240, 168, 108))
+        d.rectangle([0, int(hz * .74), W, hz], fill=(150, 96, 60), outline=OUT, width=lw)
+        for i in range(1, 12):
+            x = W * i // 12
+            d.line([(x, int(hz * .74)), (x, hz)], fill=(126, 78, 48), width=lw)
+        d.rectangle([0, hz, W, H], fill=(92, 76, 70))
+        for i in range(1, 7):
+            d.line([(0, hz + (H - hz) * i // 7), (W, hz + (H - hz) * i // 7)], fill=(78, 64, 58), width=lw)
+        for k in range(9):  # 메뉴 나무패
+            x0 = int(W * (.06 + k * .1))
+            d.rectangle([x0, int(hz * .08), x0 + int(W * .075), int(hz * .36)], fill=(255, 246, 222), outline=OUT, width=lw)
+            for j in range(3):
+                yy = int(hz * (.13 + j * .07))
+                d.line([(x0 + int(W * .02), yy), (x0 + int(W * .055), yy)], fill=(150, 40, 30) if j == 0 else (90, 70, 60), width=lw * 2)
+        for fx in (.2, .5, .8):  # 홍등
+            x = int(W * fx)
+            d.line([(x, 0), (x, int(hz * .42))], fill=OUT, width=lw)
+            d.ellipse([x - int(W * .028), int(hz * .42), x + int(W * .028), int(hz * .6)], fill=(226, 56, 48), outline=OUT, width=lw)
+            d.rectangle([x - int(W * .012), int(hz * .4), x + int(W * .012), int(hz * .43)], fill=(250, 200, 80))
+        ty = hz - int(H * .02)  # 긴 식탁 + 불판 + 초록 병
+        d.rectangle([int(W * .02), ty, int(W * .98), ty + int(H * .05)], fill=(176, 120, 76), outline=OUT, width=lw)
+        for fx in (.14, .38, .62, .86):
+            x = int(W * fx)
+            d.ellipse([x - int(W * .05), ty - int(H * .012), x + int(W * .05), ty + int(H * .03)], fill=(70, 70, 76), outline=OUT, width=lw)
+            d.ellipse([x - int(W * .03), ty - int(H * .002), x + int(W * .03), ty + int(H * .02)], fill=(240, 120, 60))
+            bx = x + int(W * .07)
+            d.rectangle([bx, ty - int(H * .07), bx + int(W * .014), ty], fill=(90, 170, 110), outline=OUT, width=lw)
     elif kind == "park":
         grad(d, W, H, 0, hz, (150, 214, 250), (226, 246, 255))
         d.ellipse([int(W * .78), int(H * .06), int(W * .78) + int(H * .13), int(H * .06) + int(H * .13)], fill=(255, 236, 130), outline=OUT, width=lw)
