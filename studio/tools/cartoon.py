@@ -4,7 +4,7 @@
 """
 import math
 import random
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageOps, ImageFont
 
 SS = 2                    # 슈퍼샘플링 배율
 OUT = (43, 34, 51)        # 외곽선 색
@@ -413,9 +413,10 @@ class Renderer:
 
     def frame(self, w, h, *, bg, chars, speaker, emotions, mouth, blink, text, name, name_color,
               chip=None, hook=None, progress=0.0, accent=(255, 213, 79), hook_big=False, lying=(), shot="wide",
-              caption="box", hook_overlay=False, end_text=None):
+              caption="box", hook_overlay=False, end_text=None, tint=None, badge=None):
         """chars: [(id, spec)] / emotions: {id: emo} / hook_big: 숏폼 첫 3초 후크 카드(큰 글씨+폭발 배경)
-        lying: 병원 침대에 누운 캐릭터 id 목록 (hospital 배경의 침대 위에 머리+이불로 그림)"""
+        lying: 병원 침대에 누운 캐릭터 id 목록 (hospital 배경의 침대 위에 머리+이불로 그림)
+        tint: "flashback" 이면 빛바랜 세피아 톤(회상) / badge: 오른쪽 위 시점 표시(예: "20년 전", "하이라이트")"""
         vertical = h > w
         horizon = .54 if vertical else .70
         hook_raw = hook  # 큰 후크 문구는 지정한 줄바꿈 그대로
@@ -480,6 +481,9 @@ class Renderer:
             layer = layer.crop((int(x0), int(y0), int(x0 + cw), int(y0 + chh))).resize((w, h), Image.LANCZOS).convert("RGB")
         else:
             layer = layer.reduce(SS).convert("RGB")  # 2배→1배 박스 축소(빠름)
+        if tint == "flashback":  # 회상: 채도를 빼고 따뜻한 세피아로 — 시간이 바뀐 걸 한눈에
+            sep = ImageOps.colorize(ImageOps.grayscale(layer), (60, 42, 30), (255, 236, 205))
+            layer = Image.blend(layer, sep, .55)
         d = ImageDraw.Draw(layer)
 
         u = w / 1080 if vertical else w / 1920
@@ -489,6 +493,15 @@ class Renderer:
             tw = d.textlength(chip, font=f)
             d.rounded_rectangle([pad, int(46 * u), pad + tw + int(50 * u), int(46 * u) + int(66 * u)], radius=int(33 * u), fill=(20, 20, 40))
             d.text((pad + int(25 * u), int(46 * u) + int(10 * u)), chip, font=f, fill=accent)
+        if badge and not vertical:  # 시점 표시 (롱폼 오른쪽 위. 쇼츠는 위쪽이 후크 문구 자리라 세피아 톤만)
+            bf = self.font(40 * u)
+            bw = d.textlength(badge, font=bf) + int(50 * u)
+            bh = int(66 * u)
+            bx, by = w - pad - bw, int(46 * u)
+            red = badge.startswith("▶")
+            d.rounded_rectangle([bx, by, bx + bw, by + bh], radius=int(33 * u), fill=(214, 40, 40) if red else (255, 246, 225),
+                                outline=OUT, width=max(2, int(3 * u)))
+            d.text((bx + int(25 * u), by + int(10 * u)), badge, font=bf, fill="white" if red else (90, 60, 30))
         if hook and vertical and hook_overlay:  # 쇼츠 첫 대사: 화면 위쪽에 큰 후크 문구 (영상은 움직이는 채로)
             hl = _split_balanced(hook_raw)[:3]
             hs = 104 * u

@@ -434,7 +434,12 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
 
     if sc.get("_cover"):  # 쇼츠 표지: 0.35초 — 첫 프레임은 온전한 표지, 이어서 펀치 줌, 소리는 '쿵'만
         hk = dict(w=w, h=h, spec=sc["_cover"]["spec"], emo=sc["_cover"]["emo"], text=hook or "",
-                  prop=sc["_cover"].get("prop"), tone=sc["_cover"].get("tone", "red"), progress=prog)
+                  prop=sc["_cover"].get("prop"), tone=sc["_cover"].get("tone", "red"),
+                  progress=1 / total if sc["_cover"].get("loop") else prog)  # 반복용 끝 표지는 첫 프레임과 똑같이
+        if sc["_cover"].get("loop"):  # 쇼츠 끝: 첫 프레임(표지)으로 돌아가 반복 재생이 끊김 없이 이어지게
+            png = wd / f"{k:02d}_loop.png"
+            jobs.append((str(png), {"_hook": dict(hk, mouth=False, blink=False, zoom=1.0)}))
+            return [(png, .45)], [silence(root, .45)], []
         for zi, (z, d_) in enumerate(((1.0, .12), (1.12, .07), (1.07, .07), (1.03, .09))):
             png = wd / f"{k:02d}_cover{zi}.png"
             jobs.append((str(png), {"_hook": dict(hk, mouth=False, blink=False, zoom=z)}))
@@ -473,7 +478,9 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
                                             lying=tuple(sc.get("lying", ())), shot=shot,
                                             caption="pop" if vertical else "box",
                                             hook_overlay=bool(ln.get("_hook_overlay")),
-                                            end_text=ln.get("_end_text"))))
+                                            end_text=ln.get("_end_text"),
+                                            tint="flashback" if sc.get("flashback") else None,
+                                            badge=sc.get("when"))))
                 states[st] = png
             t, step, pattern = 0.0, 0.16, []
             while t < cdur - 1e-6:
@@ -520,7 +527,7 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
     for k, si in enumerate(scene_ids):
         sc = proj["scenes"][si]
         print(f"[장면] {k + 1}/{total} {sc.get('title', '')}")
-        chip = sc.get("title")
+        chip = None if sc.get("_teaser") else sc.get("title")  # 하이라이트는 오른쪽 위 빨간 표시로 대신
         start = sum(s for _, s in frames)
         if is_cartoon(proj, sc):
             f, a, ev = cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip)
@@ -532,7 +539,7 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
         mood = sc.get("mood") or ("tense" if sc.get("_hook_card") else sound.auto_mood(scene_lines(sc) if sc.get("lines") or sc.get("narration") else []))
         sections.append((start, end, mood))
         events += [(start + o, kind) for o, kind in ev]
-        if k > 0 and not sc.get("_hook_card") and not proj["scenes"][scene_ids[k - 1]].get("_hook_card") \
+        if k > 0 and not sc.get("_hook_card") and not sc.get("_cover") and not proj["scenes"][scene_ids[k - 1]].get("_hook_card") \
                 and not proj["scenes"][scene_ids[k - 1]].get("_cover"):
             events.append((max(0, start - .25), "whoosh"))
     if jobs:
@@ -588,11 +595,32 @@ def render_video(proj, root, scene_ids, size, out, hook=None, theme_shift=0, fon
     return total_s
 
 
+def clip_scenes(proj, clips, **extra):
+    """[[장면, 시작줄, 끝줄(제외)], ...] → 잘라 낸 장면 dict 목록"""
+    out = []
+    for clip in clips:
+        sc = proj["scenes"][clip[0]]
+        a_, b_ = (clip[1] if len(clip) > 1 else 0), (clip[2] if len(clip) > 2 else None)
+        out.append(dict(sc, lines=[dict(x) for x in scene_lines(sc)[a_:b_]], **extra))
+    return out
+
+
+def long_plan(proj):
+    """롱폼 장면 순서: (하이라이트 미리보기) + 본편. 하이라이트 = project.json 의 teaser 구간을 맨 앞에 붙임"""
+    p2 = dict(proj, scenes=list(proj["scenes"]))
+    ids = [i for i, sc in enumerate(proj["scenes"]) if not sc.get("shorts_only")]  # 숏폼 전용 장면 제외
+    if proj.get("teaser"):
+        tz = clip_scenes(proj, proj["teaser"], title="하이라이트", when="▶ 하이라이트", flashback=False, _teaser=True)
+        p2["scenes"] += tz
+        ids = list(range(len(proj["scenes"]), len(p2["scenes"]))) + ids
+    return p2, ids
+
+
 def cmd_long(proj, root, font):
     out = root / "output"
     out.mkdir(exist_ok=True)
-    ids = [i for i, sc in enumerate(proj["scenes"]) if not sc.get("shorts_only")]  # 숏폼 전용 장면 제외
-    secs = render_video(proj, root, ids, (1920, 1080), out / "longform.mp4", font=font)
+    p2, ids = long_plan(proj)
+    secs = render_video(p2, root, ids, (1920, 1080), out / "longform.mp4", font=font)
     if secs < 8 * 60:
         need = int((480 - secs) / 60 * CHARS_PER_MIN) + 1
         print(f"  ! 8분 미만: 미드롤 광고를 위해선 8분 이상 필요 → 대사 약 {need:,}자(≈{need // 25 + 1}줄) 더 추가하세요")
@@ -608,13 +636,8 @@ def cmd_shorts(proj, root, font):
     for n, sh_ in enumerate(proj.get("shorts", []), 1):
         p2 = dict(proj, scenes=list(proj["scenes"]))
         clips = sh_.get("clips") or [[i] for i in sh_["scenes"]]
-        ids = []
-        for clip in clips:
-            sc = proj["scenes"][clip[0]]
-            lines = scene_lines(sc)
-            a_, b_ = (clip[1] if len(clip) > 1 else 0), (clip[2] if len(clip) > 2 else None)
-            p2["scenes"].append(dict(sc, lines=[dict(x) for x in lines[a_:b_]]))
-            ids.append(len(p2["scenes"]) - 1)
+        p2["scenes"] += clip_scenes(proj, clips)
+        ids = list(range(len(proj["scenes"]), len(p2["scenes"])))
         first, last = p2["scenes"][ids[0]], p2["scenes"][ids[-1]]
         hook = sh_.get("hook", "")
         if hook:
@@ -623,16 +646,20 @@ def cmd_shorts(proj, root, font):
         if sh_.get("cover", True) and is_cartoon(proj, first):
             who = sh_.get("hook_who") or next((x for x in (first.get("cast") or []) if x in cast), None)
             spec = cast.get(who) or cartoon.DEFAULT_LOOK
-            p2["scenes"].append({"title": "", "bg": first.get("bg"), "mood": "tense", "lines": [],
-                                 "_cover": {"spec": spec, "emo": sh_.get("hook_emotion", "shock"),
-                                            "prop": sh_.get("hook_prop"), "tone": sh_.get("hook_tone", "red")}})
+            cover = {"spec": spec, "emo": sh_.get("hook_emotion", "shock"),
+                     "prop": sh_.get("hook_prop"), "tone": sh_.get("hook_tone", "red")}
+            p2["scenes"].append({"title": "", "bg": first.get("bg"), "mood": "tense", "lines": [], "_cover": cover})
             ids = [len(p2["scenes"]) - 1] + ids
+            if sh_.get("loop", proj.get("shorts_loop", True)):  # 끝에 표지를 다시 붙여 반복 재생이 자연스럽게
+                p2["scenes"].append({"title": "", "bg": first.get("bg"), "mood": last.get("mood", "tense"), "lines": [],
+                                     "_cover": dict(cover, loop=True)})
+                ids.append(len(p2["scenes"]) - 1)
         speed = float(sh_.get("speed", proj.get("shorts_speed", 1.25)))
         secs = render_video(p2, root, ids, (1080, 1920), out / f"short_{n:02d}.mp4",
                             hook=hook, theme_shift=n, font=font, speed=speed)
         print(f"    {speed}배속 · 표지 0.35초 · {len(clips)}개 구간")
-        if secs > 50:
-            print("  ! 50초 초과: 사연 쇼츠 상위권 길이 중앙값은 28~50초입니다. 구간을 줄여 보세요")
+        if secs > 40:
+            print("  ! 40초 초과: 감동 사연 쇼츠 상위 25% 길이 중앙값은 약 24초(2026-10 조사)입니다. 구간을 줄여 보세요")
 
 
 def cmd_thumb(proj, root, font):
@@ -668,19 +695,47 @@ def cmd_thumb(proj, root, font):
         print(f"  ✔ {out / name}")
 
 
-def chapters_text(proj, root):
-    """롱폼 챕터 타임스탬프 (실제 음성 길이 + 대사 간 여백 기준)"""
-    t, out = 0.0, []
-    for sc in proj["scenes"]:
-        if sc.get("shorts_only"):
-            continue
-        out.append(f"{int(t // 60)}:{int(t % 60):02d} {sc.get('title', '')}".rstrip())
-        if is_cartoon(proj, sc):
+def timeline(proj, root):
+    """롱폼 장면별 (시작 초, 장면 dict) 목록과 전체 길이 (실제 음성 길이 + 대사 간 여백 기준, 하이라이트 포함)"""
+    p2, ids = long_plan(proj)
+    t, rows = 0.0, []
+    for si in ids:
+        sc = p2["scenes"][si]
+        rows.append((t, sc))
+        if is_cartoon(p2, sc):
             for ln in scene_lines(sc):
-                t += speak(proj, root, ln.get("who", "narrator"), ln["text"])[1] + 0.18
+                t += speak(p2, root, ln.get("who", "narrator"), ln["text"])[1] + 0.18
         else:
-            t += speak(proj, root, "narrator", sc["narration"])[1]
+            t += speak(p2, root, "narrator", sc["narration"])[1]
+    return rows, t
+
+
+def mmss(t):
+    return f"{int(t // 60)}:{int(t % 60):02d}"
+
+
+def chapters_text(proj, root):
+    """롱폼 챕터 타임스탬프. 하이라이트 구간(여러 개)은 0:00 '하이라이트' 하나로 묶음"""
+    out = []
+    for t, sc in timeline(proj, root)[0]:
+        if sc.get("_teaser") and out:
+            continue
+        out.append(f"{mmss(t)} {sc.get('title', '')}".rstrip())
     return "\n".join(out)
+
+
+def midroll_points(proj, root):
+    """중간광고 수동 위치 추천: 장면 경계 중 약 2분 30초 간격, 2분 이후·끝나기 1분 전까지.
+    반전(효과음) 직후보다 직전, 즉 긴장이 걸린 장면 경계를 우선 (광고 뒤에도 계속 보게)"""
+    rows, total = timeline(proj, root)
+    cands = [(t, sc) for t, sc in rows if 120 <= t <= total - 60 and not sc.get("_teaser")]
+    picks, target = [], 150.0
+    while cands and target <= total - 60:
+        t, sc = min(cands, key=lambda x: abs(x[0] - target) - (8 if any(l.get("sfx") for l in scene_lines(x[1])[:2]) else 0))
+        if not picks or t - picks[-1][0] >= 120:
+            picks.append((t, sc))
+        target = max(target, t) + 150
+    return picks
 
 
 def publish_info(proj, root):
@@ -744,9 +799,15 @@ def cmd_kit(proj, root, font):
         if b:
             thumbs += f'<figure><img alt="{name}" src="data:image/jpeg;base64,{b}"><figcaption>{name}</figcaption></figure>'
     when = when_ko(pub.get("publish_at")) or "직접 선택 (권장: 저녁 6~7시)"
+    variants = [v for v in pub.get("title_variants", []) if v != pub["title"]][:2]
+    mids = midroll_points(proj, root)
+    mid_html = ("<li>중간광고: <b>자동 배치 켜기</b> + 수동 추가 " + ", ".join(f"<b>{mmss(t)}</b>" for t, _ in mids)
+                + " (장면이 바뀌는 지점)</li>") if mids else ""
     long_block = (
         f'<section><h2>롱폼 <small>longform.mp4</small></h2>'
-        + field("제목", pub["title"]) + field("설명", pub["description"], 10)
+        + field("제목 A (기본)", pub["title"])
+        + "".join(field(f"제목 {'BC'[i]} (테스트 및 비교용)", v) for i, v in enumerate(variants))
+        + field("설명", pub["description"], 10)
         + field("태그 (쉼표 구분)", ", ".join(pub["tags"]), 3)
         + (field("고정 댓글", pub["pinned_comment"], 3) if pub.get("pinned_comment") else "")
         + f'<ul class="set"><li>공개 상태: <b>예약</b> · {H.escape(when)}</li>'
@@ -754,8 +815,11 @@ def cmd_kit(proj, root, font):
         f'<li>변경되었거나 합성된 콘텐츠: <b>{"예" if pub["synthetic_media"] else "아니요"}</b> (합성 음성 사용)</li>'
         f'<li>카테고리: <b>{cats.get(pub["category"], pub["category"])}</b></li>'
         + (f'<li>재생목록: <b>{H.escape(pub["playlist"])}</b></li>' if pub.get("playlist") else "")
+        + mid_html
+        + '<li>최종 화면(마지막 20초): <b>지난 영상 1개 + 구독 버튼</b></li>'
         + f'</ul><div class="thumbs">{thumbs}</div>'
-        '<p class="hint">썸네일 3장은 길게 눌러 저장한 뒤, YouTube 스튜디오(웹)의 <b>테스트 및 비교</b>에 등록하세요. 휴대폰 앱에서는 1장만 고를 수 있습니다.</p></section>')
+        '<p class="hint">썸네일 3장은 길게 눌러 저장한 뒤, YouTube 스튜디오(웹)의 <b>테스트 및 비교</b>에 등록하세요. '
+        '제목 B·C도 함께 넣으면 제목×썸네일 조합을 시청 시간 기준으로 비교해 줍니다. 휴대폰 앱에서는 1개만 고를 수 있습니다.</p></section>')
     short_blocks = "".join(
         f'<section><h2>숏폼 {i} <small>{s["file"]}</small></h2>' + field("제목", s["title"])
         + field("설명", s["description"], 4)
@@ -803,6 +867,89 @@ document.querySelectorAll('button.cp').forEach(function(b){{b.addEventListener('
     print(f"  ✔ {out / 'upload.html'}  (+ upload.json)")
 
 
+BEAT_EMO = ("shock", "surprised", "angry", "cry")
+
+
+def cmd_lint(proj, root, font=None):
+    """대본 점검 (렌더링 전에 실행): 잘 되는 사연 영상들의 공통 요소가 빠졌는지 확인. 음성 없이 글자 수로 길이 추정
+    기준 출처: studio/KNOWHOW.md (2026-10 유튜브 사연 상위 영상 분석)"""
+    est = lambda txt: len(txt) * 60 / CHARS_PER_MIN
+    probs, oks = [], []
+    ck = lambda cond, ok, bad: (oks.append(ok) if cond else probs.append(bad))
+    scenes = [(i, sc) for i, sc in enumerate(proj["scenes"]) if not sc.get("shorts_only")]
+    lines = [ln for _, sc in scenes for ln in scene_lines(sc)]
+    total = sum(est(ln["text"]) for ln in lines)
+    tz = clip_scenes(proj, proj.get("teaser", []))
+    tz_secs = sum(est(ln["text"]) for sc in tz for ln in scene_lines(sc))
+    total_all = total + tz_secs
+    # 1) 길이·구조
+    ck(total_all >= 8 * 60, f"길이 약 {mmss(total_all)} (8분 이상: 중간광고 가능)", f"길이 약 {mmss(total_all)} — 8분 미만이면 중간광고 불가")
+    ck(10 <= tz_secs <= 35, f"0:00 하이라이트 {tz_secs:.0f}초", "0:00 하이라이트 없음/길이 부적절 — teaser 로 절정 대사 15~30초를 맨 앞에 (챕터 '0:00 하이라이트')")
+    t, first_beat = 0.0, None
+    for _, sc in scenes:
+        for ln in scene_lines(sc):
+            if first_beat is None and (ln.get("sfx") or ln.get("emotion") in BEAT_EMO):
+                first_beat = t
+            t += est(ln["text"])
+    ck(tz_secs >= 10 or (first_beat is not None and first_beat <= 20), "첫 20초 안에 충격 장면(하이라이트 또는 본편)",
+       "첫 20초 안에 충격·반전(효과음 또는 shock/surprised) 대사가 없음")
+    # 2) 리듬: 감정 비트 간격·장면 길이·배경 반복
+    t, last, gaps = 0.0, 0.0, []
+    for _, sc in scenes[:-1]:  # 마지막 맺음 장면은 잔잔해도 됨
+        for ln in scene_lines(sc):
+            if ln.get("sfx") or ln.get("emotion") in BEAT_EMO:
+                gaps.append((t - last, sc.get("title")))
+                last = t
+            t += est(ln["text"])
+    gaps.append((t - last, "끝"))
+    worst = max(gaps, key=lambda g: g[0])
+    ck(worst[0] <= 90, f"감정 비트 최대 간격 {worst[0]:.0f}초", f"{worst[0]:.0f}초 동안 감정 비트 없음('{worst[1]}' 앞) — 60~90초마다 반전·질문·효과음으로 주의 환기")
+    long_sc = [(sc.get("title"), sum(est(l["text"]) for l in scene_lines(sc))) for _, sc in scenes]
+    long_sc = [(n, d) for n, d in long_sc if d > 75]
+    ck(not long_sc, "장면 길이 모두 75초 이하", "75초 넘는 장면: " + ", ".join(f"{n}({d:.0f}초)" for n, d in long_sc) + " — 나누거나 배경을 바꾸세요")
+    same = [scenes[k][1].get("title") for k in range(1, len(scenes)) if scenes[k][1].get("bg") == scenes[k - 1][1].get("bg")]
+    ck(not same, "연속 장면 배경 모두 다름", "앞 장면과 배경이 같음: " + ", ".join(map(str, same)))
+    nar = sum(len(l["text"]) for l in lines if l.get("who", "narrator") == "narrator") / max(1, sum(len(l["text"]) for l in lines))
+    ck(nar <= .45, f"해설 비중 {nar:.0%}", f"해설 비중 {nar:.0%} — 45% 넘으면 슬라이드쇼처럼 보임(비진정성 정책 위험). 대사로 바꾸세요")
+    crowd = [sc.get("title") for _, sc in scenes if len(sc.get("cast") or []) > 4]
+    ck(not crowd, "장면당 인물 4명 이하", "인물 5명 이상 장면: " + ", ".join(map(str, crowd)))
+    longl = [l["text"] for l in lines if len(l["text"]) > 60]
+    ck(not longl, "대사 한 줄 60자 이하", f"60자 넘는 대사 {len(longl)}줄 — 두 줄로 나누면 자막이 읽기 쉬움: " + " / ".join(x[:20] + "…" for x in longl[:3]))
+    flash = [sc for _, sc in scenes if sc.get("when") or sc.get("flashback")]
+    ck(bool(flash), f"시점 표시 {len(flash)}장면 (when/flashback)", "회상·시간 이동 장면에 when(예: '20년 전') 또는 flashback 표시가 없음")
+    # 3) 끝맺음·정책
+    end = " ".join(l["text"] for l in scene_lines(scenes[-1][1]))
+    ck("?" in end, "마지막에 댓글 유도 질문", "마지막 장면에 시청자에게 던지는 질문(?)이 없음 — 댓글 유도")
+    ck(any(k in end for k in ("창작 사연", "실화")), "끝에 창작/실화 표시", "마지막 장면에 '창작 사연' 또는 '실화' 표시가 없음")
+    ck(sum(est(l["text"]) for l in scene_lines(scenes[-1][1])) >= 20, "마지막 장면 20초 이상(최종 화면 자리)", "마지막 장면이 20초 미만 — 최종 화면(다음 영상·구독) 넣을 시간이 부족")
+    # 4) 제목·설명
+    pub = proj.get("publish", {})
+    title = pub.get("title", proj.get("title", ""))
+    ck(20 <= len(title) <= 50, f"제목 {len(title)}자", f"제목 {len(title)}자 — 상위 사연 영상은 28~41자")
+    ck(len(pub.get("title_variants", [])) >= 2, "제목 B·C 준비(테스트 및 비교)", "publish.title_variants 에 제목 2개 더 — 하나는 “대사”… 형식 추천")
+    desc = pub.get("description", "")
+    ck("?" in desc, "설명에 질문", "설명에 '여러분이라면 어떻게 하셨을까요?' 같은 질문이 없음")
+    ck("{chapters}" in desc, "설명에 챕터 자리", "설명에 {chapters} 가 없음 (챕터 자동 삽입)")
+    # 5) 쇼츠
+    speed = float(proj.get("shorts_speed", 1.25))
+    for n, sh_ in enumerate(proj.get("shorts", []), 1):
+        ls = [l for sc in clip_scenes(proj, sh_.get("clips") or [[i] for i in sh_.get("scenes", [])]) for l in scene_lines(sc)]
+        secs = sum(est(l["text"]) for l in ls) / speed * .93 + .8
+        hook = sh_.get("hook", "")
+        hl = hook.split("\n")
+        ck(15 <= secs <= 35, f"쇼츠{n} 약 {secs:.0f}초", f"쇼츠{n} 약 {secs:.0f}초 — 15~35초 권장(감동 사연 상위권 중앙값 24초)")
+        ck(hook and len(hl) <= 2 and max(len(x) for x in hl) <= 13, f"쇼츠{n} 후크 2줄", f"쇼츠{n} 후크는 2줄·줄당 13자 이하로: {hook!r}")
+        ck(bool(ls) and (ls[0].get("emotion") in BEAT_EMO + ("sad",) or ls[0].get("sfx") or "?" in ls[0]["text"]),
+           f"쇼츠{n} 첫 대사 감정 강함", f"쇼츠{n} 첫 대사가 밋밋함 — 갈등·충격 대사로 시작하세요")
+    print(f"[대본 점검] {proj.get('title', '')}")
+    for o in oks:
+        print("  ✔", o)
+    for b in probs:
+        print("  !", b)
+    print(f"  → 통과 {len(oks)} · 보완 {len(probs)}")
+    return probs
+
+
 def cmd_check():
     ok = True
     for tool in ("ffmpeg", "ffprobe"):
@@ -825,7 +972,7 @@ def cmd_check():
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["check", "long", "shorts", "thumb", "kit", "all"])
+    ap.add_argument("cmd", choices=["check", "lint", "long", "shorts", "thumb", "kit", "all"])
     ap.add_argument("project", nargs="?")
     ap.add_argument("--font")
     ap.add_argument("--fast", action="store_true", help="미리보기용 빠른 인코딩(가변 프레임레이트)")
@@ -836,6 +983,8 @@ if __name__ == "__main__":
     if not a.project:
         sys.exit("project.json 경로가 필요합니다")
     proj, root = load(a.project)
+    if a.cmd in ("lint", "all"):
+        cmd_lint(proj, root)
     if a.cmd in ("long", "all"):
         cmd_long(proj, root, a.font)
     if a.cmd in ("shorts", "all"):
