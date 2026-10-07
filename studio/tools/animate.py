@@ -6,7 +6,7 @@
 3) 하늘은 구름이 흐르고, 물은 일렁이고, 밤하늘 별은 반짝이게 합니다.
 
 사용법:
-  python3 studio/tools/animate.py 사진.jpg 결과.mp4 [--secs 2] [--size 1080x1350] [--move push|left|right|up|orbit] [--fx auto|none|sky,water,stars]
+  python3 studio/tools/animate.py 사진.jpg 결과.mp4 [--secs 1.6] [--size 1080x1350] [--move push|left|right|up|orbit|fly] [--fx auto|none|sky,water,stars]
 필요: pip install onnxruntime opencv-python-headless  (모델 약 100MB 는 처음 한 번 자동으로 받음)
 """
 import argparse, math, os, subprocess, sys, urllib.request
@@ -89,13 +89,29 @@ def cover_crop(rgb, w, h, extra=1.10):
     return img[y:y + H, x:x + W].copy()
 
 
-def frames(rgb, w, h, secs, move="push", fx="auto", fps=30):
-    """프레임 생성기 (RGB uint8 w×h)"""
+# 카메라 움직임 (벤치마킹 영상 실측 기준, 초당 비율): 확대 zoom, 가로 tx·세로 ty(화면 폭 대비), 기울기 roll(도)
+MOVES = {
+    "push": dict(zoom=.045, tx=0, ty=-.010, roll=.6),    # 천천히 다가가며 살짝 올라감
+    "left": dict(zoom=.012, tx=-.045, ty=0, roll=.8),    # 옆으로 흐름 (가까운 것이 더 빨리 → 입체감)
+    "right": dict(zoom=.012, tx=.045, ty=0, roll=-.8),
+    "up": dict(zoom=.015, tx=0, ty=-.035, roll=.4),      # 위로 올라가며 드러남
+    "orbit": dict(zoom=.010, tx=.030, ty=0, roll=2.0),   # 돌아가는 느낌
+    "fly": dict(zoom=.20, tx=0, ty=-.010, roll=1.0),     # 드론처럼 쭉 들어감 (천장 창·복도·입구)
+}
+
+
+def frames(rgb, w, h, secs, move="push", fx="auto", fps=30, seed=0):
+    """프레임 생성기 (RGB uint8 w×h). 일정한 속도로 '이미 움직이는 중'인 카메라 (긴 영상의 중간을 자른 느낌)"""
     import cv2
-    img = cover_crop(rgb, w, h)
+    mv = MOVES.get(move, MOVES["push"])
+    extra = 1.12 + max(mv["zoom"] * secs * .5 if move != "fly" else 0, abs(mv["tx"]) * secs) + abs(mv["roll"]) * secs * .012
+    img = cover_crop(rgb, w, h, extra)
     H0, W0 = img.shape[:2]
     d = depth(img)
     m = masks(img, d) if fx != "none" else {"sky": 0, "water": 0, "night": 0}
+    # 가까운 물체 경계가 찢기지 않게: 앞쪽 깊이를 살짝 넓혀 물체가 통째로 움직이고 배경이 늘어나게
+    k = max(3, W0 // 70) | 1
+    d = cv2.GaussianBlur(cv2.dilate(d, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))), (0, 0), k / 3)
     want = set(fx.split(",")) if fx not in ("auto", "none") else {"sky", "water", "stars"}
     sky = m["sky"] if "sky" in want and not (m["night"] and "stars" in want) else 0
     water = m["water"] if "water" in want else 0
@@ -105,35 +121,33 @@ def frames(rgb, w, h, secs, move="push", fx="auto", fps=30):
         sky = cv2.erode(sky, np.ones((1, 2 * reach + 1), np.uint8))
     xs, ys = np.meshgrid(np.arange(W0, dtype=np.float32), np.arange(H0, dtype=np.float32))
     cx, cy = W0 / 2, H0 / 2
+    px, py = xs - cx, ys - cy
+    par = 0.3 + 0.7 * d  # 시차: 먼 것 0.3, 가까운 것 1.0
     n = max(1, round(secs * fps))
-    rng = np.random.default_rng(7)
+    rng = np.random.default_rng(7 + seed)
+    sign = 1 if rng.random() < .5 else -1  # 기울기 방향은 컷마다 다르게
     if isinstance(stars_mask, np.ndarray):  # 반짝일 별: 밤하늘의 밝은 점
         g = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY).astype(np.float32)
         bright = (g - cv2.GaussianBlur(g, (0, 0), 3)) > 25
         star_amp = (bright * stars_mask).astype(np.float32)
         phase = rng.uniform(0, 2 * np.pi, star_amp.shape).astype(np.float32)
-    amp = (W0 - w) / 2 * 0.9  # 시차 최대 이동(px)
     for i in range(n):
-        t = i / max(1, n - 1)
-        e = t * t * (3 - 2 * t)
         tt = i / fps
-        # 카메라: 가까운 것(d≈1)이 먼 것보다 더 많이 움직임 → 입체감
-        if move == "push":
-            z = 0.06 * e
-            mx = cx + (xs - cx) / (1 + z * (0.35 + 0.65 * d))
-            my = cy + (ys - cy) / (1 + z * (0.35 + 0.65 * d))
-        else:
-            vx, vy = {"left": (-1, 0), "right": (1, 0), "up": (0, -1), "orbit": (math.cos(2 * math.pi * t) * .6, math.sin(2 * math.pi * t) * .6)}.get(move, (1, 0))
-            s = (e - .5) * 2 if move != "orbit" else 1
-            mx = xs + vx * s * amp * (0.25 + 0.75 * d)
-            my = ys + vy * s * amp * 0.5 * (0.25 + 0.75 * d)
+        u = tt if move == "fly" else tt - (n - 1) / fps / 2  # 중간을 기준으로 앞뒤 대칭 → 시작부터 움직이는 중
+        zf = 1 + mv["zoom"] * u * (0.55 + 0.45 * d)  # 다가갈수록 가까운 것이 더 커짐
+        th = math.radians(mv["roll"] * u * sign)
+        c, sn = math.cos(th), math.sin(th)
+        qx, qy = px / zf, py / zf
+        wob = W0 * .0012  # 손에 든 카메라처럼 아주 약한 흔들림
+        mx = cx + c * qx + sn * qy - mv["tx"] * u * W0 * par + wob * math.sin(tt * 4.1 + seed)
+        my = cy - sn * qx + c * qy - mv["ty"] * u * W0 * par + wob * math.sin(tt * 3.3 + 2 * seed)
         if isinstance(sky, np.ndarray):  # 구름 흐름
             mx = mx - sky * (tt * W0 * 0.008)
         if isinstance(water, np.ndarray):  # 물결 일렁임 (가로 물결 + 느린 흐름)
-            ph = ys * 0.11 + tt * 3.0  # 반사가 가로로 흔들림 (먼 물일수록 촘촘)
+            ph = ys * 0.11 + tt * 3.0
             mx = mx + water * (np.sin(ph + np.sin(xs * 0.008 + tt) * 2) * (1.2 + 2.2 * d))
             my = my + water * (np.sin(xs * 0.04 + tt * 2.2) * (0.5 + 1.0 * d))
-        out = cv2.remap(img, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+        out = cv2.remap(img, mx.astype(np.float32), my.astype(np.float32), cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
         if isinstance(stars_mask, np.ndarray):
             tw = 1 + 0.9 * np.sin(phase + tt * 6) * star_amp
             out = np.clip(out.astype(np.float32) * tw[..., None], 0, 255).astype(np.uint8)
@@ -141,7 +155,7 @@ def frames(rgb, w, h, secs, move="push", fx="auto", fps=30):
         yield out[y0:y0 + h, x0:x0 + w]
 
 
-def render(src, out, size=(1080, 1350), secs=2.0, move="push", fx="auto", fps=30):
+def render(src, out, size=(1080, 1350), secs=1.6, move="push", fx="auto", fps=30):
     from PIL import Image
     rgb = np.asarray(Image.open(src).convert("RGB"))
     w, h = size
@@ -159,9 +173,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("src")
     ap.add_argument("out")
-    ap.add_argument("--secs", type=float, default=2.0)
+    ap.add_argument("--secs", type=float, default=1.6)
     ap.add_argument("--size", default="1080x1350")
-    ap.add_argument("--move", default="push", choices=["push", "left", "right", "up", "orbit"])
+    ap.add_argument("--move", default="push", choices=list(MOVES))
     ap.add_argument("--fx", default="auto")
     a = ap.parse_args()
     if not available():
