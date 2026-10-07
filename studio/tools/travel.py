@@ -560,6 +560,24 @@ CW, CH = 1080, 1350  # 인스타 영상 묶음 4:5
 AUTO_MOVES = ["push", "right", "up", "left", "push", "right"]  # 움직임을 지정하지 않은 컷은 돌아가며
 
 
+BADGE = REPO / "trip" / "brand" / "badge.png"  # 숙소찜 로고 배지 (studio/brand/logo-source.html 에서 만듦)
+
+
+def brand_badge(ov, trip, x, y, fpath, h=84):
+    """왼쪽 위 로고: 배지 그림이 있으면 그림, 없거나 brand 를 따로 지정했으면 글자 배지"""
+    if BADGE.exists() and trip.get("brand", "숙소찜") == "숙소찜":
+        b = Image.open(BADGE).convert("RGBA")
+        b = b.resize((round(b.width * h / b.height), h), Image.LANCZOS)
+        ov.alpha_composite(b, (x, y))
+        return
+    d = ImageDraw.Draw(ov)
+    brand = trip.get("brand", "숙소찜")
+    f = font(32, fpath)
+    tw = d.textlength(brand, font=f)
+    d.rounded_rectangle((x, y, x + tw + 40, y + 58), 29, fill=(255, 255, 255, 235))
+    d.text((x + 20, y + 29), brand, font=f, fill=(25, 25, 25), anchor="lm")
+
+
 def soft_text(ov, xy, text, f, fill=WHITE):
     """벤치마킹 자막: 흰 글씨 + 퍼진 그림자 (두꺼운 테두리 없음)"""
     sh = Image.new("RGBA", ov.size, (0, 0, 0, 0))
@@ -575,11 +593,8 @@ def insta_overlay(trip, k, text, fpath, size, note=None):
     ov = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
     top = 36 if h <= CH else 150  # 9:16 은 상단 앱 버튼을 피해 아래로
-    brand = trip.get("brand", "숙소찜")
-    f = font(32, fpath)
-    tw = d.textlength(brand, font=f)
-    d.rounded_rectangle((36, top, 36 + tw + 40, top + 58), 29, fill=(255, 255, 255, 235))
-    d.text((56, top + 29), brand, font=f, fill=(25, 25, 25), anchor="lm")
+    brand_badge(ov, trip, 30, top - 10, fpath)
+    d = ImageDraw.Draw(ov)
     if k == 0:  # 광고 표시 (작게, 첫 장)
         soft_text(ov, (w - 80, top + 29), "광고", font(28, fpath))
     if text:
@@ -648,11 +663,8 @@ def cmd_carousel(trip, root, fpath=None):
 def voice_overlay(trip, k, hook, phrase, end_text, note, fpath):
     ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
-    brand = trip.get("brand", "숙소찜")
-    f = font(32, fpath)
-    tw = d.textlength(brand, font=f)
-    d.rounded_rectangle((36, 150, 36 + tw + 40, 208), 29, fill=(255, 255, 255, 235))
-    d.text((56, 179), brand, font=f, fill=(25, 25, 25), anchor="lm")
+    brand_badge(ov, trip, 30, 140, fpath)
+    d = ImageDraw.Draw(ov)
     soft_text(ov, (W - 80, 179), "광고", font(28, fpath))  # 영상 내내 작게 (쇼츠는 설명란을 잘 안 봄)
     if hook:
         for i, ln in enumerate(hook[:2]):
