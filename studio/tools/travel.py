@@ -228,13 +228,22 @@ def live_frames(trip, shot, root, secs, w, h, seed=0):
     yield from photo_frames(shot, root, secs)
 
 
+def clip_filter(shot, w, h):
+    """zoom(예: 1.4) + focus([가로, 세로] 0~1) 로 같은 AI 영상에서 다른 구도(가까이)를 잘라 씀"""
+    z = float(shot.get("zoom", 1.0))
+    fx, fy = shot.get("focus", [.5, .5])
+    zw, zh = int(w * z) // 2 * 2, int(h * z) // 2 * 2
+    return (f"fps={FPS},scale={zw}:{zh}:force_original_aspect_ratio=increase,"
+            f"crop={w}:{h}:'(iw-{w})*{fx}':'(ih-{h})*{fy}'")
+
+
 def clip_frames(shot, root, secs, w=W, h=H):
     """AI 영상 클립(구글 Flow·Veo·Kling 등) → w×h 로 맞춘 프레임.
     AI 영상은 처음 0.5초쯤 사진처럼 멈춰 있다가 움직이므로 start(기본 0.8초)부터 사용. 짧으면 반복"""
     start = float(shot.get("start", 0.8))
     p = subprocess.Popen(["ffmpeg", "-v", "error", "-ss", f"{start:.2f}", "-stream_loop", "-1", "-i", str(root / shot["clip"]),
                           "-t", f"{secs:.3f}", "-an",
-                          "-vf", f"fps={FPS},scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h}",
+                          "-vf", clip_filter(shot, w, h),
                           "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
     n, size = max(1, round(secs * FPS)), w * h * 3
     last = None

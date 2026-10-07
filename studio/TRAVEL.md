@@ -147,6 +147,7 @@
 | 욕실·실내 | `slow lateral slide across the room, soft light` |
 | 야경·별 | `slow tilt up to the night sky, twinkling stars, gentle breeze` |
 
+**영상 1개로 여러 컷**: Flow 무료는 하루 약 5개라, AI 영상 1개(8초)에서 2~3컷을 잘라 씁니다. 같은 `clip` 을 여러 번 쓰고 `start`(몇 초부터), `zoom`(1.2~1.6 = 가까이), `focus`([가로, 세로] 0~1 = 어디를 크게)를 다르게 주면 다른 장면처럼 보입니다. 예) AI 영상 4개 + 사진 3장(움직이는 사진) = 7~10컷.
 **넣는 법**: 클립을 `photos/` 에 넣고 `trip.json` 의 컷을 `{"clip": "photos/pool.mp4", "card": "…"}` 로. AI 영상은 처음 0.5초쯤 멈춰 있어서 0.8초부터 씁니다(`start` 로 조정). 사진 컷과 섞어 써도 됩니다.
 **주의**: 실제 숙소에 없는 것(없는 수영장·바다·은하수)이 생기면 그 클립은 버립니다 (기만 광고). 업로드 때 유튜브 '합성 콘텐츠: 예', 인스타 'AI 정보' 표시.
 
