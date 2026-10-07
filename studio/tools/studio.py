@@ -179,7 +179,7 @@ async def _tts(text, voice, rate, pitch, out):
 
 
 _warned = set()
-CHARS_PER_MIN = 400  # 실측: Google 음성 + 대사 간 여백 기준 분당 약 400자
+CHARS_PER_MIN = 430  # 실측(4편): Google 음성 + 대사 간 여백 기준 분당 410~433자 → 짧게 추정되도록 430
 FAST = False  # --fast: 가변 프레임레이트(VFR)로 인코딩 2배 빠름 (미리보기용)
 
 
@@ -464,7 +464,7 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
         audios.append(mp3)
         speaker = who if who in dict(chars) else ("_mascot" if who == "narrator" and chars[0][0] == "_mascot" else None)
         emo = ln.get("emotion", "normal")
-        listen = "sad" if sc.get("mood") == "sad" else "normal"  # 슬픈 장면에서 듣는 사람이 웃고 있지 않게
+        listen = {"sad": "sad", "tense": "think"}.get(sc.get("mood"), "normal")  # 슬픈·긴장 장면에서 듣는 사람이 웃고 있지 않게
         emos = {cid: ln.get("react", {}).get(cid, listen) for cid, _ in chars}
         if speaker:
             emos[speaker] = emo
