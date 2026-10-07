@@ -150,6 +150,14 @@
 **넣는 법**: 클립을 `photos/` 에 넣고 `trip.json` 의 컷을 `{"clip": "photos/pool.mp4", "card": "…"}` 로. AI 영상은 처음 0.5초쯤 멈춰 있어서 0.8초부터 씁니다(`start` 로 조정). 사진 컷과 섞어 써도 됩니다.
 **주의**: 실제 숙소에 없는 것(없는 수영장·바다·은하수)이 생기면 그 클립은 버립니다 (기만 광고). 업로드 때 유튜브 '합성 콘텐츠: 예', 인스타 'AI 정보' 표시.
 
+## 기본 방식 = 처음 벤치마킹(뉴머니) 그대로 (2026-10-08 확정)
+사용자 결정: 인스타 허지니 스타일이 아니라 **처음 유튜브 영상 방식**을 따른다.
+1. 숙소 사진 1장씩 → **구글 Flow**(영상에서 쓴 도구)로 AI 영상 클립 만들기 — 사용자가 휴대폰에서 (아래 'AI 영상 클립으로 만들기' 프롬프트)
+2. Claude: 대사 작성(`shots[].line`) → **성우 목소리**(Google Chirp3-HD) → 구절 자막 → 잔잔한 음악(목소리 나올 때 작아짐)
+3. 끝 컷에 숙소명 + 플랫폼별 안내(프로필 링크 N번 / 댓글 DM / 틱톡 주소), 영상 내내 작은 "광고" 표시
+
+`"style": "voice"`(기본) · `"insta"`(무음 묶음 스타일) · `"classic"`(예전 스타일). 컷은 `clip`(AI 영상) 또는 `img`(사진 — 움직이는 사진으로 대체).
+
 ## 영상 공식 (travel.py 기본값)
 | 구간 | 내용 |
 |---|---|
@@ -191,7 +199,7 @@ git add trip studio/projects/busan-ocean && git commit -m "Add busan-ocean" && g
 | `dm_keyword` | 인스타 댓글 자동 DM 키워드 (`"*"` = 아무 댓글) → `short_ig.mp4` + DM 설정값 |
 | `brand`, `points`, `shots[].card`, `carousel_secs`, `carousel_shots`, `carousel` | 인스타 영상 묶음 (위 '살아 있는 사진' 참고) |
 | `live`, `shots[].fx` | 움직이는 사진 켜기/끄기, 효과 고르기 |
-| `style` | `insta`(기본) / `classic`(음성 해설) |
+| `style` | `voice`(기본, 성우 내레이션) / `insta`(무음) / `classic` |
 | `tiktok`, `tiktok_dm_keyword`, `tiktok_bio`, `site_label` | 틱톡용 `short_tt.mp4` 끝 안내 (위 표) |
 | `deal_id` | 비워 두면 `all`/`deal` 이 새 번호를 매기고 기록 |
 | `video_url` | 올린 뒤 쇼츠 주소 (선택) |

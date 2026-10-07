@@ -302,7 +302,10 @@ def split_phrases(text, secs, lead=.05):
 
 # ───────────────────────── 명령 ─────────────────────────
 def cmd_render(trip, root, fpath=None):
-    if trip.get("style", "insta") == "insta":  # 기본: 벤치마킹 인스타 스타일 (음성 없이 움직이는 사진 + 글씨 + 음악)
+    style = trip.get("style", "voice")
+    if style == "voice":  # 기본: 처음 벤치마킹(뉴머니) 방식 — AI 영상 클립 + AI 대본 성우 내레이션 + 자막
+        return cmd_voice(trip, root, fpath)
+    if style == "insta":  # 음성 없이 움직이는 사진 + 글씨 + 음악 (인스타 허지니 묶음 스타일)
         return cmd_reel(trip, root, fpath)
     return cmd_render_classic(trip, root, fpath)
 
@@ -626,6 +629,120 @@ def cmd_carousel(trip, root, fpath=None):
     print(f"  ✔ {outd} ({len(outs)}개) — 인스타에서 순서대로 여러 개 선택해 올리기")
 
 
+def voice_overlay(trip, k, hook, phrase, end_text, note, fpath):
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    brand = trip.get("brand", "여기찜")
+    f = font(32, fpath)
+    tw = d.textlength(brand, font=f)
+    d.rounded_rectangle((36, 150, 36 + tw + 40, 208), 29, fill=(255, 255, 255, 235))
+    d.text((56, 179), brand, font=f, fill=(25, 25, 25), anchor="lm")
+    soft_text(ov, (W - 80, 179), "광고", font(28, fpath))  # 영상 내내 작게 (쇼츠는 설명란을 잘 안 봄)
+    if hook:
+        for i, ln in enumerate(hook[:2]):
+            s = fit_size(d, ln, fpath, 92, W - 120)
+            soft_text(ov, (W // 2, 470 + i * (s + 24)), ln, font(s, fpath), fill=WHITE if i == 0 else YELLOW)
+    if end_text:
+        for i, ln in enumerate(end_text.split("\n")[:2]):
+            s = fit_size(d, ln, fpath, 70 if i else 56, W - 120)
+            soft_text(ov, (W // 2, int(H * .40) + i * (s + 26)), ln, font(s, fpath), fill=YELLOW if i else WHITE)
+    if phrase:
+        s = fit_size(d, phrase, fpath, 66, W - 120)
+        soft_text(ov, (W // 2, int(H * .68)), phrase, font(s, fpath))
+    if note:
+        soft_text(ov, (W // 2, int(H * .76)), note, font(30, fpath), fill=(235, 235, 235))
+    return ov
+
+
+def voice_job(job):
+    trip, shot, k, secs, phrases, hook, end_text, note, out, fpath = job
+    root = Path(trip["_root"])
+    if not shot.get("motion") and not shot.get("clip"):
+        shot = dict(shot, motion=AUTO_MOVES[k % len(AUTO_MOVES)])
+    frames = clip_frames(shot, root, secs) if shot.get("clip") else live_frames(trip, shot, root, secs, W, H, seed=k)
+    enc = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
+                            "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
+                            "-pix_fmt", "yuv420p", str(out)], stdin=subprocess.PIPE)
+    cache = {}
+    for i, fr in enumerate(frames):
+        t = i / FPS
+        ph = next((p for a, b, p in phrases if a <= t < b), "")
+        if ph not in cache:
+            cache[ph] = voice_overlay(trip, k, hook, ph, end_text, note, fpath)
+        fr = (cover(fr, W, H) if fr.size != (W, H) else fr).convert("RGBA")
+        fr.alpha_composite(cache[ph])
+        enc.stdin.write(fr.convert("RGB").tobytes())
+    enc.stdin.close()
+    if enc.wait():
+        raise RuntimeError(f"인코딩 실패: {out}")
+    return str(out)
+
+
+def cmd_voice(trip, root, fpath=None):
+    """처음 벤치마킹(뉴머니 '사진 1장으로 여행쇼츠') 방식: AI 영상 클립(또는 움직이는 사진) + 성우 내레이션 + 자막 + 음악"""
+    fpath = studio.find_font(fpath)
+    trip["_root"] = str(root)
+    work, outd = root / "work", root / "output"
+    work.mkdir(exist_ok=True)
+    outd.mkdir(exist_ok=True)
+    shots = trip["shots"]
+    print(f"[음성] {sum(1 for s in shots if s.get('line'))}개")
+    with ThreadPoolExecutor(8) as ex:
+        audios = list(ex.map(lambda a: tts(trip, root, a[1]["line"], a[0]) if a[1].get("line") else None, enumerate(shots)))
+    gap = .15
+    secs = [max(1.6, studio.dur(a) + gap) if a else float(s.get("secs", 1.6)) for a, s in zip(audios, shots)]
+    did = trip.get("deal_id", "?")
+    note = f"가격 {trip.get('price_checked', '')} 기준 · 날짜에 따라 달라요" if trip.get("price") else None
+    name = trip.get("name", "")
+    ends = [("short", f"{name}\n프로필 링크 {did}번")] + [(f"short_{n}", f"{name}\n{cta}") for n, cta in variants(trip)]
+    jobs, last = [], len(shots) - 1
+    for k, (sh, sc) in enumerate(zip(shots, secs)):
+        phr = split_phrases(sh.get("caption", sh.get("line", "")), sc - gap) if sh.get("line") else []
+        hook = trip.get("hook") if k == 0 else None
+        if k < last:
+            jobs.append((trip, sh, k, sc, phr, hook, None, None, work / f"v{k:02d}.mp4", fpath))
+        else:
+            for nm, end in ends:
+                jobs.append((trip, sh, k, sc, phr, hook, end, note, work / f"v_end_{nm}.mp4", fpath))
+    total = sum(secs)
+    print(f"[화면] 컷 {len(shots)}개 · {total:.1f}초 · 판 {len(ends)}개")
+    with ProcessPoolExecutor(max(1, min(len(jobs), os.cpu_count() or 2))) as ex:
+        segs = list(ex.map(voice_job, jobs))
+    body, endsegs = segs[:last], segs[last:]
+    # 내레이션: 컷 시작 시각에 맞춰 배치
+    narr, inputs, flt, t = work / "narr.wav", [], [], 0.0
+    for a, sc in zip(audios, secs):
+        if a:
+            inputs += ["-i", str(a)]
+            j = len(inputs) // 2 - 1
+            flt.append(f"[{j}:a]aresample=44100,adelay={int((t + .05) * 1000)}:all=1[a{j}]")
+        t += sc
+    nin = len(inputs) // 2
+    if nin:
+        fc = ";".join(flt) + ";" + "".join(f"[a{j}]" for j in range(nin)) + f"amix=inputs={nin}:normalize=0,apad=whole_dur={total:.2f}[o]"
+        studio.sh(["ffmpeg", "-y", *inputs, "-filter_complex", fc, "-map", "[o]", "-t", f"{total:.2f}", str(narr)])
+    else:
+        studio.sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", f"{total:.2f}", str(narr)])
+    m, _ = sound.build(total, [(0, total, trip.get("music", "hope"))], [], float(trip.get("music_volume", 1.4)))
+    sound.write_wav(work / "music.wav", m)
+    fc = ("[1:a]aresample=44100,asplit=2[va][vb];[2:a]aresample=44100[m];"
+          "[m][va]sidechaincompress=threshold=0.015:ratio=8:attack=15:release=400[md];"
+          f"[vb][md]amix=inputs=2:duration=first:normalize=0,afade=t=out:st={max(0, total - .6):.2f}:d=0.6,"
+          "loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[aout]")
+    for (nm, _), endseg in zip(ends, endsegs):
+        lst = work / f"{nm}.txt"
+        lst.write_text("".join(f"file '{Path(x).resolve()}'\n" for x in body + [endseg]))
+        out = outd / f"{nm}.mp4"
+        studio.sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst), "-i", str(narr), "-i", str(work / "music.wav"),
+                   "-filter_complex", fc, "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac", "-b:a", "160k",
+                   "-t", f"{total:.2f}", "-movflags", "+faststart", str(out)])
+        print(f"  ✔ {out} ({total:.1f}초)")
+    studio.sh(["ffmpeg", "-y", "-ss", "0.3", "-i", str(outd / "short.mp4"), "-frames:v", "1", "-q:v", "3", str(outd / "cover.jpg")])
+    if not os.environ.get("STUDIO_KEEP_WORK"):
+        for x in segs:
+            Path(x).unlink(missing_ok=True)
+
+
 def cmd_reel(trip, root, fpath=None):
     """세로 쇼츠·릴스·틱톡 (인스타 스타일): 움직이는 사진을 끊김 없이 이어 붙이고 마지막 컷에만 안내 문구"""
     fpath = studio.find_font(fpath)
@@ -803,7 +920,7 @@ def main():
             sys.exit("점검 오류를 먼저 고치세요")
         cmd_deal(trip, root, path=a.trip) if not trip.get("deal_id") and not trip.get("sample") else None  # 번호 먼저 확정 (영상에 표시)
         cmd_render(trip, root, a.font)
-        if trip.get("carousel", True):
+        if trip.get("carousel", trip.get("style", "voice") == "insta"):
             cmd_carousel(trip, root, a.font)
         cmd_kit(trip, root)
         cmd_deal(trip, root, path=a.trip)
