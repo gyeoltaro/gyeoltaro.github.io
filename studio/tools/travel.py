@@ -444,12 +444,19 @@ def ig_how(trip, dm=True):
     return f"👉 프로필 링크에서 {did}번 검색"
 
 
+def ga(word):
+    """받침 있으면 '이가', 없으면 '가' (하루가 / 찜이가)"""
+    c = ord(word[-1]) - 0xAC00 if word else -1
+    return word + ("이가" if 0 <= c < 11172 and c % 28 else "가")
+
+
 def ig_caption(trip, how, disc, title, body, tags):
     """인스타 캡션. points 가 있으면 '후크 → 본문 → ✔️ 포인트 → 안내' 틀"""
     pts = trip.get("points") or []
     head = trip.get("publish", {}).get("ig_hook") or title
     mid = ("\n".join(f"✔️ {p}" for p in pts) + "\n\n") if pts else ""
-    return (f"[광고] {head}\n\n{body}\n\n{mid}{how}\n(가격 {trip.get('price_checked', '')} 기준)\n\n{disc}\n\n"
+    sign = f"🏠 {ga(trip.get('persona', '하루'))} 찜해 둔 숙소예요\n\n"
+    return (f"[광고] {head}\n\n{body}\n\n{mid}{sign}{how}\n(가격 {trip.get('price_checked', '')} 기준)\n\n{disc}\n\n"
             f"{' '.join(tags + ['#숙소추천'])}")
 
 
