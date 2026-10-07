@@ -133,6 +133,23 @@
 - `"style": "classic"`: 예전 방식(음성 해설, 구절 자막, 후크 고정, 끝 안내 상자)
 - 컷별 움직임 `motion`: `push`(다가감) · `left`/`right`(옆으로) · `up`(위로) · `orbit`(돌아감) · `fly`(쭉 들어감 — 천장 창·복도·입구에) — 지정하지 않으면 돌아가며 자동
 
+## AI 영상 클립으로 만들기 (B안, 2026-10-08 — 벤치마킹 수준)
+사진만 움직이는 방식(위)은 카메라 이동과 구름·물결까지만 됩니다. 벤치마킹 계정처럼 공간 안으로 들어가는 영상은 **AI 영상 앱**(구글 Flow, Kling 등)에서 사진마다 클립을 만들고, 이 도구로 이어 붙입니다.
+
+**앱 설정**: 이미지→영상, 비율 **9:16**, 길이 5초, 화질 가장 높게. 사진은 큰 원본으로.
+**프롬프트** (영어가 더 잘 됨 · 끝에 꼭 `realistic, keep the original details, no new objects, no people, no text`)
+| 사진 | 프롬프트 |
+|---|---|
+| 외관 | `slow cinematic drone push-in toward the hotel at dusk, warm window lights, gentle camera rise` |
+| 수영장 | `slow dolly forward along the rooftop pool, gentle water ripples and reflections, soft sunlight` |
+| 객실 | `smooth slow camera glide into the room toward the window, curtains gently moving` |
+| 창가 뷰 | `slow push-in toward the window and the harbor view, subtle parallax` |
+| 욕실·실내 | `slow lateral slide across the room, soft light` |
+| 야경·별 | `slow tilt up to the night sky, twinkling stars, gentle breeze` |
+
+**넣는 법**: 클립을 `photos/` 에 넣고 `trip.json` 의 컷을 `{"clip": "photos/pool.mp4", "card": "…"}` 로. AI 영상은 처음 0.5초쯤 멈춰 있어서 0.8초부터 씁니다(`start` 로 조정). 사진 컷과 섞어 써도 됩니다.
+**주의**: 실제 숙소에 없는 것(없는 수영장·바다·은하수)이 생기면 그 클립은 버립니다 (기만 광고). 업로드 때 유튜브 '합성 콘텐츠: 예', 인스타 'AI 정보' 표시.
+
 ## 영상 공식 (travel.py 기본값)
 | 구간 | 내용 |
 |---|---|

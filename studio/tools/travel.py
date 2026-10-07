@@ -228,18 +228,21 @@ def live_frames(trip, shot, root, secs, w, h, seed=0):
     yield from photo_frames(shot, root, secs)
 
 
-def clip_frames(shot, root, secs):
-    """AI 영상 클립(구글 Flow·Veo·Kling 등) → 9:16 로 맞춘 프레임. 짧으면 반복"""
-    p = subprocess.Popen(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", str(root / shot["clip"]), "-t", f"{secs:.3f}",
-                          "-vf", f"fps={FPS},scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
+def clip_frames(shot, root, secs, w=W, h=H):
+    """AI 영상 클립(구글 Flow·Veo·Kling 등) → w×h 로 맞춘 프레임.
+    AI 영상은 처음 0.5초쯤 사진처럼 멈춰 있다가 움직이므로 start(기본 0.8초)부터 사용. 짧으면 반복"""
+    start = float(shot.get("start", 0.8))
+    p = subprocess.Popen(["ffmpeg", "-v", "error", "-ss", f"{start:.2f}", "-stream_loop", "-1", "-i", str(root / shot["clip"]),
+                          "-t", f"{secs:.3f}", "-an",
+                          "-vf", f"fps={FPS},scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h}",
                           "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
-    n, size = max(1, round(secs * FPS)), W * H * 3
+    n, size = max(1, round(secs * FPS)), w * h * 3
     last = None
     for _ in range(n):
         buf = p.stdout.read(size)
         if len(buf) == size:
-            last = Image.frombytes("RGB", (W, H), buf)
-        yield last if last is not None else Image.new("RGB", (W, H))
+            last = Image.frombytes("RGB", (w, h), buf)
+        yield last if last is not None else Image.new("RGB", (w, h))
     p.stdout.close()
     p.wait()
 
@@ -582,7 +585,7 @@ def insta_job(job):
     ov = insta_overlay(trip, k, text, fpath, size, note)
     if not shot.get("motion") and not shot.get("clip"):
         shot = dict(shot, motion=AUTO_MOVES[k % len(AUTO_MOVES)])
-    frames = clip_frames(shot, root, secs) if shot.get("clip") else live_frames(trip, shot, root, secs, w, h, seed=k)
+    frames = clip_frames(shot, root, secs, w, h) if shot.get("clip") else live_frames(trip, shot, root, secs, w, h, seed=k)
     enc = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}",
                             "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
                             "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out)], stdin=subprocess.PIPE)
