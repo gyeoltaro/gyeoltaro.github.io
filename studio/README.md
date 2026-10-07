@@ -3,6 +3,10 @@
 `studio/index.html` (GitHub Pages: `/studio/`) 에서 부서별 프롬프트를 복사해 Claude Code 에 붙여넣으면
 Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏폼/썸네일 렌더링까지 수행합니다.
 
+## 여행 쇼핑쇼츠 (제휴 링크 수익화) — `TRAVEL.md`
+사진 몇 장 + 대사 → 15~30초 여행 쇼츠 + 업로드 키트 + 링크 페이지(`/trip/`) 번호 등록. 마이리얼트립·여기어때·쿠팡 파트너스.
+    python3 studio/tools/travel.py all studio/projects/<slug>/trip.json
+
 ## 준비
     pip install pillow edge-tts
     sudo apt install ffmpeg fonts-nanum      # 한글 폰트(없으면 --font 로 지정)

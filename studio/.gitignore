@@ -6,3 +6,4 @@ __pycache__/
 # YouTube API 원자료는 저장소에 올리지 않음 (개발자 정책: 30일 초과 보관 금지). Claude 분석(insights)만 보관
 research/**/data.json
 research/**/report.md
+projects/trip-sample/photos/
