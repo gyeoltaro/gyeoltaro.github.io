@@ -4,7 +4,7 @@
 사용법:
   python3 studio/tools/travel.py sample                                   # 예시 프로젝트(그림 사진) 만들기
   python3 studio/tools/travel.py lint   studio/projects/<slug>/trip.json  # 규정·수익화 점검
-  python3 studio/tools/travel.py render studio/projects/<slug>/trip.json  # output/short.mp4 (+short_ig.mp4) + cover.jpg
+  python3 studio/tools/travel.py render studio/projects/<slug>/trip.json  # output/short.mp4 (+short_ig·short_tt) + cover.jpg
   python3 studio/tools/travel.py kit    studio/projects/<slug>/trip.json  # output/kit.html (제목·설명·캡션 복사)
   python3 studio/tools/travel.py deal   studio/projects/<slug>/trip.json  # trip/deals.json 에 번호·링크 등록
   python3 studio/tools/travel.py all    studio/projects/<slug>/trip.json  # lint → render → kit → deal
@@ -302,14 +302,14 @@ def cmd_render(trip, root, fpath=None):
     last = dict(shots[trip.get("end_shot", len(shots) - 1)])
     last["motion"] = "out" if not last.get("clip") else None
     jobs.append((trip, last, len(shots), len(shots), end_secs, t, [], work / "seg_end.mp4", fpath, True))
-    kw = trip.get("dm_keyword")
-    if kw:  # 인스타용: 끝 안내만 '댓글 키워드 → 자동 DM' 으로 바꾼 판
-        ig = dict(trip, cta=f"댓글에 '{kw}' 남기면 링크 DM")
-        jobs.append((ig, last, len(shots), len(shots), end_secs, t, [], work / "seg_end_ig.mp4", fpath, True))
+    extra = variants(trip)  # 끝 안내만 바꾼 플랫폼별 판 (인스타·틱톡)
+    for name, cta in extra:
+        jobs.append((dict(trip, cta=cta), last, len(shots), len(shots), end_secs, t, [], work / f"seg_end_{name}.mp4", fpath, True))
     print(f"[화면] 컷 {len(jobs)}개 · {trip['_total']:.1f}초")
     with ProcessPoolExecutor(max(1, min(len(jobs), os.cpu_count() or 2))) as ex:
         segs = list(ex.map(render_segment, jobs))
-    seg_ig = segs.pop() if kw else None
+    ends = segs[len(segs) - len(extra):] if extra else []
+    segs = segs[:len(segs) - len(extra)]
 
     # 대사 이어 붙이기 (컷 시작 시각에 맞춰)
     narr = work / "narr.wav"
@@ -350,13 +350,37 @@ def cmd_render(trip, root, fpath=None):
           "[m][va]sidechaincompress=threshold=0.015:ratio=8:attack=15:release=400[md];[3:a]aresample=44100[fx];"
           "[vb][md][fx]amix=inputs=3:duration=first:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[aout]")
     mux(segs, out)  # 유튜브 쇼츠·네이버 클립: 프로필 링크 N번
-    if seg_ig:
-        mux(segs[:-1] + [seg_ig], outd / "short_ig.mp4")  # 인스타 릴스: 댓글 키워드 → 자동 DM
-        segs.append(seg_ig)
+    for (name, _), seg in zip(extra, ends):
+        mux(segs[:-1] + [seg], outd / f"short_{name}.mp4")
+    segs += ends
     studio.sh(["ffmpeg", "-y", "-ss", "0.5", "-i", str(out), "-frames:v", "1", "-q:v", "3", str(outd / "cover.jpg")])
     if not os.environ.get("STUDIO_KEEP_WORK"):
         for s in segs:
             Path(s).unlink(missing_ok=True)
+
+
+def site_label(trip):
+    """화면에 적을 링크 페이지 주소 (틱톡 팔로워 1천 명 전에는 프로필 링크가 없어서 주소를 직접 보여 줌)"""
+    return trip.get("site_label") or re.sub(r"^https?://|/$", "", trip.get("site") or "gyeoltaro.github.io/trip/")
+
+
+def tiktok_how(trip):
+    did = trip.get("deal_id", "?")
+    if trip.get("tiktok_dm_keyword"):
+        return f"DM으로 '{trip['tiktok_dm_keyword']}' 보내면 링크", f"💬 DM으로 '{trip['tiktok_dm_keyword']}' 보내 주시면 예약 링크를 바로 보내드려요"
+    if trip.get("tiktok_bio"):
+        return f"프로필 링크에서 {did}번", f"👉 프로필 링크에서 {did}번 검색"
+    return f"{site_label(trip)} 에서 {did}번", f"👉 {site_label(trip)} 에서 {did}번 검색"
+
+
+def variants(trip):
+    """[(이름, 끝 안내 문구)] — short.mp4(유튜브·네이버) 외에 추가로 만들 판"""
+    out = []
+    if trip.get("dm_keyword"):
+        out.append(("ig", f"댓글에 '{trip['dm_keyword']}' 남기면 링크 DM"))
+    if trip.get("tiktok", True):
+        out.append(("tt", tiktok_how(trip)[0]))
+    return out
 
 
 def hashtags(trip):
@@ -382,11 +406,13 @@ def texts(trip):
     ig = (f"[광고] {title}\n\n{body}\n\n{how}\n"
           f"(가격 {trip.get('price_checked', '')} 기준)\n\n{disc}\n\n{' '.join(tags + ['#여행추천', '#숙소추천'])}")
     pin = f"📍 {trip.get('name', '')} 예약 링크는 채널 프로필 링크 → {did}번이에요! (광고·제휴 링크)"
-    return title, yt, ig, pin
+    tt = (f"[광고] {title}\n{tiktok_how(trip)[1]}\n(가격 {trip.get('price_checked', '')} 기준)\n{disc}\n"
+          f"{' '.join(tags[:3] + ['#여행', '#숙소추천'])}")
+    return title, yt, ig, pin, tt
 
 
 def cmd_kit(trip, root, fpath=None):
-    title, yt, ig, pin = texts(trip)
+    title, yt, ig, pin, tt = texts(trip)
     kw = trip.get("dm_keyword")
     blocks = [("유튜브 쇼츠 제목", title), ("유튜브 설명", yt), ("고정 댓글", pin),
               ("인스타 릴스 캡션 (short_ig.mp4)" if kw else "인스타 릴스 · 네이버 클립 캡션", ig)]
@@ -399,12 +425,18 @@ def cmd_kit(trip, root, fpath=None):
                     f"요청하신 {trip.get('name', '')} 예약 링크예요 🙌\n{trip.get('link', '')}\n\n"
                     f"가격은 {trip.get('price_checked', '')} 기준이라 날짜에 따라 달라질 수 있어요.\n[광고] {disc}"),
                    ("자동 DM 설정 · 공개 답글", "DM으로 링크 보내드렸어요! 📩 안 보이면 메시지 요청함을 확인해 주세요")]
+    if trip.get("tiktok", True):
+        blocks.append(("틱톡 캡션 (short_tt.mp4)", tt))
+        if trip.get("tiktok_dm_keyword"):
+            blocks.append(("틱톡 키워드 자동 답장 · 키워드 / 답장", f"{trip['tiktok_dm_keyword']}\n\n"
+                           f"{trip.get('name', '')} 예약 링크예요 🙌 {trip.get('link', '')} [광고] {DISCLOSURE.get(trip.get('platform'), '')}"))
     items = "".join(
         f'<section><h2>{html.escape(h)}</h2><textarea readonly rows="{min(14, t.count(chr(10)) + 2)}">{html.escape(t)}</textarea>'
         f'<button onclick="c(this)">복사</button></section>' for h, t in blocks)
     checks = ("유튜브: 세부정보 → '유료 프로모션 포함' 체크", "유튜브: '변경되었거나 합성된 콘텐츠' — AI 영상 클립을 썼으면 '예'",
               "인스타: '유료 파트너십' 라벨 또는 캡션 첫 줄 [광고]",
-              *([f"인스타 자동 DM 툴에 키워드 '{kw}' 규칙 추가 (업로드 전에)", "인스타에는 short_ig.mp4, 유튜브·네이버에는 short.mp4"] if kw else []), f"링크 페이지에 {trip.get('deal_id', '?')}번이 보이는지 확인 (travel.py deal 후 push)",
+              *([f"인스타 자동 DM 툴에 키워드 '{kw}' 규칙 추가 (업로드 전에)", "인스타에는 short_ig.mp4, 유튜브·네이버에는 short.mp4"] if kw else []),
+              *(["틱톡: short_tt.mp4 · 더보기 → '콘텐츠 공개'(브랜드 콘텐츠) 켜기 · AI 영상 클립을 썼으면 'AI 생성 콘텐츠' 라벨"] if trip.get("tiktok", True) else []), f"링크 페이지에 {trip.get('deal_id', '?')}번이 보이는지 확인 (travel.py deal 후 push)",
               "올리기 직전 가격·재고 다시 확인 (화면 속 가격 날짜와 다르면 수정)")
     page = f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>업로드 키트 · {html.escape(trip.get('name', ''))}</title><style>
