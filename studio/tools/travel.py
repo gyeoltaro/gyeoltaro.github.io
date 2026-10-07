@@ -568,7 +568,7 @@ def insta_overlay(trip, k, text, fpath, size, note=None):
     ov = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
     top = 36 if h <= CH else 150  # 9:16 은 상단 앱 버튼을 피해 아래로
-    brand = trip.get("brand", "여기찜")
+    brand = trip.get("brand", "숙소찜")
     f = font(32, fpath)
     tw = d.textlength(brand, font=f)
     d.rounded_rectangle((36, top, 36 + tw + 40, top + 58), 29, fill=(255, 255, 255, 235))
@@ -641,7 +641,7 @@ def cmd_carousel(trip, root, fpath=None):
 def voice_overlay(trip, k, hook, phrase, end_text, note, fpath):
     ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
-    brand = trip.get("brand", "여기찜")
+    brand = trip.get("brand", "숙소찜")
     f = font(32, fpath)
     tw = d.textlength(brand, font=f)
     d.rounded_rectangle((36, 150, 36 + tw + 40, 208), 29, fill=(255, 255, 255, 235))
