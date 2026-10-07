@@ -97,6 +97,25 @@
 - 주소를 화면에 적어야 하므로 **짧은 도메인**이 있으면 훨씬 좋습니다 (예: `○○trip.kr/1`). 도메인을 사면 `"site_label"` 에 적으세요.
 - 업로드할 때: 더보기 → **콘텐츠 공개(브랜드 콘텐츠)** 켜기, 캡션 첫 줄 `[광고]`, AI 영상 클립을 썼으면 'AI 생성 콘텐츠' 라벨. 키트에 틱톡 캡션이 나옵니다.
 
+## 살아 있는 사진 + 인스타 영상 묶음 (2026-10-08 추가)
+벤치마킹(`research/ig-heo.jinny.gogo/insights.md`)에서 가장 잘 된 형식은 **1~2초짜리 움직이는 사진 8~13장을 묶은 인스타 캐러셀**이었습니다.
+
+**사진을 실제로 움직이는 듯하게** (`tools/animate.py`, 무료 · 이 컴퓨터에서 처리)
+- 깊이 추정 AI(Depth Anything V2 small)로 가까운 것과 먼 것을 나눠, 카메라가 다가가거나 옆으로 흐르는 **3D 입체감**을 줍니다.
+- **하늘은 구름이 흐르고, 물은 일렁이고, 밤하늘 별은 반짝입니다** (자동 인식). 컷별 `"fx": "none"` 으로 끄거나 `"sky,water,stars"` 중 골라 쓰기.
+- 쇼츠·릴스·틱톡 영상과 영상 묶음 모두 기본으로 적용됩니다. 끄려면 `"live": false` (예전 줌·패닝).
+- 한계: 사람·폭포처럼 '스스로 움직이는 것'은 만들지 못합니다. 그런 장면은 구글 Flow·Veo, Kling 같은 AI 영상 도구로 만든 mp4 를 `"clip"` 으로 넣으세요 (권리가 있는 사진으로만, 업로드 때 AI 표시).
+- 첫 실행 때 모델(약 100MB)을 자동으로 받습니다. 필요: `pip install onnxruntime opencv-python-headless`
+
+**인스타 영상 묶음** (`travel.py carousel`, `all` 에 포함)
+- `output/carousel/01.mp4 …` — 4:5(1080×1350), 장당 2초(`carousel_secs`), 무음, 왼쪽 위 브랜드(`brand`, 기본 "여기찜")
+- 1장: 후크 2줄 (`hook`) + 오른쪽 위 "광고" · 2~3장: 짧은 설명 (`shots[].card`, 2줄은 `\n`) · 나머지: 글씨 없이 장면만
+- 인스타 앱에서 여러 개 선택 → 01부터 순서대로 → 캡션은 키트에서 복사
+- 사진은 8~10장이 좋습니다 (`carousel_shots` 로 쇼츠와 다른 사진 목록을 줄 수도 있음)
+
+**벤치마킹 캡션 틀** — `points`(✔️ 포인트 3~4개)를 넣으면 키트가 「후크 → 본문 → ✔️ 포인트 → 안내」 순서로 캡션을 만듭니다.
+**아무 댓글 → 자동 DM**: `"dm_keyword": "*"` → "아무 댓글이나 남겨주세요" 안내, 끝 화면 "댓글 남기면 숙소 링크 DM", 자동 DM 도구는 '모든 댓글' 트리거.
+
 ## 영상 공식 (travel.py 기본값)
 | 구간 | 내용 |
 |---|---|
@@ -135,7 +154,9 @@ git add trip studio/projects/busan-ocean && git commit -m "Add busan-ocean" && g
 | `music` | `hope`/`warm`/`calm` … · `music_volume` |
 | `voice` | `gvoice`(Google Chirp3-HD 음성), `edge`, `rate` |
 | `publish` | `title`, `description`, `hashtags` |
-| `dm_keyword` | 인스타 댓글 자동 DM 키워드 → `short_ig.mp4` + DM 설정값 |
+| `dm_keyword` | 인스타 댓글 자동 DM 키워드 (`"*"` = 아무 댓글) → `short_ig.mp4` + DM 설정값 |
+| `brand`, `points`, `shots[].card`, `carousel_secs`, `carousel_shots`, `carousel` | 인스타 영상 묶음 (위 '살아 있는 사진' 참고) |
+| `live`, `shots[].fx` | 움직이는 사진 켜기/끄기, 효과 고르기 |
 | `tiktok`, `tiktok_dm_keyword`, `tiktok_bio`, `site_label` | 틱톡용 `short_tt.mp4` 끝 안내 (위 표) |
 | `deal_id` | 비워 두면 `all`/`deal` 이 새 번호를 매기고 기록 |
 | `video_url` | 올린 뒤 쇼츠 주소 (선택) |
