@@ -4,7 +4,7 @@
 사용법:
   python3 studio/tools/travel.py sample                                   # 예시 프로젝트(그림 사진) 만들기
   python3 studio/tools/travel.py lint   studio/projects/<slug>/trip.json  # 규정·수익화 점검
-  python3 studio/tools/travel.py render studio/projects/<slug>/trip.json  # output/short.mp4 + cover.jpg
+  python3 studio/tools/travel.py render studio/projects/<slug>/trip.json  # output/short.mp4 (+short_ig.mp4) + cover.jpg
   python3 studio/tools/travel.py kit    studio/projects/<slug>/trip.json  # output/kit.html (제목·설명·캡션 복사)
   python3 studio/tools/travel.py deal   studio/projects/<slug>/trip.json  # trip/deals.json 에 번호·링크 등록
   python3 studio/tools/travel.py all    studio/projects/<slug>/trip.json  # lint → render → kit → deal
@@ -302,9 +302,14 @@ def cmd_render(trip, root, fpath=None):
     last = dict(shots[trip.get("end_shot", len(shots) - 1)])
     last["motion"] = "out" if not last.get("clip") else None
     jobs.append((trip, last, len(shots), len(shots), end_secs, t, [], work / "seg_end.mp4", fpath, True))
+    kw = trip.get("dm_keyword")
+    if kw:  # 인스타용: 끝 안내만 '댓글 키워드 → 자동 DM' 으로 바꾼 판
+        ig = dict(trip, cta=f"댓글에 '{kw}' 남기면 링크 DM")
+        jobs.append((ig, last, len(shots), len(shots), end_secs, t, [], work / "seg_end_ig.mp4", fpath, True))
     print(f"[화면] 컷 {len(jobs)}개 · {trip['_total']:.1f}초")
     with ProcessPoolExecutor(max(1, min(len(jobs), os.cpu_count() or 2))) as ex:
         segs = list(ex.map(render_segment, jobs))
+    seg_ig = segs.pop() if kw else None
 
     # 대사 이어 붙이기 (컷 시작 시각에 맞춰)
     narr = work / "narr.wav"
@@ -331,21 +336,27 @@ def cmd_render(trip, root, fpath=None):
     sound.write_wav(work / "music.wav", music)
     sound.write_wav(work / "fx.wav", fx)
 
-    lst = work / "segs.txt"
-    lst.write_text("".join(f"file '{Path(s).resolve()}'\n" for s in segs))
+    def mux(seg_list, out):
+        lst = work / f"{out.stem}.txt"
+        lst.write_text("".join(f"file '{Path(s).resolve()}'\n" for s in seg_list))
+        studio.sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst), "-i", str(narr),
+                   "-i", str(work / "music.wav"), "-i", str(work / "fx.wav"), "-filter_complex", fc,
+                   "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac", "-b:a", "160k",
+                   "-t", f"{trip['_total']:.2f}", "-movflags", "+faststart", str(out)])
+        print(f"  ✔ {out} ({trip['_total']:.1f}초)")
+
     out = outd / "short.mp4"
     fc = ("[1:a]aresample=44100,asplit=2[va][vb];[2:a]aresample=44100[m];"
           "[m][va]sidechaincompress=threshold=0.015:ratio=8:attack=15:release=400[md];[3:a]aresample=44100[fx];"
           "[vb][md][fx]amix=inputs=3:duration=first:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[aout]")
-    studio.sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst), "-i", str(narr),
-               "-i", str(work / "music.wav"), "-i", str(work / "fx.wav"), "-filter_complex", fc,
-               "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac", "-b:a", "160k",
-               "-t", f"{trip['_total']:.2f}", "-movflags", "+faststart", str(out)])
+    mux(segs, out)  # 유튜브 쇼츠·네이버 클립: 프로필 링크 N번
+    if seg_ig:
+        mux(segs[:-1] + [seg_ig], outd / "short_ig.mp4")  # 인스타 릴스: 댓글 키워드 → 자동 DM
+        segs.append(seg_ig)
     studio.sh(["ffmpeg", "-y", "-ss", "0.5", "-i", str(out), "-frames:v", "1", "-q:v", "3", str(outd / "cover.jpg")])
     if not os.environ.get("STUDIO_KEEP_WORK"):
         for s in segs:
             Path(s).unlink(missing_ok=True)
-    print(f"  ✔ {out} ({trip['_total']:.1f}초)")
 
 
 def hashtags(trip):
@@ -366,7 +377,9 @@ def texts(trip):
     yt = (f"[광고] {disc}\n\n{body}\n\n📍 예약 링크: 채널 프로필 링크 → {did}번\n{site}#{did}\n"
           f"💰 가격은 {trip.get('price_checked', '')} 기준이며 날짜·객실에 따라 달라집니다.\n"
           f"{trip.get('credit', '')}\n\n{' '.join(tags)}")
-    ig = (f"[광고] {title}\n\n{body}\n\n👉 프로필 링크에서 {did}번 검색\n"
+    kw = trip.get("dm_keyword")
+    how = f"💬 댓글에 '{kw}' 남기면 예약 링크를 DM으로 보내드려요" if kw else f"👉 프로필 링크에서 {did}번 검색"
+    ig = (f"[광고] {title}\n\n{body}\n\n{how}\n"
           f"(가격 {trip.get('price_checked', '')} 기준)\n\n{disc}\n\n{' '.join(tags + ['#여행추천', '#숙소추천'])}")
     pin = f"📍 {trip.get('name', '')} 예약 링크는 채널 프로필 링크 → {did}번이에요! (광고·제휴 링크)"
     return title, yt, ig, pin
@@ -374,13 +387,24 @@ def texts(trip):
 
 def cmd_kit(trip, root, fpath=None):
     title, yt, ig, pin = texts(trip)
+    kw = trip.get("dm_keyword")
     blocks = [("유튜브 쇼츠 제목", title), ("유튜브 설명", yt), ("고정 댓글", pin),
-              ("인스타 릴스 · 네이버 클립 캡션", ig)]
+              ("인스타 릴스 캡션 (short_ig.mp4)" if kw else "인스타 릴스 · 네이버 클립 캡션", ig)]
+    if kw:
+        disc = DISCLOSURE.get(trip.get("platform"), "")
+        blocks += [("네이버 클립 캡션 (short.mp4)", ig.replace(f"💬 댓글에 '{kw}' 남기면 예약 링크를 DM으로 보내드려요",
+                                                          f"👉 프로필 링크에서 {trip.get('deal_id', '?')}번 검색")),
+                   ("자동 DM 설정 · 키워드", kw),
+                   ("자동 DM 설정 · 보낼 메시지",
+                    f"요청하신 {trip.get('name', '')} 예약 링크예요 🙌\n{trip.get('link', '')}\n\n"
+                    f"가격은 {trip.get('price_checked', '')} 기준이라 날짜에 따라 달라질 수 있어요.\n[광고] {disc}"),
+                   ("자동 DM 설정 · 공개 답글", "DM으로 링크 보내드렸어요! 📩 안 보이면 메시지 요청함을 확인해 주세요")]
     items = "".join(
         f'<section><h2>{html.escape(h)}</h2><textarea readonly rows="{min(14, t.count(chr(10)) + 2)}">{html.escape(t)}</textarea>'
         f'<button onclick="c(this)">복사</button></section>' for h, t in blocks)
     checks = ("유튜브: 세부정보 → '유료 프로모션 포함' 체크", "유튜브: '변경되었거나 합성된 콘텐츠' — AI 영상 클립을 썼으면 '예'",
-              "인스타: '유료 파트너십' 라벨 또는 캡션 첫 줄 [광고]", f"링크 페이지에 {trip.get('deal_id', '?')}번이 보이는지 확인 (travel.py deal 후 push)",
+              "인스타: '유료 파트너십' 라벨 또는 캡션 첫 줄 [광고]",
+              *([f"인스타 자동 DM 툴에 키워드 '{kw}' 규칙 추가 (업로드 전에)", "인스타에는 short_ig.mp4, 유튜브·네이버에는 short.mp4"] if kw else []), f"링크 페이지에 {trip.get('deal_id', '?')}번이 보이는지 확인 (travel.py deal 후 push)",
               "올리기 직전 가격·재고 다시 확인 (화면 속 가격 날짜와 다르면 수정)")
     page = f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>업로드 키트 · {html.escape(trip.get('name', ''))}</title><style>
@@ -451,6 +475,9 @@ def cmd_lint(trip, root, fpath=None):
     except ValueError:
         if trip.get("price"):
             errs.append("price 를 쓰면 price_checked(YYYY-MM-DD) 도 필요")
+    kw = trip.get("dm_keyword")
+    if kw is not None and (not kw or " " in kw or len(kw) > 6):
+        warns.append(f"dm_keyword '{kw}' — 띄어쓰기 없이 2~6자 (예: 부산, 다낭1) 가 오타 없이 따라 쓰기 쉬움")
     for ln in trip.get("hook", []):
         if len(ln) > 13:
             warns.append(f"후크 '{ln}' {len(ln)}자 — 줄당 13자 이하 권장")
