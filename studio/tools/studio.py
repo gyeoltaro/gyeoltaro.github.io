@@ -411,7 +411,8 @@ def phrases(text, max_chars=12):
     if cur:
         out.append(cur)
     if len(out) > 1 and len(out[-1]) <= 3:  # 꼬리 한두 글자는 앞 구절에 붙임
-        out[-2] += " " + out.pop()
+        tail = out.pop()  # (out[-2] += out.pop() 은 pop 전에 위치를 잡아 구절이 2개일 때 IndexError)
+        out[-1] += " " + tail
     return out or [text]
 
 

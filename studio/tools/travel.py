@@ -5,6 +5,7 @@
   python3 studio/tools/travel.py sample                                   # 예시 프로젝트(그림 사진) 만들기
   python3 studio/tools/travel.py lint   studio/projects/<slug>/trip.json  # 규정·수익화 점검
   python3 studio/tools/travel.py render studio/projects/<slug>/trip.json  # output/short.mp4 (+short_ig·short_tt) + cover.jpg
+  python3 studio/tools/travel.py carousel studio/projects/<slug>/trip.json  # output/carousel/01~NN.mp4 (인스타 4:5 영상 묶음)
   python3 studio/tools/travel.py kit    studio/projects/<slug>/trip.json  # output/kit.html (제목·설명·캡션 복사)
   python3 studio/tools/travel.py deal   studio/projects/<slug>/trip.json  # trip/deals.json 에 번호·링크 등록
   python3 studio/tools/travel.py all    studio/projects/<slug>/trip.json  # lint → render → kit → deal
@@ -16,9 +17,11 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import animate  # noqa: E402  (사진을 실제로 움직이는 듯하게: 깊이 기반 3D 시차 + 구름·물결·별)
 import studio  # noqa: E402  (음성 합성·폰트·ffmpeg 도우미 재사용)
 import sound  # noqa: E402
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, H, FPS = 1080, 1920, 30
@@ -207,18 +210,48 @@ def photo_frames(shot, root, secs):
         yield big.transform((W, H), Image.AFFINE, (1 / scale, 0, x0, 0, 1 / scale, y0), Image.BICUBIC)
 
 
-def clip_frames(shot, root, secs):
-    """AI 영상 클립(구글 Flow·Veo·Kling 등) → 9:16 로 맞춘 프레임. 짧으면 반복"""
-    p = subprocess.Popen(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", str(root / shot["clip"]), "-t", f"{secs:.3f}",
-                          "-vf", f"fps={FPS},scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
+LIVE_MOVE = {"in": "push", "out": "push", "push": "push", "left": "left", "right": "right", "up": "up", "orbit": "orbit", "fly": "fly"}
+
+
+def live_frames(trip, shot, root, secs, w, h, seed=0):
+    """기본: 깊이 기반 '살아 있는 사진'. live: false 이거나 모듈이 없으면 줌·패닝"""
+    if shot.get("live", trip.get("live", True)) and animate.available():
+        src = Image.open(root / shot["img"]).convert("RGB")
+        mo = LIVE_MOVE.get(motion_of(shot, src), "push")
+        for fr in animate.frames(np.asarray(src), w, h, secs, mo, shot.get("fx", "auto"), seed=seed):
+            yield Image.fromarray(fr)
+        return
+    if (w, h) != (W, H):  # 줌·패닝 엔진은 9:16 전용 → 잘라서 사용
+        for fr in photo_frames(shot, root, secs):
+            yield cover(fr, w, h)
+        return
+    yield from photo_frames(shot, root, secs)
+
+
+def clip_filter(shot, w, h):
+    """zoom(예: 1.4) + focus([가로, 세로] 0~1) 로 같은 AI 영상에서 다른 구도(가까이)를 잘라 씀"""
+    z = float(shot.get("zoom", 1.0))
+    fx, fy = shot.get("focus", [.5, .5])
+    zw, zh = int(w * z) // 2 * 2, int(h * z) // 2 * 2
+    return (f"fps={FPS},scale={zw}:{zh}:force_original_aspect_ratio=increase,"
+            f"crop={w}:{h}:'(iw-{w})*{fx}':'(ih-{h})*{fy}'")
+
+
+def clip_frames(shot, root, secs, w=W, h=H):
+    """AI 영상 클립(구글 Flow·Veo·Kling 등) → w×h 로 맞춘 프레임.
+    AI 영상은 처음 0.5초쯤 사진처럼 멈춰 있다가 움직이므로 start(기본 0.8초)부터 사용. 짧으면 반복"""
+    start = float(shot.get("start", 0.8))
+    p = subprocess.Popen(["ffmpeg", "-v", "error", "-ss", f"{start:.2f}", "-stream_loop", "-1", "-i", str(root / shot["clip"]),
+                          "-t", f"{secs:.3f}", "-an",
+                          "-vf", clip_filter(shot, w, h),
                           "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
-    n, size = max(1, round(secs * FPS)), W * H * 3
+    n, size = max(1, round(secs * FPS)), w * h * 3
     last = None
     for _ in range(n):
         buf = p.stdout.read(size)
         if len(buf) == size:
-            last = Image.frombytes("RGB", (W, H), buf)
-        yield last if last is not None else Image.new("RGB", (W, H))
+            last = Image.frombytes("RGB", (w, h), buf)
+        yield last if last is not None else Image.new("RGB", (w, h))
     p.stdout.close()
     p.wait()
 
@@ -226,7 +259,7 @@ def clip_frames(shot, root, secs):
 def render_segment(job):
     trip, shot, k, n, secs, start, phrases, out, fpath, end_card = job
     root = Path(trip["_root"])
-    frames = clip_frames(shot, root, secs) if shot.get("clip") else photo_frames(shot, root, secs)
+    frames = clip_frames(shot, root, secs) if shot.get("clip") else live_frames(trip, shot, root, secs, W, H)
     enc = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
                             "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
                             "-pix_fmt", "yuv420p", str(out)], stdin=subprocess.PIPE)
@@ -278,6 +311,16 @@ def split_phrases(text, secs, lead=.05):
 
 # ───────────────────────── 명령 ─────────────────────────
 def cmd_render(trip, root, fpath=None):
+    style = trip.get("style", "voice")
+    if style == "voice":  # 기본: 처음 벤치마킹(뉴머니) 방식 — AI 영상 클립 + AI 대본 성우 내레이션 + 자막
+        return cmd_voice(trip, root, fpath)
+    if style == "insta":  # 음성 없이 움직이는 사진 + 글씨 + 음악 (인스타 허지니 묶음 스타일)
+        return cmd_reel(trip, root, fpath)
+    return cmd_render_classic(trip, root, fpath)
+
+
+def cmd_render_classic(trip, root, fpath=None):
+    """예전 방식: 음성 해설 + 구절 자막 + 후크 고정 + 끝 안내 상자 ("style": "classic")"""
     fpath = studio.find_font(fpath)
     work, outd = root / "work", root / "output"
     work.mkdir(exist_ok=True)
@@ -377,7 +420,8 @@ def variants(trip):
     """[(이름, 끝 안내 문구)] — short.mp4(유튜브·네이버) 외에 추가로 만들 판"""
     out = []
     if trip.get("dm_keyword"):
-        out.append(("ig", f"댓글에 '{trip['dm_keyword']}' 남기면 링크 DM"))
+        kw = trip["dm_keyword"]
+        out.append(("ig", "댓글 남기면 숙소 링크 DM" if kw == "*" else f"댓글에 '{kw}' 남기면 링크 DM"))
     if trip.get("tiktok", True):
         out.append(("tt", tiktok_how(trip)[0]))
     return out
@@ -386,6 +430,34 @@ def variants(trip):
 def hashtags(trip):
     tags = trip.get("publish", {}).get("hashtags") or [f"#{trip.get('region', '여행')}여행", "#국내여행"]
     return [t if t.startswith("#") else "#" + t for t in tags]
+
+
+def ig_how(trip, dm=True):
+    did = trip.get("deal_id", "?")
+    kw = trip.get("dm_keyword") if dm else None
+    if kw == "*":  # 아무 댓글이나 → 자동 DM (벤치마킹: 댓글 장벽을 없애 댓글 수를 늘림)
+        return ("📌 숙소 정보가 궁금하신 분들은 아무 댓글이나 남겨주세요☺️\n"
+                "⚠️ 팔로우하시면 DM이 메시지 요청함에 묻히지 않아요\n"
+                f"❤️ 프로필링크 {did}번에서도 확인할 수 있어요!")
+    if kw:
+        return f"💬 댓글에 '{kw}' 남기면 예약 링크를 DM으로 보내드려요\n❤️ 프로필링크 {did}번에서도 확인할 수 있어요!"
+    return f"👉 프로필 링크에서 {did}번 검색"
+
+
+def ga(word):
+    """받침 있으면 '이가', 없으면 '가' (하루가 / 찜이가)"""
+    c = ord(word[-1]) - 0xAC00 if word else -1
+    return word + ("이가" if 0 <= c < 11172 and c % 28 else "가")
+
+
+def ig_caption(trip, how, disc, title, body, tags):
+    """인스타 캡션. points 가 있으면 '후크 → 본문 → ✔️ 포인트 → 안내' 틀"""
+    pts = trip.get("points") or []
+    head = trip.get("publish", {}).get("ig_hook") or title
+    mid = ("\n".join(f"✔️ {p}" for p in pts) + "\n\n") if pts else ""
+    sign = f"🏠 {ga(trip.get('persona', '하루'))} 찜해 둔 숙소예요\n\n"
+    return (f"[광고] {head}\n\n{body}\n\n{mid}{sign}{how}\n(가격 {trip.get('price_checked', '')} 기준)\n\n{disc}\n\n"
+            f"{' '.join(tags + ['#숙소추천'])}")
 
 
 def texts(trip):
@@ -401,10 +473,7 @@ def texts(trip):
     yt = (f"[광고] {disc}\n\n{body}\n\n📍 예약 링크: 채널 프로필 링크 → {did}번\n{site}#{did}\n"
           f"💰 가격은 {trip.get('price_checked', '')} 기준이며 날짜·객실에 따라 달라집니다.\n"
           f"{trip.get('credit', '')}\n\n{' '.join(tags)}")
-    kw = trip.get("dm_keyword")
-    how = f"💬 댓글에 '{kw}' 남기면 예약 링크를 DM으로 보내드려요" if kw else f"👉 프로필 링크에서 {did}번 검색"
-    ig = (f"[광고] {title}\n\n{body}\n\n{how}\n"
-          f"(가격 {trip.get('price_checked', '')} 기준)\n\n{disc}\n\n{' '.join(tags + ['#여행추천', '#숙소추천'])}")
+    ig = ig_caption(trip, ig_how(trip), disc, title, body, tags)
     pin = f"📍 {trip.get('name', '')} 예약 링크는 채널 프로필 링크 → {did}번이에요! (광고·제휴 링크)"
     tt = (f"[광고] {title}\n{tiktok_how(trip)[1]}\n(가격 {trip.get('price_checked', '')} 기준)\n{disc}\n"
           f"{' '.join(tags[:3] + ['#여행', '#숙소추천'])}")
@@ -415,12 +484,14 @@ def cmd_kit(trip, root, fpath=None):
     title, yt, ig, pin, tt = texts(trip)
     kw = trip.get("dm_keyword")
     blocks = [("유튜브 쇼츠 제목", title), ("유튜브 설명", yt), ("고정 댓글", pin),
-              ("인스타 릴스 캡션 (short_ig.mp4)" if kw else "인스타 릴스 · 네이버 클립 캡션", ig)]
+              ("인스타 캡션 (영상 묶음 carousel/ 또는 릴스 short_ig.mp4)" if kw else "인스타 · 네이버 클립 캡션", ig)]
     if kw:
         disc = DISCLOSURE.get(trip.get("platform"), "")
-        blocks += [("네이버 클립 캡션 (short.mp4)", ig.replace(f"💬 댓글에 '{kw}' 남기면 예약 링크를 DM으로 보내드려요",
-                                                          f"👉 프로필 링크에서 {trip.get('deal_id', '?')}번 검색")),
-                   ("자동 DM 설정 · 키워드", kw),
+        title_, _, _, _, _ = texts(trip)
+        disc_ = DISCLOSURE.get(trip.get("platform"), "")
+        body_ = trip.get("publish", {}).get("description") or f"{trip.get('name', '')} · {trip.get('price', '')}"
+        blocks += [("네이버 클립 캡션 (short.mp4)", ig_caption(trip, ig_how(trip, dm=False), disc_, title_, body_, hashtags(trip))),
+                   ("자동 DM 설정 · 트리거", "모든 댓글 (키워드 없이)" if kw == "*" else f"키워드: {kw}"),
                    ("자동 DM 설정 · 보낼 메시지",
                     f"요청하신 {trip.get('name', '')} 예약 링크예요 🙌\n{trip.get('link', '')}\n\n"
                     f"가격은 {trip.get('price_checked', '')} 기준이라 날짜에 따라 달라질 수 있어요.\n[광고] {disc}"),
@@ -435,7 +506,7 @@ def cmd_kit(trip, root, fpath=None):
         f'<button onclick="c(this)">복사</button></section>' for h, t in blocks)
     checks = ("유튜브: 세부정보 → '유료 프로모션 포함' 체크", "유튜브: '변경되었거나 합성된 콘텐츠' — AI 영상 클립을 썼으면 '예'",
               "인스타: '유료 파트너십' 라벨 또는 캡션 첫 줄 [광고]",
-              *([f"인스타 자동 DM 툴에 키워드 '{kw}' 규칙 추가 (업로드 전에)", "인스타에는 short_ig.mp4, 유튜브·네이버에는 short.mp4"] if kw else []),
+              *([("인스타 자동 DM 도구에 '모든 댓글' 규칙 추가 (업로드 전에)" if kw == "*" else f"인스타 자동 DM 도구에 키워드 '{kw}' 규칙 추가 (업로드 전에)"), "인스타에는 short_ig.mp4, 유튜브·네이버에는 short.mp4"] if kw else []),
               *(["틱톡: short_tt.mp4 · 더보기 → '콘텐츠 공개'(브랜드 콘텐츠) 켜기 · AI 영상 클립을 썼으면 'AI 생성 콘텐츠' 라벨"] if trip.get("tiktok", True) else []), f"링크 페이지에 {trip.get('deal_id', '?')}번이 보이는지 확인 (travel.py deal 후 push)",
               "올리기 직전 가격·재고 다시 확인 (화면 속 가격 날짜와 다르면 수정)")
     page = f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -482,6 +553,263 @@ def cmd_deal(trip, root, fpath=None, path=None):
     DEALS.parent.mkdir(exist_ok=True)
     DEALS.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"  ✔ {DEALS} 에 {entry['id']}번 등록 — git push 하면 링크 페이지에 반영")
+
+
+# ───────────────────────── 인스타 스타일 (벤치마킹: 움직이는 사진 + 깔끔한 글씨) ─────────────────────────
+CW, CH = 1080, 1350  # 인스타 영상 묶음 4:5
+AUTO_MOVES = ["push", "right", "up", "left", "push", "right"]  # 움직임을 지정하지 않은 컷은 돌아가며
+
+
+BADGE = REPO / "trip" / "brand" / "badge.png"  # 숙소찜 로고 배지 (studio/brand/logo-source.html 에서 만듦)
+
+
+def brand_badge(ov, trip, x, y, fpath, h=84):
+    """왼쪽 위 로고: 배지 그림이 있으면 그림, 없거나 brand 를 따로 지정했으면 글자 배지"""
+    if BADGE.exists() and trip.get("brand", "숙소찜") == "숙소찜":
+        b = Image.open(BADGE).convert("RGBA")
+        b = b.resize((round(b.width * h / b.height), h), Image.LANCZOS)
+        ov.alpha_composite(b, (x, y))
+        return
+    d = ImageDraw.Draw(ov)
+    brand = trip.get("brand", "숙소찜")
+    f = font(32, fpath)
+    tw = d.textlength(brand, font=f)
+    d.rounded_rectangle((x, y, x + tw + 40, y + 58), 29, fill=(255, 255, 255, 235))
+    d.text((x + 20, y + 29), brand, font=f, fill=(25, 25, 25), anchor="lm")
+
+
+def soft_text(ov, xy, text, f, fill=WHITE):
+    """벤치마킹 자막: 흰 글씨 + 퍼진 그림자 (두꺼운 테두리 없음)"""
+    sh = Image.new("RGBA", ov.size, (0, 0, 0, 0))
+    ImageDraw.Draw(sh).text(xy, text, font=f, fill=(0, 0, 0, 200), anchor="mm")
+    sh = sh.filter(ImageFilter.GaussianBlur(f.size / 9))
+    ov.alpha_composite(sh)
+    ov.alpha_composite(sh)
+    ImageDraw.Draw(ov).text(xy, text, font=f, fill=fill, anchor="mm")
+
+
+def insta_overlay(trip, k, text, fpath, size, note=None):
+    w, h = size
+    ov = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    top = 36 if h <= CH else 150  # 9:16 은 상단 앱 버튼을 피해 아래로
+    brand_badge(ov, trip, 30, top - 10, fpath)
+    d = ImageDraw.Draw(ov)
+    if k == 0:  # 광고 표시 (작게, 첫 장)
+        soft_text(ov, (w - 80, top + 29), "광고", font(28, fpath))
+    if text:
+        lines = text.split("\n")[:2]
+        big = k == 0
+        size_ = 76 if big else 50
+        base = (h * .70 if h > w * 1.5 else h * .76) if big else (h * .74 if h > w * 1.5 else h * .80)
+        if big:
+            soft_text(ov, (w // 2, int(base - size_ * 1.15)), "*", font(44, fpath))
+        for i, ln in enumerate(lines):
+            s = fit_size(d, ln, fpath, size_, w - 140)
+            soft_text(ov, (w // 2, int(base + i * (s + 18))), ln, font(s, fpath))
+    if note:
+        soft_text(ov, (w // 2, int(h * (.88 if h > w * 1.5 else .93))), note, font(30, fpath), fill=(235, 235, 235))
+    return ov
+
+
+def insta_job(job):
+    trip, shot, k, text, secs, out, fpath, size, note = job
+    root = Path(trip["_root"])
+    w, h = size
+    ov = insta_overlay(trip, k, text, fpath, size, note)
+    if not shot.get("motion") and not shot.get("clip"):
+        shot = dict(shot, motion=AUTO_MOVES[k % len(AUTO_MOVES)])
+    frames = clip_frames(shot, root, secs, w, h) if shot.get("clip") else live_frames(trip, shot, root, secs, w, h, seed=k)
+    enc = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}",
+                            "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
+                            "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out)], stdin=subprocess.PIPE)
+    for fr in frames:
+        fr = (cover(fr, w, h) if fr.size != (w, h) else fr).convert("RGBA")
+        fr.alpha_composite(ov)
+        enc.stdin.write(fr.convert("RGB").tobytes())
+    enc.stdin.close()
+    if enc.wait():
+        raise RuntimeError(f"인코딩 실패: {out}")
+    return str(out)
+
+
+def insta_plan(trip):
+    """[(컷, 글씨, 초)] — 1장 후크, card 가 있는 장은 글을 읽을 만큼 길게"""
+    shots = trip.get("carousel_shots") or trip["shots"]
+    secs = float(trip.get("carousel_secs", 1.6))
+    plan = []
+    for k, sh in enumerate(shots[:20]):
+        text = "\n".join(trip.get("hook", [])) if k == 0 else (sh.get("card") or "")
+        plan.append((sh, text, float(sh.get("secs", max(secs, len(text.replace(chr(10), "")) / 9 + .6 if text else secs)))))
+    return plan
+
+
+def cmd_carousel(trip, root, fpath=None):
+    """인스타 영상 묶음: 사진마다 4:5 움직이는 영상(기본 1.6초, 무음). 첫 장 = 후크 2줄, 2~3장 = 짧은 설명"""
+    fpath = studio.find_font(fpath)
+    trip["_root"] = str(root)
+    outd = root / "output" / "carousel"
+    outd.mkdir(parents=True, exist_ok=True)
+    for old in outd.glob("*.mp4"):
+        old.unlink()
+    plan = insta_plan(trip)
+    jobs = [(trip, sh, k, text, sc, outd / f"{k + 1:02d}.mp4", fpath, (CW, CH), None) for k, (sh, text, sc) in enumerate(plan)]
+    print(f"[인스타 묶음] {len(jobs)}장 · 4:5")
+    with ProcessPoolExecutor(max(1, min(len(jobs), (os.cpu_count() or 2)))) as ex:
+        outs = list(ex.map(insta_job, jobs))
+    print(f"  ✔ {outd} ({len(outs)}개) — 인스타에서 순서대로 여러 개 선택해 올리기")
+
+
+def voice_overlay(trip, k, hook, phrase, end_text, note, fpath):
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    brand_badge(ov, trip, 30, 140, fpath)
+    d = ImageDraw.Draw(ov)
+    soft_text(ov, (W - 80, 179), "광고", font(28, fpath))  # 영상 내내 작게 (쇼츠는 설명란을 잘 안 봄)
+    if hook:
+        for i, ln in enumerate(hook[:2]):
+            s = fit_size(d, ln, fpath, 92, W - 120)
+            soft_text(ov, (W // 2, 470 + i * (s + 24)), ln, font(s, fpath), fill=WHITE if i == 0 else YELLOW)
+    if end_text:
+        for i, ln in enumerate(end_text.split("\n")[:2]):
+            s = fit_size(d, ln, fpath, 70 if i else 56, W - 120)
+            soft_text(ov, (W // 2, int(H * .40) + i * (s + 26)), ln, font(s, fpath), fill=YELLOW if i else WHITE)
+    if phrase:
+        s = fit_size(d, phrase, fpath, 66, W - 120)
+        soft_text(ov, (W // 2, int(H * .68)), phrase, font(s, fpath))
+    if note:
+        soft_text(ov, (W // 2, int(H * .76)), note, font(30, fpath), fill=(235, 235, 235))
+    return ov
+
+
+def voice_job(job):
+    trip, shot, k, secs, phrases, hook, end_text, note, out, fpath = job
+    root = Path(trip["_root"])
+    if not shot.get("motion") and not shot.get("clip"):
+        shot = dict(shot, motion=AUTO_MOVES[k % len(AUTO_MOVES)])
+    frames = clip_frames(shot, root, secs) if shot.get("clip") else live_frames(trip, shot, root, secs, W, H, seed=k)
+    enc = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
+                            "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
+                            "-pix_fmt", "yuv420p", str(out)], stdin=subprocess.PIPE)
+    cache = {}
+    for i, fr in enumerate(frames):
+        t = i / FPS
+        ph = next((p for a, b, p in phrases if a <= t < b), "")
+        if ph not in cache:
+            cache[ph] = voice_overlay(trip, k, hook, ph, end_text, note, fpath)
+        fr = (cover(fr, W, H) if fr.size != (W, H) else fr).convert("RGBA")
+        fr.alpha_composite(cache[ph])
+        enc.stdin.write(fr.convert("RGB").tobytes())
+    enc.stdin.close()
+    if enc.wait():
+        raise RuntimeError(f"인코딩 실패: {out}")
+    return str(out)
+
+
+def cmd_voice(trip, root, fpath=None):
+    """처음 벤치마킹(뉴머니 '사진 1장으로 여행쇼츠') 방식: AI 영상 클립(또는 움직이는 사진) + 성우 내레이션 + 자막 + 음악"""
+    fpath = studio.find_font(fpath)
+    trip["_root"] = str(root)
+    work, outd = root / "work", root / "output"
+    work.mkdir(exist_ok=True)
+    outd.mkdir(exist_ok=True)
+    shots = trip["shots"]
+    print(f"[음성] {sum(1 for s in shots if s.get('line'))}개")
+    with ThreadPoolExecutor(8) as ex:
+        audios = list(ex.map(lambda a: tts(trip, root, a[1]["line"], a[0]) if a[1].get("line") else None, enumerate(shots)))
+    gap = .15
+    secs = [max(1.6, studio.dur(a) + gap) if a else float(s.get("secs", 1.6)) for a, s in zip(audios, shots)]
+    did = trip.get("deal_id", "?")
+    note = f"가격 {trip.get('price_checked', '')} 기준 · 날짜에 따라 달라요" if trip.get("price") else None
+    name = trip.get("name", "")
+    ends = [("short", f"{name}\n프로필 링크 {did}번")] + [(f"short_{n}", f"{name}\n{cta}") for n, cta in variants(trip)]
+    jobs, last = [], len(shots) - 1
+    for k, (sh, sc) in enumerate(zip(shots, secs)):
+        phr = split_phrases(sh.get("caption", sh.get("line", "")), sc - gap) if sh.get("line") else []
+        hook = trip.get("hook") if k == 0 else None
+        if k < last:
+            jobs.append((trip, sh, k, sc, phr, hook, None, None, work / f"v{k:02d}.mp4", fpath))
+        else:
+            for nm, end in ends:
+                jobs.append((trip, sh, k, sc, phr, hook, end, note, work / f"v_end_{nm}.mp4", fpath))
+    total = sum(secs)
+    print(f"[화면] 컷 {len(shots)}개 · {total:.1f}초 · 판 {len(ends)}개")
+    with ProcessPoolExecutor(max(1, min(len(jobs), os.cpu_count() or 2))) as ex:
+        segs = list(ex.map(voice_job, jobs))
+    body, endsegs = segs[:last], segs[last:]
+    # 내레이션: 컷 시작 시각에 맞춰 배치
+    narr, inputs, flt, t = work / "narr.wav", [], [], 0.0
+    for a, sc in zip(audios, secs):
+        if a:
+            inputs += ["-i", str(a)]
+            j = len(inputs) // 2 - 1
+            flt.append(f"[{j}:a]aresample=44100,adelay={int((t + .05) * 1000)}:all=1[a{j}]")
+        t += sc
+    nin = len(inputs) // 2
+    if nin:
+        fc = ";".join(flt) + ";" + "".join(f"[a{j}]" for j in range(nin)) + f"amix=inputs={nin}:normalize=0,apad=whole_dur={total:.2f}[o]"
+        studio.sh(["ffmpeg", "-y", *inputs, "-filter_complex", fc, "-map", "[o]", "-t", f"{total:.2f}", str(narr)])
+    else:
+        studio.sh(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", f"{total:.2f}", str(narr)])
+    m, _ = sound.build(total, [(0, total, trip.get("music", "hope"))], [], float(trip.get("music_volume", 1.4)))
+    sound.write_wav(work / "music.wav", m)
+    fc = ("[1:a]aresample=44100,asplit=2[va][vb];[2:a]aresample=44100[m];"
+          "[m][va]sidechaincompress=threshold=0.015:ratio=8:attack=15:release=400[md];"
+          f"[vb][md]amix=inputs=2:duration=first:normalize=0,afade=t=out:st={max(0, total - .6):.2f}:d=0.6,"
+          "loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[aout]")
+    for (nm, _), endseg in zip(ends, endsegs):
+        lst = work / f"{nm}.txt"
+        lst.write_text("".join(f"file '{Path(x).resolve()}'\n" for x in body + [endseg]))
+        out = outd / f"{nm}.mp4"
+        studio.sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst), "-i", str(narr), "-i", str(work / "music.wav"),
+                   "-filter_complex", fc, "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac", "-b:a", "160k",
+                   "-t", f"{total:.2f}", "-movflags", "+faststart", str(out)])
+        print(f"  ✔ {out} ({total:.1f}초)")
+    studio.sh(["ffmpeg", "-y", "-ss", "0.3", "-i", str(outd / "short.mp4"), "-frames:v", "1", "-q:v", "3", str(outd / "cover.jpg")])
+    if not os.environ.get("STUDIO_KEEP_WORK"):
+        for x in segs:
+            Path(x).unlink(missing_ok=True)
+
+
+def cmd_reel(trip, root, fpath=None):
+    """세로 쇼츠·릴스·틱톡 (인스타 스타일): 움직이는 사진을 끊김 없이 이어 붙이고 마지막 컷에만 안내 문구"""
+    fpath = studio.find_font(fpath)
+    trip["_root"] = str(root)
+    work, outd = root / "work", root / "output"
+    work.mkdir(exist_ok=True)
+    outd.mkdir(exist_ok=True)
+    plan = insta_plan(trip)
+    if len(plan) < 2:
+        sys.exit("인스타 스타일은 사진 2장 이상이 필요합니다")
+    did = trip.get("deal_id", "?")
+    note = f"가격 {trip.get('price_checked', '')} 기준 · 광고" if trip.get("price") else "광고"
+    ends = [("short", f"{trip.get('name', '')}\n프로필 링크 {did}번")] + \
+           [(f"short_{n}", f"{trip.get('name', '')}\n{cta}") for n, cta in variants(trip)]
+    end_secs = max(2.4, plan[-1][2])
+    jobs = [(trip, sh, k, text, sc, work / f"r{k:02d}.mp4", fpath, (W, H), None) for k, (sh, text, sc) in enumerate(plan[:-1])]
+    for name, cta in ends:
+        jobs.append((trip, plan[-1][0], len(plan) - 1, cta, end_secs, work / f"r_end_{name}.mp4", fpath, (W, H), note))
+    total = sum(sc for _, _, sc in plan[:-1]) + end_secs
+    print(f"[세로 영상] 컷 {len(plan)}개 · {total:.1f}초 · 판 {len(ends)}개")
+    with ProcessPoolExecutor(max(1, min(len(jobs), os.cpu_count() or 2))) as ex:
+        segs = list(ex.map(insta_job, jobs))
+    body, endsegs = segs[:len(plan) - 1], segs[len(plan) - 1:]
+    music = trip.get("music", "hope")
+    m, _ = sound.build(total, [(0, total, music)], [], float(trip.get("music_volume", 2.2)))
+    sound.write_wav(work / "music.wav", m)
+    for (name, _), endseg in zip(ends, endsegs):
+        lst = work / f"{name}.txt"
+        lst.write_text("".join(f"file '{Path(x).resolve()}'\n" for x in body + [endseg]))
+        out = outd / f"{name}.mp4"
+        studio.sh(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(lst), "-i", str(work / "music.wav"),
+                   "-map", "0:v", "-map", "1:a", "-c:v", "copy",
+                   "-af", f"afade=t=in:d=0.3,afade=t=out:st={max(0, total - .8):.2f}:d=0.8,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100",
+                   "-c:a", "aac", "-b:a", "160k", "-t", f"{total:.2f}", "-movflags", "+faststart", str(out)])
+        print(f"  ✔ {out} ({total:.1f}초)")
+    studio.sh(["ffmpeg", "-y", "-ss", "0.3", "-i", str(outd / "short.mp4"), "-frames:v", "1", "-q:v", "3", str(outd / "cover.jpg")])
+    if not os.environ.get("STUDIO_KEEP_WORK"):
+        for x in segs:
+            Path(x).unlink(missing_ok=True)
 
 
 def cmd_lint(trip, root, fpath=None):
@@ -603,7 +931,7 @@ def cmd_sample():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["sample", "lint", "render", "kit", "deal", "all"])
+    ap.add_argument("cmd", choices=["sample", "lint", "render", "carousel", "kit", "deal", "all"])
     ap.add_argument("trip", nargs="?")
     ap.add_argument("--font")
     a = ap.parse_args()
@@ -620,12 +948,14 @@ def main():
             sys.exit("점검 오류를 먼저 고치세요")
         cmd_deal(trip, root, path=a.trip) if not trip.get("deal_id") and not trip.get("sample") else None  # 번호 먼저 확정 (영상에 표시)
         cmd_render(trip, root, a.font)
+        if trip.get("carousel", trip.get("style", "voice") == "insta"):
+            cmd_carousel(trip, root, a.font)
         cmd_kit(trip, root)
         cmd_deal(trip, root, path=a.trip)
         return
     if a.cmd == "deal":
         return cmd_deal(trip, root, path=a.trip)
-    {"render": cmd_render, "kit": cmd_kit}[a.cmd](trip, root, a.font)
+    {"render": cmd_render, "carousel": cmd_carousel, "kit": cmd_kit}[a.cmd](trip, root, a.font)
 
 
 if __name__ == "__main__":

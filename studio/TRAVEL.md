@@ -3,6 +3,21 @@
 2026-10-07 시작. 여행지·숙소·투어 쇼츠를 만들어 **마이리얼트립 · 여기어때 · 쿠팡 파트너스** 제휴 링크로 수익을 냅니다.
 도구는 `tools/travel.py`, 링크 페이지는 `/trip/` (https://gyeoltaro.github.io/trip/) 입니다.
 
+## 채널 이름: 숙소찜 (2026-10-08 확정)
+- 유튜브·인스타·틱톡·링크 페이지 모두 **숙소찜**. 기존 유튜브 채널(@yeogijjim, 구독 48)은 이름과 핸들만 바꿔서 계속 사용
+- 핸들 후보 **@sukjjim** — 2026-10-08 확인: 유튜브 비어 있음, 틱톡 비어 있음, 인스타는 앱에서 확인 필요
+- 도메인 **sukjjim.com** 등록 가능(2026-10-08 RDAP 확인). 사면 틱톡 화면에 `sukjjim.com/23` 처럼 짧게 표시 → `site_label`
+- '여기찜'을 바꾼 이유: 제휴사 '여기어때'와 앞부분이 같아 상표 혼동 우려
+- 캐릭터: **하루** (하룻밤 묵을 곳을 골라 주는 사람) · 성우: 밝은 여성 (Google Chirp3-HD Aoede, `voice.gvoice`) · `trip.json` 의 `persona`(기본 "하루")
+- 말투: "하루가 찜해 둔 숙소예요", 영상 마지막 대사 예) "하루가 찜한 숙소, 프로필 링크 23번이에요"
+
+**프로필에 넣을 문구**
+| 어디 | 이름 | 소개 |
+|---|---|---|
+| 유튜브 | 숙소찜 하루 | 하루가 찜해 둔 국내 숙소를 소개합니다 🏠 / 영상 속 번호 → 프로필 링크에서 바로 찾기 / ※ 일부 링크는 제휴 링크로, 예약 시 수수료를 받을 수 있습니다 |
+| 인스타 | 숙소찜 하루 \| 국내 숙소 추천 | 하루가 찜해 둔 숙소 🏠 / 💬 댓글 남기면 숙소 링크 DM / ※ 제휴 링크 포함 (광고) |
+| 틱톡 | 숙소찜 하루 | 하루가 찜해 둔 국내 숙소 🏠 / 영상 속 번호로 찾기 (제휴 링크 포함) |
+
 ## 한눈에 보기
 ```
 사진 3~6장 (또는 AI 영상 클립) + 대사 4~6줄 ─▶ travel.py all ─▶ short.mp4 (15~30초, 9:16)
@@ -97,6 +112,68 @@
 - 주소를 화면에 적어야 하므로 **짧은 도메인**이 있으면 훨씬 좋습니다 (예: `○○trip.kr/1`). 도메인을 사면 `"site_label"` 에 적으세요.
 - 업로드할 때: 더보기 → **콘텐츠 공개(브랜드 콘텐츠)** 켜기, 캡션 첫 줄 `[광고]`, AI 영상 클립을 썼으면 'AI 생성 콘텐츠' 라벨. 키트에 틱톡 캡션이 나옵니다.
 
+## 살아 있는 사진 + 인스타 영상 묶음 (2026-10-08 추가)
+벤치마킹(`research/ig-heo.jinny.gogo/insights.md`)에서 가장 잘 된 형식은 **1~2초짜리 움직이는 사진 8~13장을 묶은 인스타 캐러셀**이었습니다.
+
+**사진을 실제로 움직이는 듯하게** (`tools/animate.py`, 무료 · 이 컴퓨터에서 처리)
+- 깊이 추정 AI(Depth Anything V2 small)로 가까운 것과 먼 것을 나눠, 카메라가 다가가거나 옆으로 흐르는 **3D 입체감**을 줍니다.
+- **하늘은 구름이 흐르고, 물은 일렁이고, 밤하늘 별은 반짝입니다** (자동 인식). 컷별 `"fx": "none"` 으로 끄거나 `"sky,water,stars"` 중 골라 쓰기.
+- 쇼츠·릴스·틱톡 영상과 영상 묶음 모두 기본으로 적용됩니다. 끄려면 `"live": false` (예전 줌·패닝).
+- 한계: 사람·폭포처럼 '스스로 움직이는 것'은 만들지 못합니다. 그런 장면은 구글 Flow·Veo, Kling 같은 AI 영상 도구로 만든 mp4 를 `"clip"` 으로 넣으세요 (권리가 있는 사진으로만, 업로드 때 AI 표시).
+- 첫 실행 때 모델(약 100MB)을 자동으로 받습니다. 필요: `pip install onnxruntime opencv-python-headless`
+
+**인스타 영상 묶음** (`travel.py carousel`, `all` 에 포함)
+- `output/carousel/01.mp4 …` — 4:5(1080×1350), 장당 2초(`carousel_secs`), 무음, 왼쪽 위 브랜드(`brand`, 기본 "숙소찜")
+- 1장: 후크 2줄 (`hook`) + 오른쪽 위 "광고" · 2~3장: 짧은 설명 (`shots[].card`, 2줄은 `\n`) · 나머지: 글씨 없이 장면만
+- 인스타 앱에서 여러 개 선택 → 01부터 순서대로 → 캡션은 키트에서 복사
+- 사진은 8~10장이 좋습니다 (`carousel_shots` 로 쇼츠와 다른 사진 목록을 줄 수도 있음)
+
+**벤치마킹 캡션 틀** — `points`(✔️ 포인트 3~4개)를 넣으면 키트가 「후크 → 본문 → ✔️ 포인트 → 안내」 순서로 캡션을 만듭니다.
+**아무 댓글 → 자동 DM**: `"dm_keyword": "*"` → "아무 댓글이나 남겨주세요" 안내, 끝 화면 "댓글 남기면 숙소 링크 DM", 자동 DM 도구는 '모든 댓글' 트리거.
+
+## 인스타 스타일이 기본 (2026-10-08, 사용자 피드백 "편집 장면이 부자연스럽다")
+벤치마킹 영상 40컷의 카메라 움직임을 측정해서(광류 분석) 그대로 맞췄습니다.
+
+| 항목 | 벤치마킹 실측 | 지금 설정 |
+|---|---|---|
+| 컷 길이 | 1.2~2.2초 (중간값 1.6초) | 1.6초 (`carousel_secs`), 글이 있는 장은 읽을 만큼 |
+| 움직임 | 처음부터 일정한 속도로 움직이는 중 | 가속·감속 없이 일정 속도 (긴 영상의 중간을 자른 느낌) |
+| 확대 | 컷당 3~9% (드론처럼 들어가는 컷은 20~50%) | `push` 약 5%, `fly` 약 30% |
+| 옆 이동 | 초당 화면 폭의 3~4% | `left`/`right` 4.5% (가까운 것이 더 빨리) |
+| 기울기 | 0.5~5도 | 0.4~2도 + 아주 약한 흔들림 |
+| 소리 | 묶음은 무음, 효과음 없음 | 묶음 무음 · 세로 영상은 잔잔한 음악만 |
+| 글씨 | 흰 글씨 + 그림자, 1장 후크 · 2~3장 설명 · 왼쪽 위 로고 | 같음 (`brand`) |
+
+- `"style": "insta"`(기본): 세로 영상(`short*.mp4`)도 묶음과 같은 방식 — 음성 없이 움직이는 사진 + 글씨 + 음악, 마지막 컷에만 숙소명과 안내(프로필 링크 N번 / 댓글 DM / 틱톡 주소)
+- `"style": "classic"`: 예전 방식(음성 해설, 구절 자막, 후크 고정, 끝 안내 상자)
+- 컷별 움직임 `motion`: `push`(다가감) · `left`/`right`(옆으로) · `up`(위로) · `orbit`(돌아감) · `fly`(쭉 들어감 — 천장 창·복도·입구에) — 지정하지 않으면 돌아가며 자동
+
+## AI 영상 클립으로 만들기 (B안, 2026-10-08 — 벤치마킹 수준)
+사진만 움직이는 방식(위)은 카메라 이동과 구름·물결까지만 됩니다. 벤치마킹 계정처럼 공간 안으로 들어가는 영상은 **AI 영상 앱**(구글 Flow, Kling 등)에서 사진마다 클립을 만들고, 이 도구로 이어 붙입니다.
+
+**앱 설정**: 이미지→영상, 비율 **9:16**, 길이 5초, 화질 가장 높게. 사진은 큰 원본으로.
+**프롬프트** (영어가 더 잘 됨 · 끝에 꼭 `realistic, keep the original details, no new objects, no people, no text`)
+| 사진 | 프롬프트 |
+|---|---|
+| 외관 | `slow cinematic drone push-in toward the hotel at dusk, warm window lights, gentle camera rise` |
+| 수영장 | `slow dolly forward along the rooftop pool, gentle water ripples and reflections, soft sunlight` |
+| 객실 | `smooth slow camera glide into the room toward the window, curtains gently moving` |
+| 창가 뷰 | `slow push-in toward the window and the harbor view, subtle parallax` |
+| 욕실·실내 | `slow lateral slide across the room, soft light` |
+| 야경·별 | `slow tilt up to the night sky, twinkling stars, gentle breeze` |
+
+**영상 1개로 여러 컷**: Flow 무료는 하루 약 5개라, AI 영상 1개(8초)에서 2~3컷을 잘라 씁니다. 같은 `clip` 을 여러 번 쓰고 `start`(몇 초부터), `zoom`(1.2~1.6 = 가까이), `focus`([가로, 세로] 0~1 = 어디를 크게)를 다르게 주면 다른 장면처럼 보입니다. 예) AI 영상 4개 + 사진 3장(움직이는 사진) = 7~10컷.
+**넣는 법**: 클립을 `photos/` 에 넣고 `trip.json` 의 컷을 `{"clip": "photos/pool.mp4", "card": "…"}` 로. AI 영상은 처음 0.5초쯤 멈춰 있어서 0.8초부터 씁니다(`start` 로 조정). 사진 컷과 섞어 써도 됩니다.
+**주의**: 실제 숙소에 없는 것(없는 수영장·바다·은하수)이 생기면 그 클립은 버립니다 (기만 광고). 업로드 때 유튜브 '합성 콘텐츠: 예', 인스타 'AI 정보' 표시.
+
+## 기본 방식 = 처음 벤치마킹(뉴머니) 그대로 (2026-10-08 확정)
+사용자 결정: 인스타 허지니 스타일이 아니라 **처음 유튜브 영상 방식**을 따른다.
+1. 숙소 사진 1장씩 → **구글 Flow**(영상에서 쓴 도구)로 AI 영상 클립 만들기 — 사용자가 휴대폰에서 (아래 'AI 영상 클립으로 만들기' 프롬프트)
+2. Claude: 대사 작성(`shots[].line`) → **성우 목소리**(Google Chirp3-HD) → 구절 자막 → 잔잔한 음악(목소리 나올 때 작아짐)
+3. 끝 컷에 숙소명 + 플랫폼별 안내(프로필 링크 N번 / 댓글 DM / 틱톡 주소), 영상 내내 작은 "광고" 표시
+
+`"style": "voice"`(기본) · `"insta"`(무음 묶음 스타일) · `"classic"`(예전 스타일). 컷은 `clip`(AI 영상) 또는 `img`(사진 — 움직이는 사진으로 대체).
+
 ## 영상 공식 (travel.py 기본값)
 | 구간 | 내용 |
 |---|---|
@@ -135,7 +212,10 @@ git add trip studio/projects/busan-ocean && git commit -m "Add busan-ocean" && g
 | `music` | `hope`/`warm`/`calm` … · `music_volume` |
 | `voice` | `gvoice`(Google Chirp3-HD 음성), `edge`, `rate` |
 | `publish` | `title`, `description`, `hashtags` |
-| `dm_keyword` | 인스타 댓글 자동 DM 키워드 → `short_ig.mp4` + DM 설정값 |
+| `dm_keyword` | 인스타 댓글 자동 DM 키워드 (`"*"` = 아무 댓글) → `short_ig.mp4` + DM 설정값 |
+| `brand`, `points`, `shots[].card`, `carousel_secs`, `carousel_shots`, `carousel` | 인스타 영상 묶음 (위 '살아 있는 사진' 참고) |
+| `live`, `shots[].fx` | 움직이는 사진 켜기/끄기, 효과 고르기 |
+| `style` | `voice`(기본, 성우 내레이션) / `insta`(무음) / `classic` |
 | `tiktok`, `tiktok_dm_keyword`, `tiktok_bio`, `site_label` | 틱톡용 `short_tt.mp4` 끝 안내 (위 표) |
 | `deal_id` | 비워 두면 `all`/`deal` 이 새 번호를 매기고 기록 |
 | `video_url` | 올린 뒤 쇼츠 주소 (선택) |
