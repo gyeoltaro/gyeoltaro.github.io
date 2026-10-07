@@ -8,8 +8,6 @@ fi
 
 # 파이썬 패키지 (Pillow: 그림, edge-tts: 음성)
 python3 -c "import PIL, edge_tts, numpy" 2>/dev/null || pip install -q pillow edge-tts numpy
-# 사진을 움직이는 영상으로(studio/tools/animate.py): 깊이 추정 모델 실행용. 실패해도 줌·패닝으로 대체되므로 계속 진행
-python3 -c "import onnxruntime, cv2" 2>/dev/null || pip install -q onnxruntime opencv-python-headless || true
 
 # apt 패키지: 썸네일용 굵은 한글 폰트(Noto Sans CJK Black), 오프라인 대체 음성(espeak-ng)
 need=()
