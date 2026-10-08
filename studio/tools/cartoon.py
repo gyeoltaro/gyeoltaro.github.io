@@ -660,6 +660,17 @@ class Renderer:
             d.rounded_rectangle([(w - ew) / 2 - 36 * u, ey - 16 * u, (w + ew) / 2 + 36 * u, ey + 92 * u], radius=int(26 * u),
                                 fill=(255, 213, 60), outline=OUT, width=max(3, int(5 * u)))
             d.text(((w - ew) / 2, ey), end_text, font=ef, fill=(20, 20, 28))
+            # 쇼츠 화면 왼쪽 아래 '관련 동영상' 버튼을 가리키는 화살표 (쇼츠 → 본편 유입)
+            af = heavy_font(46 * u, self.font_path)
+            msg = "아래 링크 누르면 결말"
+            mw = d.textlength(msg, font=af)
+            mx, my = int(w * .06), int(h * .77)
+            d.rounded_rectangle([mx - 18 * u, my - 12 * u, mx + mw + 18 * u, my + 70 * u], radius=int(20 * u),
+                                fill=(230, 40, 40), outline=OUT, width=max(3, int(4 * u)))
+            d.text((mx, my), msg, font=af, fill="white")
+            ax_, ay0, ay1 = mx + 40 * u, my + 80 * u, int(h * .88)
+            d.rectangle([ax_ - 14 * u, ay0, ax_ + 14 * u, ay1 - 40 * u], fill=(255, 213, 60), outline=OUT, width=max(2, int(4 * u)))
+            d.polygon([(ax_ - 44 * u, ay1 - 44 * u), (ax_ + 44 * u, ay1 - 44 * u), (ax_, ay1 + 10 * u)], fill=(255, 213, 60), outline=OUT)
         if text and vertical and caption == "pop":  # 쇼츠 자막: 크고 굵은 구절, 상자 없이 테두리, 숫자는 노랑
             cf = heavy_font(80 * u, self.font_path)
             words = text.split()
