@@ -368,13 +368,18 @@ def _render_job(job):
         _RDR.frame(**kw).save(png, compress_level=1)
 
 
+def vwho(ln):
+    """대사 음성의 주인: 보통은 말하는 사람, "voice" 가 있으면 그 인물 목소리로 해설 (예: 2부는 할머니 시점 해설)"""
+    return ln.get("voice") or ln.get("who", "narrator")
+
+
 def prefetch_audio(proj, root, scene_ids):
     """모든 대사 음성을 동시에 미리 생성(캐시에 저장). 이후 speak() 는 캐시만 읽음"""
     todo = []
     for si in scene_ids:
         sc = proj["scenes"][si]
         if is_cartoon(proj, sc):
-            todo += [(ln.get("who", "narrator"), ln["text"]) for ln in scene_lines(sc)]
+            todo += [(vwho(ln), ln["text"]) for ln in scene_lines(sc)]
         else:
             todo.append(("narrator", sc["narration"]))
     t0 = time.time()
@@ -459,7 +464,7 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
     t_scene = 0.0
     for li, ln in enumerate(lines):
         who = ln.get("who", "narrator")
-        mp3, secs = speak(proj, root, who, ln["text"])
+        mp3, secs = speak(proj, root, vwho(ln), ln["text"])
         if ln.get("sfx"):
             events.append((t_scene, ln["sfx"]))
         audios.append(mp3)
@@ -714,7 +719,7 @@ def timeline(proj, root):
         rows.append((t, sc))
         if is_cartoon(p2, sc):
             for ln in scene_lines(sc):
-                t += speak(p2, root, ln.get("who", "narrator"), ln["text"])[1] + 0.18
+                t += speak(p2, root, vwho(ln), ln["text"])[1] + 0.18
         else:
             t += speak(p2, root, "narrator", sc["narration"])[1]
     return rows, t
@@ -893,9 +898,9 @@ def cmd_lint(proj, root, font=None):
     ck = lambda cond, ok, bad: (oks.append(ok) if cond else probs.append(bad))
     scenes = [(i, sc) for i, sc in enumerate(proj["scenes"]) if not sc.get("shorts_only")]
     lines = [ln for _, sc in scenes for ln in scene_lines(sc)]
-    total = sum(est(ln["text"], ln.get("who", "narrator")) for ln in lines)
+    total = sum(est(ln["text"], vwho(ln)) for ln in lines)
     tz = clip_scenes(proj, proj.get("teaser", []))
-    tz_secs = sum(est(ln["text"], ln.get("who", "narrator")) for sc in tz for ln in scene_lines(sc))
+    tz_secs = sum(est(ln["text"], vwho(ln)) for sc in tz for ln in scene_lines(sc))
     total_all = total + tz_secs
     # 1) 길이·구조
     ck(total_all >= 8 * 60 + 10, f"길이 약 {mmss(total_all)} (8분 이상: 중간광고 가능)",
@@ -906,7 +911,7 @@ def cmd_lint(proj, root, font=None):
         for ln in scene_lines(sc):
             if first_beat is None and (ln.get("sfx") or ln.get("emotion") in BEAT_EMO):
                 first_beat = t
-            t += est(ln["text"], ln.get("who", "narrator"))
+            t += est(ln["text"], vwho(ln))
     ck(tz_secs >= 10 or (first_beat is not None and first_beat <= 20), "첫 20초 안에 충격 장면(하이라이트 또는 본편)",
        "첫 20초 안에 충격·반전(효과음 또는 shock/surprised) 대사가 없음")
     # 2) 리듬: 감정 비트 간격·장면 길이·배경 반복
@@ -916,11 +921,11 @@ def cmd_lint(proj, root, font=None):
             if ln.get("sfx") or ln.get("emotion") in BEAT_EMO:
                 gaps.append((t - last, sc.get("title")))
                 last = t
-            t += est(ln["text"], ln.get("who", "narrator"))
+            t += est(ln["text"], vwho(ln))
     gaps.append((t - last, "끝"))
     worst = max(gaps, key=lambda g: g[0])
     ck(worst[0] <= 90, f"감정 비트 최대 간격 {worst[0]:.0f}초", f"{worst[0]:.0f}초 동안 감정 비트 없음('{worst[1]}' 앞) — 60~90초마다 반전·질문·효과음으로 주의 환기")
-    long_sc = [(sc.get("title"), sum(est(l["text"], l.get("who", "narrator")) for l in scene_lines(sc))) for _, sc in scenes]
+    long_sc = [(sc.get("title"), sum(est(l["text"], vwho(l)) for l in scene_lines(sc))) for _, sc in scenes]
     long_sc = [(n, d) for n, d in long_sc if d > 75]
     ck(not long_sc, "장면 길이 모두 75초 이하", "75초 넘는 장면: " + ", ".join(f"{n}({d:.0f}초)" for n, d in long_sc) + " — 나누거나 배경을 바꾸세요")
     same = [scenes[k][1].get("title") for k in range(1, len(scenes)) if scenes[k][1].get("bg") == scenes[k - 1][1].get("bg")]
@@ -937,7 +942,7 @@ def cmd_lint(proj, root, font=None):
     end = " ".join(l["text"] for l in scene_lines(scenes[-1][1]))
     ck("?" in end, "마지막에 댓글 유도 질문", "마지막 장면에 시청자에게 던지는 질문(?)이 없음 — 댓글 유도")
     ck(any(k in end for k in ("창작 사연", "실화")), "끝에 창작/실화 표시", "마지막 장면에 '창작 사연' 또는 '실화' 표시가 없음")
-    ck(sum(est(l["text"], l.get("who", "narrator")) for l in scene_lines(scenes[-1][1])) >= 20, "마지막 장면 20초 이상(최종 화면 자리)", "마지막 장면이 20초 미만 — 최종 화면(다음 영상·구독) 넣을 시간이 부족")
+    ck(sum(est(l["text"], vwho(l)) for l in scene_lines(scenes[-1][1])) >= 20, "마지막 장면 20초 이상(최종 화면 자리)", "마지막 장면이 20초 미만 — 최종 화면(다음 영상·구독) 넣을 시간이 부족")
     # 4) 제목·설명
     pub = proj.get("publish", {})
     title = pub.get("title", proj.get("title", ""))
@@ -950,7 +955,7 @@ def cmd_lint(proj, root, font=None):
     speed = float(proj.get("shorts_speed", 1.25))
     for n, sh_ in enumerate(proj.get("shorts", []), 1):
         ls = [l for sc in clip_scenes(proj, sh_.get("clips") or [[i] for i in sh_.get("scenes", [])]) for l in scene_lines(sc)]
-        secs = sum(est(l["text"], l.get("who", "narrator")) for l in ls) / speed * .93 + .8
+        secs = sum(est(l["text"], vwho(l)) for l in ls) / speed * .93 + .8
         hook = sh_.get("hook", "")
         hl = hook.split("\n")
         ck(15 <= secs <= 35, f"쇼츠{n} 약 {secs:.0f}초", f"쇼츠{n} 약 {secs:.0f}초 — 15~35초 권장(감동 사연 상위권 중앙값 24초)")
