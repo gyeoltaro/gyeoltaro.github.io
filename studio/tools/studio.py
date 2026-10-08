@@ -657,6 +657,9 @@ def cmd_shorts(proj, root, font):
         hook = sh_.get("hook", "")
         if hook:
             first["lines"][0]["_hook_overlay"] = True
+        cta = sh_.get("cta_line", proj.get("shorts_cta_line", "결말은 아래 링크를 눌러서 확인하세요."))
+        if cta:  # 마지막에 말로도 안내 (실측: 쇼츠 → 본편 이동 0.6~3%)
+            last["lines"].append({"who": "narrator", "text": cta})
         last["lines"][-1]["_end_text"] = sh_.get("end_text", "결말은 본편에서 ▶")
         if sh_.get("cover", True) and is_cartoon(proj, first):
             who = sh_.get("hook_who") or next((x for x in (first.get("cast") or []) if x in cast), None)
@@ -765,11 +768,14 @@ def publish_info(proj, root):
     pub.setdefault("made_for_kids", False)
     pub.setdefault("synthetic_media", True)  # 합성 음성 사용
     shorts = []
+    url = pub.get("url")  # 롱폼을 올린 뒤 project.json publish.url 에 넣으면 쇼츠 설명·고정 댓글에 링크가 들어감
     for n, s in enumerate(proj.get("shorts", []), 1):
         title = s.get("title") or s.get("hook") or f"{proj['title']} #{n}"
-        d = s.get("description") or f"{title}\n전체 영상 👉 「{pub['title']}」\n#Shorts " + " ".join(
+        link = f"결말 보기 👉 {url}" if url else f"전체 영상 👉 「{pub['title']}」"
+        d = s.get("description") or f"{title}\n{link}\n#Shorts " + " ".join(
             "#" + x.replace(" ", "") for x in pub["tags"][:3])
-        shorts.append({"file": f"short_{n:02d}.mp4", "title": title[:100], "description": d,
+        shorts.append({"file": f"short_{n:02d}.mp4", "title": title[:100], "description": d, "long_url": url or "",
+                       "pinned_comment": f"이 이야기의 결말은 여기서 볼 수 있어요 👉 {url}" if url else "",
                        "publish_at": s.get("publish_at", ""), "tags": s.get("tags", pub["tags"][:10])})
     return pub, shorts
 
@@ -838,8 +844,9 @@ def cmd_kit(proj, root, font):
     short_blocks = "".join(
         f'<section><h2>숏폼 {i} <small>{s["file"]}</small></h2>' + field("제목", s["title"])
         + field("설명", s["description"], 4)
+        + (field("고정 댓글", s["pinned_comment"], 2) if s.get("pinned_comment") else "")
         + f'<ul class="set"><li>공개: <b>예약</b> · {H.escape(when_ko(s["publish_at"]) or "롱폼 다음 날부터 하루 1개")}</li><li>시청자층: <b>아동용 아님</b> · 합성 콘텐츠: <b>예</b></li>'
-        f'<li><b>관련 동영상</b>: 롱폼을 연결 (쇼츠 → 본편 유입)</li><li>표지: <b>첫 프레임(0초)</b> 그대로</li></ul></section>'
+        f'<li><b>관련 동영상</b>: {H.escape(s["long_url"]) if s.get("long_url") else "롱폼"} 연결 — 꼭 설정 (쇼츠 → 본편 유입의 핵심)</li><li>표지: <b>첫 프레임(0초)</b> 그대로</li></ul></section>'
         for i, s in enumerate(shorts, 1))
     page = f"""<title>업로드 키트 · {H.escape(pub['title'][:30])}</title>
 <style>
