@@ -3,6 +3,9 @@
 `studio/index.html` (GitHub Pages: `/studio/`) 에서 부서별 프롬프트를 복사해 Claude Code 에 붙여넣으면
 Claude 가 만화 콘티 `project.json`(cast·bg·lines) 작성 → 롱폼/숏폼/썸네일 렌더링까지 수행합니다.
 
+## 여행 쇼핑쇼츠 → 숙소찜 저장소로 이동
+여행 숙소 쇼츠 도구(travel.py · animate.py)와 링크 페이지는 2026-10-08 `sukjjim/sukjjim.github.io` 로 옮겼습니다 (https://sukjjim.github.io).
+
 ## 준비
     pip install pillow edge-tts
     sudo apt install ffmpeg fonts-nanum      # 한글 폰트(없으면 --font 로 지정)
