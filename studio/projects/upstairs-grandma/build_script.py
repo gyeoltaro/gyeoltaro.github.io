@@ -214,6 +214,7 @@ proj = {
         ],
     },
     "publish": {
+        "url": "https://youtu.be/ps3Sdkd-bMg",  # 업로드된 롱폼 (쇼츠 설명·고정 댓글 링크)
         "title": TITLE,
         "title_variants": ["“할머니, 지금 몇 시인 줄 아세요?” 석 달 층간소음의 진짜 이유",
                            "읽지도 않고 버린 위층 할머니의 쪽지, 거기엔 이렇게 적혀 있었습니다"],

@@ -140,13 +140,13 @@ const SRC=(p)=>`\n===== 원문 =====\n${p.src||'(여기에 원문이 들어갑�
 const SCHEMA=`project.json 형식 (자막 들어간 사연 만화, 반드시 유효 JSON):
 {"title":"","slug":"","narrator_gvoice":"ko-KR-Chirp3-HD-Aoede",
  "cast":{"jieun":{"name":"지은","gvoice":"ko-KR-Chirp3-HD-Aoede","color":"#ff8a65","hair":"short|long|bun|spiky|none","hair_color":"#3b2a20","accessory":"glasses|bow|none","scale":1}},
- "scenes":[{"title":"장면 제목(좌상단 칩)","bg":"room|living|kitchen|room_night|street|office|bank|cafe|hoesik(회식 고깃집)|warehouse(물류센터)|bakery(빵집)|hallway(아파트 복도)|wedding(결혼식장)|park|night|hospital|memorial|plain","cast":["jieun","dad"],
+ "scenes":[{"title":"장면 제목(좌상단 칩)","bg":"room|living|kitchen|room_night|street|office|bank|cafe|hoesik(회식 고깃집)|warehouse(물류센터)|bakery(빵집)|hallway(아파트 복도)|wedding(결혼식장)|classroom(교실)|mart(마트)|park|night|hospital|memorial|plain","cast":["jieun","dad"],
    "mood":"warm|sad|tense|calm|hope","lying":["dad"],"shorts_only":false,"when":"20년 전(시점 배지)","flashback":true,
    "lines":[{"who":"jieun|dad|narrator","voice":"(선택) 해설을 읽을 인물 id — 시점 전환용","text":"자막이자 대사(45자 이내 구어체)","emotion":"normal|happy|sad|angry|surprised|think|cry|shock","react":{"dad":"think"},"sfx":"ding|thud|whoosh"}]}],
  "teaser":[[장면,시작줄,끝줄]] (0:00 하이라이트 15~30초: 절정 대사 2~4개, 결말은 숨김),
  "publish":{"title":"상황+결과 28~45자","title_variants":["“대사”… + 상황","숫자·비밀 각도"],"description":"요약(따옴표 대사)+{chapters}+질문+창작 표시"},
  "shorts_speed":1.25,"shorts_loop":true,
- "shorts":[{"clips":[[장면,시작줄,끝줄]],"end_text":"결말은 본편에서 ▶","hook":"첫 화면 큰 문구 2줄(\\n, 줄당 10자 내외)","hook_line":"첫 1~2초에 캐릭터가 외칠 후크 대사","hook_who":"jieun","hook_emotion":"shock|cry","hook_tone":"red|blue|gold","hook_prop":{"type":"bankbook|letter|money|phone|photo|sidedish|key|calendar","text":"소품에 적힐 핵심 숫자·단어"}}],
+ "shorts":[{"clips":[[장면,시작줄,끝줄]],"end_text":"결말은 본편에서 ▶","hook":"첫 화면 큰 문구 2줄(\\n, 줄당 10자 내외)","hook_line":"첫 1~2초에 캐릭터가 외칠 후크 대사","hook_who":"jieun","hook_emotion":"shock|cry","hook_tone":"red|blue|gold","hook_prop":{"type":"bankbook|letter|money|phone|photo|sidedish|key|calendar|envelope","text":"소품에 적힐 핵심 숫자·단어"}}],
  "thumbnail":{"text":"2줄","highlight":"노란 강조 줄","badge":"좌상단 빨간 배지","variants":[{"style":"story","tone":"red|blue|gold","face":["jieun","cry|shock|sad"],"prop":{"type":"bankbook","text":"1억 2천만 원"}}]}}
 연출 규칙:
 - 음성은 Chirp3-HD(자연스러움 최상)로 인물마다 다르게: 여성 Aoede·Gacrux·Kore·Leda·Zephyr…, 남성 Charon·Puck·Algieba·Orus… (ko-KR-Chirp3-HD-이름)
@@ -187,7 +187,7 @@ const GROUPS=[
  ]},
  {g:'📣 퍼블리싱·성장본부',teams:[
   {id:'thumb',n:'썸네일팀',e:'🖼',d:'1280x720 썸네일 A/B/C 3종 생성',t:['문구 2줄 + 노란 강조줄','소품(통장·편지·돈) + 빨간 원','오열/충격 얼굴 클로즈업','A·B·C 3종 · 모바일 확인'],
-   p:p=>CTX(p)+`당신은 썸네일팀장입니다. python3 studio/tools/studio.py thumb studio/projects/${p.slug||'<slug>'}/project.json 으로 썸네일 3종(thumbnail.png, thumbnail_b.png, thumbnail_c.png)을 만드세요. 먼저 project.json 의 thumbnail 을 채웁니다: text 는 2줄(\\n 으로 구분, 줄당 4~6자, 호기심·숫자·반전), highlight 는 빨간 박스로 강조할 핵심 단어, badge 는 좌상단 보조 문구(예: '이유 4가지'), 사연 영상은 variants 를 "style":"story"(어두운 드라마 배경 + 감정 얼굴 클로즈업 + 소품 + 빨간 원·화살표)로 3개 만드세요: tone(red/blue/gold), face([캐릭터, cry|shock|sad]), prop({type: bankbook|letter|money|phone|photo|sidedish|key|calendar, text: 호기심을 부르는 숫자·단어}), text/highlight/badge 를 서로 다른 각도(결과·비밀·숫자)로. 소품 문구는 영상 속 실제 반전 정보여야 합니다(낚시 금지). 렌더링 후 이미지를 직접 보고 글자 잘림·캐릭터 잘림·320px 축소 시 가독성을 점검하세요. 3종은 유튜브 '테스트 및 비교'에 올립니다.`},
+   p:p=>CTX(p)+`당신은 썸네일팀장입니다. python3 studio/tools/studio.py thumb studio/projects/${p.slug||'<slug>'}/project.json 으로 썸네일 3종(thumbnail.png, thumbnail_b.png, thumbnail_c.png)을 만드세요. 먼저 project.json 의 thumbnail 을 채웁니다: text 는 2줄(\\n 으로 구분, 줄당 4~6자, 호기심·숫자·반전), highlight 는 빨간 박스로 강조할 핵심 단어, badge 는 좌상단 보조 문구(예: '이유 4가지'), 사연 영상은 variants 를 "style":"story"(어두운 드라마 배경 + 감정 얼굴 클로즈업 + 소품 + 빨간 원·화살표)로 3개 만드세요: tone(red/blue/gold), face([캐릭터, cry|shock|sad]), prop({type: bankbook|letter|money|phone|photo|sidedish|key|calendar|envelope, text: 호기심을 부르는 숫자·단어}), text/highlight/badge 를 서로 다른 각도(결과·비밀·숫자)로. 소품 문구는 영상 속 실제 반전 정보여야 합니다(낚시 금지). 렌더링 후 이미지를 직접 보고 글자 잘림·캐릭터 잘림·320px 축소 시 가독성을 점검하세요. 3종은 유튜브 '테스트 및 비교'에 올립니다.`},
   {id:'seo',n:'SEO팀',e:'🔍',d:'제목·설명·태그·챕터',t:['제목 최종안','설명란(첫 2줄 핵심)','태그/해시태그','챕터 타임스탬프'],
    p:p=>CTX(p)+`당신은 SEO팀장입니다. project.json 기준으로 최종 제목, 설명란(첫 2줄에 핵심 키워드, 챕터 타임스탬프 포함 — 장면 길이는 work 폴더의 mp3 길이로 계산), 태그 15개, 해시태그 3개, 고정댓글을 studio/projects/${p.slug||'<slug>'}/11_publish.md 로 작성하세요. 태그·키워드는 studio/projects/${p.slug||'<slug>'}/00_research.md 와 studio/research/topic-*/report.md 의 '자주 쓰인 단어/태그'에서 실제로 쓰이는 표현을 우선 쓰고, 업로드 요일·시간도 리포트의 상위 영상 타이밍을 근거로 추천하세요.`},
   {id:'upload',n:'업로드·스케줄팀',e:'📅',d:'업로드 키트(휴대폰 복사 업로드) / 심사 후 자동 업로드',t:['publish 정보 채우기','업로드 키트 생성','예약 시간 배치','심사 후 자동 업로드'],

@@ -12,9 +12,9 @@ EMOTIONS = ("normal", "happy", "sad", "angry", "surprised", "think", "cry", "sho
 import os as _os
 _FONT_FOR_BG = next((p for p in ("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
                      if _os.path.exists(p)), None)  # 배경 속 작은 글자(문 호수 등)
-BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "office", "classroom": "office",
+BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "classroom",
             "company": "office", "bar": "hoesik", "restaurant": "hoesik", "bbq": "hoesik", "pub": "hoesik", "outside": "park", "city": "street",
-            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding"}
+            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding", "supermarket": "mart", "store": "mart"}
 DEFAULT_LOOK = {"color": "#ff8a65", "skin": "#ffdcb8", "hair": "short", "hair_color": "#3b2a20"}
 
 
@@ -228,6 +228,44 @@ def draw_bg(w, h, kind, horizon):
             x = int(W * fx)
             d.line([(x, 0), (x, int(hz * .1))], fill=OUT, width=lw)
             d.polygon([(x - int(W * .05), int(hz * .1)), (x + int(W * .05), int(hz * .1)), (x, int(hz * .22))], fill=(255, 236, 180), outline=OUT)
+    elif kind == "classroom":  # 교실: 초록 칠판, 시간표, 창문, 나무 책상 줄
+        grad(d, W, H, 0, hz, (236, 240, 226), (220, 228, 208))
+        d.rectangle([0, hz, W, H], fill=(190, 150, 104))
+        for i in range(1, 8):
+            d.line([(0, hz + (H - hz) * i // 8), (W, hz + (H - hz) * i // 8)], fill=(170, 130, 88), width=lw)
+        d.rectangle([int(W * .24), int(hz * .12), int(W * .76), int(hz * .62)], fill=(52, 96, 70), outline=(150, 110, 70), width=lw * 4)
+        d.rectangle([int(W * .24), int(hz * .62), int(W * .76), int(hz * .66)], fill=(150, 110, 70), outline=OUT, width=lw)
+        for k, ln_ in enumerate(("1교시 국어", "2교시 수학")):
+            nf = ImageFont.truetype(_FONT_FOR_BG, max(10, int(hz * .05))) if _FONT_FOR_BG else None
+            if nf:
+                d.text((int(W * .3), int(hz * (.2 + k * .1))), ln_, font=nf, fill=(236, 240, 230))
+        window(int(W * .82), int(hz * .14), int(W * .97), int(hz * .58))
+        window(int(W * .03), int(hz * .14), int(W * .18), int(hz * .58))
+        for fx in (.06, .3, .54, .78):  # 책상
+            x = int(W * fx)
+            d.rectangle([x, hz - int(hz * .02), x + int(W * .16), hz + int(H * .02)], fill=(214, 170, 110), outline=OUT, width=lw)
+            d.rectangle([x + int(W * .01), hz + int(H * .02), x + int(W * .02), hz + int(H * .08)], fill=(110, 110, 120))
+            d.rectangle([x + int(W * .14), hz + int(H * .02), x + int(W * .15), hz + int(H * .08)], fill=(110, 110, 120))
+    elif kind == "mart":  # 마트 계산대: 진열대 상품, 형광등, 계산대와 컨베이어
+        grad(d, W, H, 0, hz, (246, 248, 250), (230, 234, 238))
+        d.rectangle([0, hz, W, H], fill=(214, 216, 220))
+        for i in range(1, 7):
+            d.line([(0, hz + (H - hz) * i // 7), (W, hz + (H - hz) * i // 7)], fill=(196, 198, 204), width=lw)
+        cols = [(230, 80, 70), (250, 190, 60), (90, 170, 110), (70, 140, 220), (240, 140, 60), (170, 110, 200)]
+        for k in range(3):  # 진열대
+            y = int(hz * (.22 + k * .22))
+            d.rectangle([0, y, W, y + int(hz * .025)], fill=(160, 166, 176), outline=OUT, width=lw)
+            x = int(W * .01)
+            while x < W:
+                bw, bh = int(W * rnd.uniform(.025, .045)), int(hz * rnd.uniform(.08, .15))
+                d.rectangle([x, y - bh, x + bw, y], fill=cols[rnd.randrange(len(cols))], outline=OUT, width=max(2, lw // 2))
+                x += bw + int(W * .006)
+        d.rectangle([0, 0, W, int(hz * .06)], fill=(60, 140, 90))
+        cx0 = int(W * .52)  # 계산대
+        d.rectangle([cx0, hz - int(hz * .2), W, hz + int(H * .03)], fill=(120, 126, 138), outline=OUT, width=lw)
+        d.rectangle([cx0 + int(W * .02), hz - int(hz * .2), W, hz - int(hz * .14)], fill=(40, 42, 48))
+        d.rectangle([int(W * .86), hz - int(hz * .42), int(W * .95), hz - int(hz * .2)], fill=(60, 64, 72), outline=OUT, width=lw)
+        d.rectangle([int(W * .87), hz - int(hz * .4), int(W * .94), hz - int(hz * .3)], fill=(140, 220, 180))
     elif kind == "park":
         grad(d, W, H, 0, hz, (150, 214, 250), (226, 246, 255))
         d.ellipse([int(W * .78), int(H * .06), int(W * .78) + int(H * .13), int(H * .06) + int(H * .13)], fill=(255, 236, 130), outline=OUT, width=lw)
@@ -847,7 +885,7 @@ def _fit_font(d, text, max_w, size, font_path):
 
 
 def prop_image(kind, size, text, font_path):
-    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar"""
+    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar/envelope"""
     W, H = int(size), int(size * .72)
     im = Image.new("RGBA", (W + 20, H + 20), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -935,6 +973,20 @@ def prop_image(kind, size, text, font_path):
             tw = bb[2] - bb[0]
             d.text((o + (W - tw) / 2 - bb[0], o + H * .63 - (bb[1] + bb[3]) / 2), text, font=f, fill=(222, 30, 40),
                    stroke_width=max(2, lw // 2), stroke_fill=(255, 255, 255))
+    elif kind == "envelope":  # 축의금 봉투: 흰 봉투, 빨간 '祝 結婚' 띠, 금액 글씨
+        d.rectangle([o + W * .05, o + H * .06, o + W * .95, o + H * .98], fill=(255, 255, 255), outline=OUT, width=lw)
+        d.polygon([(o + W * .05, o + H * .06), (o + W * .5, o + H * .36), (o + W * .95, o + H * .06)], fill=(244, 244, 246), outline=OUT)
+        d.line([(o + W * .05, o + H * .06), (o + W * .5, o + H * .36), (o + W * .95, o + H * .06)], fill=OUT, width=lw)
+        d.rectangle([o + W * .41, o + H * .4, o + W * .59, o + H * .94], fill=(214, 40, 48))
+        sf = _fit_font(d, "祝", W * .14, H * .22, font_path)
+        d.text((o + W * .5 - d.textlength("祝", font=sf) / 2, o + H * .44), "祝", font=sf, fill=(255, 240, 200))
+        if text:
+            f = _fit_font(d, text, W * .62, H * .26, font_path)
+            bb = d.textbbox((0, 0), text, font=f)
+            tw = bb[2] - bb[0]
+            d.rounded_rectangle([o + (W - tw) / 2 - W * .04, o + H * .7, o + (W + tw) / 2 + W * .04, o + H * .7 + (bb[3] - bb[1]) + H * .08],
+                                radius=int(size * .02), fill=(255, 255, 255), outline=(214, 40, 48), width=lw)
+            d.text((o + (W - tw) / 2 - bb[0], o + H * .74 - bb[1]), text, font=f, fill=(214, 40, 48))
     else:  # photo
         d.rectangle([o, o, o + W, o + H], fill=(255, 255, 255), outline=OUT, width=lw)
         d.rectangle([o + W * .06, o + H * .08, o + W * .94, o + H * .78], fill=(190, 210, 230))
