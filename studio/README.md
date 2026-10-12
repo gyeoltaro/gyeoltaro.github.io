@@ -72,7 +72,7 @@ python3 studio/tools/upload.py upload <project.json>      # 예약 업로드 + �
 ```
 - 2020년 7월 28일 이후 만든 프로젝트는 **YouTube API 심사 전에는 업로드 영상이 비공개로 잠깁니다.** 심사 준비는 `studio/api-audit/README.md`.
 - 개인정보처리방침과 약관 페이지: `studio/legal/privacy.html`, `studio/legal/terms.html`
-, `classroom`(교실, 별칭 school), `mart`(마트 계산대)
+, `classroom`(교실, 별칭 school), `mart`(마트 계산대), `rooftop`(옥탑방 앞 옥상)
 ## 사연 만화 기능
 - 음성: 캐릭터별 `gvoice` 에 Google **Chirp3-HD** 음성(예: `ko-KR-Chirp3-HD-Aoede`, `-Charon`, `-Puck`, `-Gacrux`, `-Kore`)을 지정하면 가장 자연스럽습니다. 해설 목소리는 `narrator_gvoice`.
 - 배경: `hospital`(병실), `memorial`(추모·장례식장) 추가. 별칭 `funeral`, `bank`(=office), `hoesik`(회식 고깃집: 메뉴패·홍등·불판, 별칭 `restaurant`·`bar`·`bbq`), `warehouse`(새벽 물류센터), `bakery`(빵집), `hallway`(아파트 복도), `wedding`(결혼식장)
@@ -90,7 +90,7 @@ python3 studio/tools/upload.py upload <project.json>      # 예약 업로드 + �
 
 ## 후킹 (썸네일 · 숏폼 첫 화면)
 - **감정 표정 추가**: `cry`(ㅠㅠ 눈물 줄기·우는 입), `shock`(큰 흰 눈·이마 그늘선·느낌표)
-- **소품**: `bankbook`(통장+금액), `letter`(편지), `money`(돈다발), `phone`(휴대폰), `photo`, `sidedish`(반찬통+쪽지), `key`(열쇠+이름표), `calendar`(달력+큰 글씨), `envelope`(축의금 봉투) — 빨간 원과 화살표로 시선을 끔
+- **소품**: `bankbook`(통장+금액), `letter`(편지), `money`(돈다발), `phone`(휴대폰), `photo`, `sidedish`(반찬통+쪽지), `key`(열쇠+이름표), `calendar`(달력+큰 글씨), `envelope`(축의금 봉투), `receipt`(영수증 묶음+빨간 도장) — 빨간 원과 화살표로 시선을 끔
 - **사연형 썸네일**: `thumbnail.variants[]` 에 `"style": "story"`, `tone`(red/blue/gold), `face`([캐릭터, 감정]), `prop`
 - **숏폼 첫 화면(후크 카드)**: `shorts[]` 에 `hook`(2줄 큰 문구), `hook_emotion`, `hook_tone`, `hook_prop`. 첫 프레임은 온전한 표지, 0.1초 뒤 펀치 줌, 충격음
 

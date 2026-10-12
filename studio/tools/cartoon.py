@@ -14,7 +14,7 @@ _FONT_FOR_BG = next((p for p in ("/usr/share/fonts/opentype/noto/NotoSansCJK-Bol
                      if _os.path.exists(p)), None)  # 배경 속 작은 글자(문 호수 등)
 BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "classroom",
             "company": "office", "bar": "hoesik", "restaurant": "hoesik", "bbq": "hoesik", "pub": "hoesik", "outside": "park", "city": "street",
-            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding", "supermarket": "mart", "store": "mart"}
+            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding", "supermarket": "mart", "store": "mart", "roof": "rooftop", "oktap": "rooftop"}
 DEFAULT_LOOK = {"color": "#ff8a65", "skin": "#ffdcb8", "hair": "short", "hair_color": "#3b2a20"}
 
 
@@ -341,6 +341,37 @@ def draw_bg(w, h, kind, horizon):
                 d.ellipse([x + math.cos(a) * W * .012 - W * .012, int(hz * .55) + math.sin(a) * W * .012 - W * .012,
                            x + math.cos(a) * W * .012 + W * .012, int(hz * .55) + math.sin(a) * W * .012 + W * .012], fill=(255, 255, 250), outline=OUT)
         d.rectangle([cx - int(W * .2), int(hz * .72), cx + int(W * .2), hz], fill=(120, 90, 66), outline=OUT, width=lw)
+    elif kind == "rooftop":  # 옥탑방 앞 옥상: 저녁 하늘, 먼 아파트, 물탱크, 빨랫줄, 옥탑방 벽·문, 초록 방수 바닥
+        grad(d, W, H, 0, hz, (250, 178, 120), (255, 222, 170))
+        x = 0
+        while x < W:
+            bw, bh = rnd.randint(int(W * .05), int(W * .1)), rnd.randint(int(hz * .12), int(hz * .32))
+            d.rectangle([x, hz - bh, x + bw, hz], fill=(214, 160, 140))
+            x += bw + int(W * .004)
+        tx = int(W * .08)  # 물탱크
+        d.rectangle([tx, int(hz * .3), tx + int(W * .12), int(hz * .62)], fill=(70, 130, 200), outline=OUT, width=lw)
+        d.ellipse([tx, int(hz * .25), tx + int(W * .12), int(hz * .35)], fill=(96, 156, 220), outline=OUT, width=lw)
+        for lx in (tx + int(W * .02), tx + int(W * .1)):
+            d.line([(lx, int(hz * .62)), (lx, hz)], fill=OUT, width=lw * 2)
+        rx0 = int(W * .62)  # 옥탑방 벽 + 문
+        d.rectangle([rx0, int(hz * .18), W, hz], fill=(236, 230, 214), outline=OUT, width=lw)
+        d.polygon([(rx0 - int(W * .03), int(hz * .2)), (W, int(hz * .08)), (W, int(hz * .2))], fill=(90, 120, 150), outline=OUT)
+        d.rectangle([rx0 + int(W * .05), int(hz * .36), rx0 + int(W * .15), hz], fill=(150, 160, 170), outline=OUT, width=lw)
+        d.ellipse([rx0 + int(W * .13), int(hz * .66), rx0 + int(W * .14), int(hz * .66) + int(W * .01)], fill=OUT)
+        window(rx0 + int(W * .2), int(hz * .38), rx0 + int(W * .33), int(hz * .64), sky=(255, 236, 190))
+        y_line = int(hz * .3)  # 빨랫줄과 빨래
+        d.line([(int(W * .22), y_line), (rx0, y_line + int(hz * .04))], fill=OUT, width=lw)
+        for k, col in enumerate(((255, 255, 255), (120, 170, 230), (240, 140, 120), (255, 230, 120))):
+            px = int(W * (.27 + k * .085))
+            py = y_line + int(hz * .01 * k / 2)
+            d.rectangle([px, py, px + int(W * .05), py + int(hz * .16)], fill=col, outline=OUT, width=max(2, lw // 2))
+        d.rectangle([0, hz, W, H], fill=(96, 150, 110))  # 방수 페인트 바닥
+        for i in range(1, 6):
+            d.line([(0, hz + (H - hz) * i // 6), (W, hz + (H - hz) * i // 6)], fill=(84, 134, 98), width=lw)
+        d.rectangle([0, hz - int(hz * .1), int(W * .6), hz - int(hz * .08)], fill=(160, 166, 176), outline=OUT, width=max(2, lw // 2))  # 난간
+        for k in range(13):
+            x = int(W * .6 * k / 12)
+            d.line([(x, hz - int(hz * .09)), (x, hz)], fill=(140, 146, 156), width=lw)
     elif kind == "night":
         grad(d, W, H, 0, hz, (16, 20, 52), (60, 52, 110))
         for _ in range(70):
@@ -885,7 +916,7 @@ def _fit_font(d, text, max_w, size, font_path):
 
 
 def prop_image(kind, size, text, font_path):
-    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar/envelope"""
+    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar/envelope/receipt"""
     W, H = int(size), int(size * .72)
     im = Image.new("RGBA", (W + 20, H + 20), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -987,6 +1018,29 @@ def prop_image(kind, size, text, font_path):
             d.rounded_rectangle([o + (W - tw) / 2 - W * .04, o + H * .7, o + (W + tw) / 2 + W * .04, o + H * .7 + (bb[3] - bb[1]) + H * .08],
                                 radius=int(size * .02), fill=(255, 255, 255), outline=(214, 40, 48), width=lw)
             d.text((o + (W - tw) / 2 - bb[0], o + H * .74 - bb[1]), text, font=f, fill=(214, 40, 48))
+    elif kind == "receipt":  # 상환 영수증 묶음: 겹친 종이 3장 + 맨 위 장에 빨간 도장(text, 예: 완납)
+        for k in (2, 1):
+            d.polygon([(o + W * (.12 + k * .04), o + H * .02 * k), (o + W * (.78 + k * .04), o + H * .02 * k),
+                       (o + W * (.78 + k * .04), o + H), (o + W * (.12 + k * .04), o + H)], fill=(236, 232, 220), outline=OUT)
+        x0, x1 = o + W * .1, o + W * .78
+        d.rectangle([x0, o, x1, o + H * .94], fill=(255, 255, 250), outline=OUT, width=lw)
+        n = 10  # 아래 톱니
+        for k in range(n):
+            a = x0 + (x1 - x0) * k / n
+            d.polygon([(a, o + H * .94), (a + (x1 - x0) / n, o + H * .94), (a + (x1 - x0) / n / 2, o + H)], fill=(255, 255, 250), outline=OUT)
+        hf = _fit_font(d, "영수증", (x1 - x0) * .6, H * .13, font_path)
+        d.text(((x0 + x1) / 2 - d.textlength("영수증", font=hf) / 2, o + H * .05), "영수증", font=hf, fill=OUT)
+        for k in range(5):
+            y = o + H * (.26 + k * .1)
+            d.line([(x0 + W * .06, y), (x1 - W * .06, y)], fill=(190, 190, 196), width=max(2, lw // 2))
+        if text:
+            f = _fit_font(d, text, W * .5, H * .26, font_path)
+            bb = d.textbbox((0, 0), text, font=f)
+            tw, th = bb[2] - bb[0], bb[3] - bb[1]
+            cx, cy = o + W * .62, o + H * .66
+            d.rounded_rectangle([cx - tw / 2 - W * .04, cy - th / 2 - H * .06, cx + tw / 2 + W * .04, cy + th / 2 + H * .06],
+                                radius=int(size * .03), outline=(214, 30, 40), width=lw * 2)
+            d.text((cx - tw / 2 - bb[0], cy - th / 2 - bb[1]), text, font=f, fill=(214, 30, 40))
     else:  # photo
         d.rectangle([o, o, o + W, o + H], fill=(255, 255, 255), outline=OUT, width=lw)
         d.rectangle([o + W * .06, o + H * .08, o + W * .94, o + H * .78], fill=(190, 210, 230))
