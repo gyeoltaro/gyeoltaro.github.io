@@ -1034,13 +1034,15 @@ def prop_image(kind, size, text, font_path):
             y = o + H * (.26 + k * .1)
             d.line([(x0 + W * .06, y), (x1 - W * .06, y)], fill=(190, 190, 196), width=max(2, lw // 2))
         if text:
-            f = _fit_font(d, text, W * .5, H * .26, font_path)
+            f = _fit_font(d, text, W * .44, H * .24, font_path)
             bb = d.textbbox((0, 0), text, font=f)
             tw, th = bb[2] - bb[0], bb[3] - bb[1]
-            cx, cy = o + W * .62, o + H * .66
-            d.rounded_rectangle([cx - tw / 2 - W * .04, cy - th / 2 - H * .06, cx + tw / 2 + W * .04, cy + th / 2 + H * .06],
-                                radius=int(size * .03), outline=(214, 30, 40), width=lw * 2)
-            d.text((cx - tw / 2 - bb[0], cy - th / 2 - bb[1]), text, font=f, fill=(214, 30, 40))
+            cx, cy = o + W * .44, o + H * .66
+            tx, ty = cx - tw / 2 - bb[0], cy - th / 2 - bb[1]
+            x0, y0, x1, y1 = d.textbbox((tx, ty), text, font=f)  # 실제 그려진 글자 기준으로 도장 테두리
+            d.rounded_rectangle([x0 - W * .06, y0 - H * .08, x1 + W * .06, y1 + H * .08],
+                                radius=int(size * .03), fill=(255, 255, 250), outline=(214, 30, 40), width=lw)
+            d.text((tx, ty), text, font=f, fill=(214, 30, 40))
     else:  # photo
         d.rectangle([o, o, o + W, o + H], fill=(255, 255, 255), outline=OUT, width=lw)
         d.rectangle([o + W * .06, o + H * .08, o + W * .94, o + H * .78], fill=(190, 210, 230))
