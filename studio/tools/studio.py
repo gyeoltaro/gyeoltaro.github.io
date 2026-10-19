@@ -495,7 +495,7 @@ def cartoon_segments(proj, sc, root, jobs, size, k, total, hook, chip):
                                             hook_overlay=bool(ln.get("_hook_overlay")),
                                             end_text=ln.get("_end_text"),
                                             tint="flashback" if sc.get("flashback") else None,
-                                            badge=sc.get("when"))))
+                                            badge=sc.get("when"), weather=sc.get("weather"))))
                 states[st] = png
             t, step, pattern = 0.0, 0.16, []
             while t < cdur - 1e-6:

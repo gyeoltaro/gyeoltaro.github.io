@@ -14,7 +14,7 @@ _FONT_FOR_BG = next((p for p in ("/usr/share/fonts/opentype/noto/NotoSansCJK-Bol
                      if _os.path.exists(p)), None)  # 배경 속 작은 글자(문 호수 등)
 BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "classroom",
             "company": "office", "bar": "hoesik", "restaurant": "hoesik", "bbq": "hoesik", "pub": "hoesik", "outside": "park", "city": "street",
-            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding", "supermarket": "mart", "store": "mart", "roof": "rooftop", "oktap": "rooftop"}
+            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding", "supermarket": "mart", "store": "mart", "roof": "rooftop", "oktap": "rooftop", "school_gate": "schoolgate", "gate": "schoolgate"}
 DEFAULT_LOOK = {"color": "#ff8a65", "skin": "#ffdcb8", "hair": "short", "hair_color": "#3b2a20"}
 
 
@@ -372,6 +372,37 @@ def draw_bg(w, h, kind, horizon):
         for k in range(13):
             x = int(W * .6 * k / 12)
             d.line([(x, hz - int(hz * .09)), (x, hz)], fill=(140, 146, 156), width=lw)
+    elif kind == "schoolgate":  # 초등학교 교문 앞: 흐린 하늘, 학교 건물·시계, 담장, 교문 기둥(학교 이름), 인도
+        grad(d, W, H, 0, hz, (176, 190, 204), (214, 222, 230))
+        bx0, bx1 = int(W * .3), int(W * .95)  # 학교 건물
+        d.rectangle([bx0, int(hz * .12), bx1, int(hz * .62)], fill=(232, 214, 186), outline=OUT, width=lw)
+        for r_ in range(3):
+            for c in range(9):
+                x = bx0 + int((bx1 - bx0) * (.04 + c * .107))
+                y = int(hz * (.2 + r_ * .13))
+                d.rectangle([x, y, x + int(W * .045), y + int(hz * .08)], fill=(170, 200, 224), outline=OUT, width=max(2, lw // 2))
+        cx_, cy_, cr = (bx0 + bx1) // 2, int(hz * .06), int(hz * .07)  # 시계탑
+        d.rectangle([cx_ - cr - lw * 4, cy_ - cr, cx_ + cr + lw * 4, int(hz * .14)], fill=(232, 214, 186), outline=OUT, width=lw)
+        d.ellipse([cx_ - cr, cy_ - cr * .8, cx_ + cr, cy_ + cr * 1.2], fill=(255, 255, 255), outline=OUT, width=lw)
+        d.line([(cx_, cy_ + cr * .2), (cx_, cy_ - cr * .5)], fill=OUT, width=lw)
+        d.line([(cx_, cy_ + cr * .2), (cx_ + cr * .45, cy_ + cr * .2)], fill=OUT, width=lw)
+        d.rectangle([0, int(hz * .62), W, hz], fill=(196, 188, 176), outline=OUT, width=lw)  # 담장
+        for x in range(0, W, int(W * .06)):
+            d.line([(x, int(hz * .62)), (x, hz)], fill=(176, 168, 156), width=lw)
+        for gx in (.06, .24):  # 교문 기둥 + 학교 이름판
+            x = int(W * gx)
+            d.rectangle([x, int(hz * .38), x + int(W * .06), hz], fill=(150, 146, 140), outline=OUT, width=lw)
+        d.rectangle([int(W * .12), int(hz * .62), int(W * .24), hz], fill=(110, 116, 124))  # 열린 교문 안쪽
+        d.rectangle([int(W * .07), int(hz * .44), int(W * .29), int(hz * .54)], fill=(255, 255, 250), outline=OUT, width=lw)
+        nf = ImageFont.truetype(_FONT_FOR_BG, max(10, int(hz * .06))) if _FONT_FOR_BG else None
+        if nf:
+            t_ = "햇살초등학교"
+            d.text((int(W * .18) - d.textlength(t_, font=nf) / 2, int(hz * .455)), t_, font=nf, fill=(40, 60, 90))
+        d.rectangle([0, hz, W, H], fill=(150, 150, 156))  # 인도 블록
+        for i in range(1, 6):
+            d.line([(0, hz + (H - hz) * i // 6), (W, hz + (H - hz) * i // 6)], fill=(134, 134, 140), width=lw)
+        for j in range(16):
+            d.line([(W * j // 16, hz), (W * j // 16 - int(W * .03), H)], fill=(134, 134, 140), width=lw)
     elif kind == "night":
         grad(d, W, H, 0, hz, (16, 20, 52), (60, 52, 110))
         for _ in range(70):
@@ -608,10 +639,11 @@ class Renderer:
 
     def frame(self, w, h, *, bg, chars, speaker, emotions, mouth, blink, text, name, name_color,
               chip=None, hook=None, progress=0.0, accent=(255, 213, 79), hook_big=False, lying=(), shot="wide",
-              caption="box", hook_overlay=False, end_text=None, tint=None, badge=None):
+              caption="box", hook_overlay=False, end_text=None, tint=None, badge=None, weather=None):
         """chars: [(id, spec)] / emotions: {id: emo} / hook_big: 숏폼 첫 3초 후크 카드(큰 글씨+폭발 배경)
         lying: 병원 침대에 누운 캐릭터 id 목록 (hospital 배경의 침대 위에 머리+이불로 그림)
-        tint: "flashback" 이면 빛바랜 세피아 톤(회상) / badge: 오른쪽 위 시점 표시(예: "20년 전", "하이라이트")"""
+        tint: "flashback" 이면 빛바랜 세피아 톤(회상) / badge: 오른쪽 위 시점 표시(예: "20년 전", "하이라이트")
+        weather: "rain" 이면 화면을 살짝 어둡게 하고 비스듬한 빗줄기를 그림 (프레임마다 빗줄기 위치가 달라 내리는 것처럼 보임)"""
         vertical = h > w
         horizon = .54 if vertical else .70
         hook_raw = hook  # 큰 후크 문구는 지정한 줄바꿈 그대로
@@ -676,6 +708,16 @@ class Renderer:
             layer = layer.crop((int(x0), int(y0), int(x0 + cw), int(y0 + chh))).resize((w, h), Image.LANCZOS).convert("RGB")
         else:
             layer = layer.reduce(SS).convert("RGB")  # 2배→1배 박스 축소(빠름)
+        if weather == "rain":
+            layer = Image.blend(layer, Image.new("RGB", layer.size, (52, 62, 84)), .28)
+            rain = Image.new("RGBA", layer.size, (0, 0, 0, 0))
+            rd = ImageDraw.Draw(rain)
+            rr = random.Random(f"{text}|{mouth}|{blink}")
+            L_ = layer.height * .07
+            for _ in range(int(layer.width * layer.height / 5200)):
+                x, y = rr.uniform(-L_, layer.width), rr.uniform(-L_, layer.height)
+                rd.line([(x, y), (x + L_ * .28, y + L_)], fill=(220, 232, 255, rr.randint(70, 150)), width=max(1, int(layer.width / 900)))
+            layer = Image.alpha_composite(layer.convert("RGBA"), rain).convert("RGB")
         if tint == "flashback":  # 회상: 채도를 빼고 따뜻한 세피아로 — 시간이 바뀐 걸 한눈에
             sep = ImageOps.colorize(ImageOps.grayscale(layer), (60, 42, 30), (255, 236, 205))
             layer = Image.blend(layer, sep, .55)
@@ -916,7 +958,7 @@ def _fit_font(d, text, max_w, size, font_path):
 
 
 def prop_image(kind, size, text, font_path):
-    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar/envelope/receipt"""
+    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar/envelope/receipt/umbrella"""
     W, H = int(size), int(size * .72)
     im = Image.new("RGBA", (W + 20, H + 20), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -1018,6 +1060,24 @@ def prop_image(kind, size, text, font_path):
             d.rounded_rectangle([o + (W - tw) / 2 - W * .04, o + H * .7, o + (W + tw) / 2 + W * .04, o + H * .7 + (bb[3] - bb[1]) + H * .08],
                                 radius=int(size * .02), fill=(255, 255, 255), outline=(214, 40, 48), width=lw)
             d.text((o + (W - tw) / 2 - bb[0], o + H * .74 - bb[1]), text, font=f, fill=(214, 40, 48))
+    elif kind == "umbrella":  # 노란 어린이 우산(펼침) + 손잡이에 이름표(text)
+        cx, top, r = o + W * .5, o + H * .04, W * .46
+        d.pieslice([cx - r, top, cx + r, top + r * 1.1], 180, 360, fill=(255, 204, 40), outline=OUT, width=lw)
+        for k in range(1, 4):
+            x = cx - r + 2 * r * k / 4
+            d.line([(cx, top + r * .02), (x, top + r * .55)], fill=(220, 160, 20), width=max(2, lw // 2))
+        for k in range(4):  # 우산 끝 물결
+            x = cx - r + 2 * r * k / 4
+            d.chord([x, top + r * .45, x + 2 * r / 4, top + r * .65], 0, 180, fill=(255, 204, 40), outline=OUT, width=lw)
+        d.line([(cx, top + r * .55), (cx, o + H * .86)], fill=OUT, width=lw * 2)
+        d.arc([cx - W * .1, o + H * .76, cx, o + H * .96], 0, 180, fill=OUT, width=lw * 2)
+        if text:
+            f = _fit_font(d, text, W * .42, H * .18, font_path)
+            bb = d.textbbox((0, 0), text, font=f)
+            tw, th = bb[2] - bb[0], bb[3] - bb[1]
+            x0, y0 = cx + W * .04, o + H * .7
+            d.rounded_rectangle([x0, y0, x0 + tw + W * .08, y0 + th + H * .1], radius=int(size * .02), fill=(255, 250, 236), outline=OUT, width=lw)
+            d.text((x0 + W * .04 - bb[0], y0 + H * .05 - bb[1]), text, font=f, fill=(170, 60, 40))
     elif kind == "receipt":  # 상환 영수증 묶음: 겹친 종이 3장 + 맨 위 장에 빨간 도장(text, 예: 완납)
         for k in (2, 1):
             d.polygon([(o + W * (.12 + k * .04), o + H * .02 * k), (o + W * (.78 + k * .04), o + H * .02 * k),
