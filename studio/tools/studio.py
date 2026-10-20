@@ -644,7 +644,8 @@ def cmd_long(proj, root, font):
 def cmd_shorts(proj, root, font):
     """쇼츠: 0.35초 표지(후크 카드) → 곧바로 이야기의 결정적 대사부터 시작(clips 로 장면 일부만) → 끝 안내는 화면에 겹쳐 표시
     shorts[]: clips=[[장면, 시작줄, 끝줄(제외, 생략 시 끝까지)], ...] 또는 scenes=[장면, ...]
-              hook(표지·첫 대사 위 큰 문구), hook_who/hook_emotion/hook_tone/hook_prop(표지), end_text, speed"""
+              hook(표지·첫 대사 위 큰 문구), hook_who/hook_emotion/hook_tone/hook_prop(표지), end_text, speed
+              format: "full" 이면 완결형(이야기가 쇼츠 안에서 끝남, 60~180초) — 보통 shorts_only 압축 장면으로 구성"""
     out = root / "output"
     out.mkdir(exist_ok=True)
     cast = proj.get("cast", {})
@@ -676,8 +677,11 @@ def cmd_shorts(proj, root, font):
         secs = render_video(p2, root, ids, (1080, 1920), out / f"short_{n:02d}.mp4",
                             hook=hook, theme_shift=n, font=font, speed=speed)
         print(f"    {speed}배속 · 표지 0.35초 · {len(clips)}개 구간")
-        if secs > 40:
-            print("  ! 40초 초과: 감동 사연 쇼츠 상위 25% 길이 중앙값은 약 24초(2026-10 조사)입니다. 구간을 줄여 보세요")
+        if sh_.get("format") == "full":  # 완결형: 쇼츠 안에서 이야기가 끝남 (2026-10-19~20 조사: 터진 사연 쇼츠 1~3분)
+            if not 60 <= secs <= 180:
+                print(f"  ! 완결형 쇼츠 {secs:.0f}초: 60~180초 권장(유튜브 쇼츠 최대 3분)")
+        elif secs > 40:
+            print("  ! 40초 초과: 예고형 쇼츠는 20~28초 권장. 이야기를 다 담으려면 \"format\": \"full\" (완결형)로 지정하세요")
 
 
 def cmd_thumb(proj, root, font):
@@ -962,10 +966,13 @@ def cmd_lint(proj, root, font=None):
     speed = float(proj.get("shorts_speed", 1.25))
     for n, sh_ in enumerate(proj.get("shorts", []), 1):
         ls = [l for sc in clip_scenes(proj, sh_.get("clips") or [[i] for i in sh_.get("scenes", [])]) for l in scene_lines(sc)]
-        secs = sum(est(l["text"], vwho(l)) for l in ls) / speed * .93 + .8
+        secs = sum(est(l["text"], vwho(l)) for l in ls) / float(sh_.get("speed", speed)) * .93 + .8
         hook = sh_.get("hook", "")
         hl = hook.split("\n")
-        ck(15 <= secs <= 35, f"쇼츠{n} 약 {secs:.0f}초", f"쇼츠{n} 약 {secs:.0f}초 — 15~35초 권장(감동 사연 상위권 중앙값 24초)")
+        if sh_.get("format") == "full":
+            ck(75 <= secs <= 170, f"쇼츠{n}(완결형) 약 {secs:.0f}초", f"쇼츠{n}(완결형) 약 {secs:.0f}초 — 1분 30초~2분 40초 권장(터진 사연 쇼츠, 최대 3분)")
+        else:
+            ck(15 <= secs <= 35, f"쇼츠{n} 약 {secs:.0f}초", f"쇼츠{n} 약 {secs:.0f}초 — 15~35초 권장(예고형). 이야기를 다 담으려면 format: full")
         ck(hook and len(hl) <= 2 and max(len(x) for x in hl) <= 13, f"쇼츠{n} 후크 2줄", f"쇼츠{n} 후크는 2줄·줄당 13자 이하로: {hook!r}")
         ck(bool(ls) and (ls[0].get("emotion") in BEAT_EMO + ("sad",) or ls[0].get("sfx") or "?" in ls[0]["text"]),
            f"쇼츠{n} 첫 대사 감정 강함", f"쇼츠{n} 첫 대사가 밋밋함 — 갈등·충격 대사로 시작하세요")

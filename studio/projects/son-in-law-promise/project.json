@@ -1,0 +1,1542 @@
+{
+ "title": "12년째 장인을 모시는 사위, 선 자리를 박차고 나간 날 수첩 첫 장을 보고 울었습니다",
+ "slug": "son-in-law-promise",
+ "voice": "ko-KR-InJoonNeural",
+ "narrator_gvoice": "ko-KR-Chirp3-HD-Charon",
+ "cast": {
+  "father": {
+   "name": "장인 오덕수",
+   "gvoice": "ko-KR-Chirp3-HD-Charon",
+   "color": "#6d6a75",
+   "hair": "short",
+   "hair_color": "#c9c3bc",
+   "skin": "#efc6a2",
+   "accessory": "glasses"
+  },
+  "jeonghun": {
+   "name": "사위 정훈",
+   "gvoice": "ko-KR-Chirp3-HD-Fenrir",
+   "color": "#3f8f6b",
+   "hair": "short",
+   "hair_color": "#222222",
+   "skin": "#f6d2b2"
+  },
+  "miyeon": {
+   "name": "미연",
+   "gvoice": "ko-KR-Chirp3-HD-Aoede",
+   "color": "#f48fb1",
+   "hair": "long",
+   "hair_color": "#3a2618",
+   "skin": "#fbdcc4"
+  },
+  "neighbor": {
+   "name": "순자 할머니",
+   "gvoice": "ko-KR-Chirp3-HD-Vindemiatrix",
+   "color": "#9575cd",
+   "hair": "bun",
+   "hair_color": "#d6d0ca",
+   "skin": "#edc4a0"
+  },
+  "eunhee": {
+   "name": "은희",
+   "gvoice": "ko-KR-Chirp3-HD-Erinome",
+   "color": "#4fc3f7",
+   "hair": "bun",
+   "hair_color": "#4a3020"
+  }
+ },
+ "scenes": [
+  {
+   "title": "선 자리",
+   "bg": "cafe",
+   "cast": [
+    "father",
+    "jeonghun",
+    "eunhee"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "일흔넷 된 이 늙은이가, 사위 몰래 선 자리를 만들었습니다."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 이게 뭐예요? 저 선 같은 거 안 봐요.",
+     "emotion": "shock",
+     "react": {
+      "father": "surprised",
+      "eunhee": "surprised"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "father",
+     "text": "앉아 봐라. 은희 씨 좋은 사람이다. 너도 이제 네 인생 살아야지.",
+     "emotion": "sad"
+    },
+    {
+     "who": "jeonghun",
+     "text": "죄송합니다, 은희 씨. 아버님, 저 먼저 들어가 볼게요.",
+     "emotion": "angry",
+     "react": {
+      "eunhee": "sad"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "십이 년 동안 한 번도 언성을 높인 적 없던 사위였어요."
+    },
+    {
+     "who": "narrator",
+     "text": "그날 밤, 저는 사위가 두고 간 낡은 수첩을 열었습니다. 그리고 첫 장에서 손이 멈췄어요."
+    },
+    {
+     "who": "narrator",
+     "text": "제 사위 정훈이 이야기를, 처음부터 해 볼까 합니다."
+    }
+   ],
+   "mood": "tense",
+   "when": "현재"
+  },
+  {
+   "title": "딸의 약속",
+   "bg": "room",
+   "cast": [
+    "father",
+    "miyeon_kid"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "미연이 엄마는 미연이가 일곱 살 때 세상을 떠났어요. 그 뒤로는 저랑 딸, 둘뿐이었죠."
+    },
+    {
+     "who": "miyeon_kid",
+     "text": "아빠, 또 라면이야? 아빠는 맨날 밥을 안 먹어.",
+     "emotion": "angry",
+     "react": {
+      "father": "sad"
+     }
+    },
+    {
+     "who": "father",
+     "text": "아빠는 배가 안 고파서 그래. 미연이나 많이 먹어.",
+     "emotion": "sad"
+    },
+    {
+     "who": "miyeon_kid",
+     "text": "거짓말. 아빠 외로우면 밥 안 먹는 거 다 알아.",
+     "emotion": "sad",
+     "react": {
+      "father": "surprised"
+     }
+    },
+    {
+     "who": "miyeon_kid",
+     "text": "내가 커서 아빠 밥 맨날 해 줄게. 약속!",
+     "emotion": "happy",
+     "react": {
+      "father": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그 꼬마가 자라서, 서른 살에 남자 하나를 데려왔습니다."
+    }
+   ],
+   "mood": "warm",
+   "when": "35년 전",
+   "flashback": true
+  },
+  {
+   "title": "상견례",
+   "bg": "living",
+   "cast": [
+    "father",
+    "jeonghun",
+    "miyeon"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "외동딸 미연이가 처음 데려온 남자가 정훈이었어요. 저는 영 마음에 들지 않았죠."
+    },
+    {
+     "who": "father",
+     "text": "자네, 월급은 얼마나 받나? 우리 미연이 고생시킬 거면 지금 일어나게.",
+     "emotion": "angry",
+     "react": {
+      "jeonghun": "surprised"
+     }
+    },
+    {
+     "who": "miyeon",
+     "text": "아빠! 왜 그래, 진짜.",
+     "emotion": "angry",
+     "react": {
+      "father": "think"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 돈은 많이 못 드려도 따님 평생 웃게 해 드리겠습니다.",
+     "emotion": "happy",
+     "react": {
+      "father": "think"
+     }
+    },
+    {
+     "who": "father",
+     "text": "말은 누가 못 하나. 두고 보겠네.",
+     "emotion": "think"
+    },
+    {
+     "who": "miyeon",
+     "text": "아빠, 정훈 씨가 아빠 혼자 사는 거 걱정돼서 결혼하면 자주 오재.",
+     "emotion": "happy",
+     "react": {
+      "father": "surprised"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그 '두고 보겠네'가, 이렇게 긴 세월이 될 줄은 몰랐습니다."
+    }
+   ],
+   "mood": "warm",
+   "when": "16년 전",
+   "flashback": true
+  },
+  {
+   "title": "병실",
+   "bg": "hospital",
+   "cast": [
+    "miyeon",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "결혼 사 년 만에, 미연이가 아팠어요. 손쓸 수 없는 병이라고 했습니다."
+    },
+    {
+     "who": "miyeon",
+     "text": "정훈 씨, 아빠는 지금 복도에 있지? 잠깐 둘이서만 얘기해.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "응, 아버님 커피 사러 가셨어. 무슨 얘긴데.",
+     "emotion": "cry"
+    },
+    {
+     "who": "miyeon",
+     "text": "부탁이 하나 있어. 꼭 들어줘야 해.",
+     "emotion": "sad"
+    },
+    {
+     "who": "jeonghun",
+     "text": "무슨 부탁이든 다 들어줄게. 그러니까 그런 말 하지 마.",
+     "emotion": "cry",
+     "react": {
+      "miyeon": "sad"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그날 병실 문 너머로 둘이 나눈 이야기를, 저는 십이 년 동안 몰랐습니다."
+    }
+   ],
+   "mood": "sad",
+   "when": "12년 전",
+   "flashback": true,
+   "lying": [
+    "miyeon"
+   ]
+  },
+  {
+   "title": "장례식 다음 날",
+   "bg": "memorial",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "미연이를 보내고 난 다음 날, 저는 사위를 불러 앉혔어요."
+    },
+    {
+     "who": "father",
+     "text": "정훈아, 이제 우리 집에 올 필요 없다. 자네는 아직 젊어.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "father",
+     "text": "장인 노릇 그만하겠네. 자네 인생 살게.",
+     "emotion": "sad"
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 이번 주 토요일에 올게요. 보일러 고치기로 했잖아요.",
+     "emotion": "happy",
+     "react": {
+      "father": "surprised"
+     }
+    },
+    {
+     "who": "father",
+     "text": "내 말 못 들었나? 오지 말라니까.",
+     "emotion": "angry"
+    },
+    {
+     "who": "jeonghun",
+     "text": "미연이가 그랬어요. 아버님 보일러는 겨울 오기 전에 꼭 봐 드리라고요.",
+     "emotion": "sad",
+     "react": {
+      "father": "sad"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그런데 그 토요일, 사위는 공구함을 들고 대문을 두드렸습니다."
+    }
+   ],
+   "mood": "sad",
+   "when": "12년 전"
+  },
+  {
+   "title": "주말마다 오는 사위",
+   "bg": "yard",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그렇게 이 년 동안, 사위는 주말마다 세 시간을 운전해 시골집에 왔어요."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 오늘 김장은 제가 할게요. 앉아 계세요.",
+     "emotion": "happy",
+     "react": {
+      "father": "think"
+     }
+    },
+    {
+     "who": "father",
+     "text": "됐다. 매주 이게 무슨 고생이냐.",
+     "emotion": "angry"
+    },
+    {
+     "who": "jeonghun",
+     "text": "그래서 말인데요, 저 회사를 읍내 지점으로 옮겼어요. 여기서 같이 살게요.",
+     "emotion": "happy",
+     "react": {
+      "father": "shock"
+     }
+    },
+    {
+     "who": "father",
+     "text": "뭐? 이 사람이 정신이 있나! 서울 집은?",
+     "emotion": "shock",
+     "react": {
+      "jeonghun": "happy"
+     },
+     "sfx": "ding"
+    },
+    {
+     "who": "jeonghun",
+     "text": "팔았어요. 아버님 혼자 밥 거르시는 거, 이제 못 보겠어요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "father",
+     "text": "자네가 왜 그렇게까지 하나. 자네는 남이야, 이제.",
+     "emotion": "angry",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "남 아니에요. 아버님은 제 아버지예요.",
+     "emotion": "sad",
+     "react": {
+      "father": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "저는 그날 처음으로, 사위 앞에서 고개를 돌리고 울었습니다."
+    }
+   ],
+   "mood": "warm",
+   "when": "10년 전"
+  },
+  {
+   "title": "마을의 수군거림",
+   "bg": "street",
+   "cast": [
+    "father",
+    "neighbor"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "사위와 산 지 칠 년쯤 됐을 때였어요. 동네에 말이 돌기 시작했습니다."
+    },
+    {
+     "who": "neighbor",
+     "text": "효자 사위 났다고들 하지. 근데 오 영감, 그거 젊은 사람 발목 잡는 거 아녀?",
+     "emotion": "think",
+     "react": {
+      "father": "sad"
+     }
+    },
+    {
+     "who": "father",
+     "text": "내가 잡은 게 아니라, 저 녀석이 안 간다는 거요.",
+     "emotion": "angry"
+    },
+    {
+     "who": "neighbor",
+     "text": "그러니까 더 놓아줘야지. 영감 가고 나면 그 사람은 혼자여.",
+     "emotion": "sad",
+     "react": {
+      "father": "think"
+     }
+    },
+    {
+     "who": "neighbor",
+     "text": "읍내 사람들은 영감이 사위 붙잡고 산다고 수군거려. 듣기 좋은 소리는 아니지.",
+     "emotion": "think",
+     "react": {
+      "father": "angry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그 말이, 가시처럼 가슴에 박혔어요."
+    }
+   ],
+   "mood": "tense",
+   "when": "5년 전"
+  },
+  {
+   "title": "재혼 권유",
+   "bg": "kitchen",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "father",
+     "text": "정훈아, 너 이제 마흔이다. 좋은 사람 만나서 다시 시작해라.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "happy"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님 김치찌개보다 맛있게 끓이는 사람 있으면 생각해 볼게요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "father",
+     "text": "농담하지 말고. 내가 미연이 볼 낯이 없어.",
+     "emotion": "angry",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "미연이는… 아버님 웃으시면 좋아할 거예요. 그거면 돼요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "father",
+     "text": "넌 왜 미연이 얘기만 나오면 말을 돌리냐.",
+     "emotion": "think",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "찌개 식어요, 아버님. 얼른 드세요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "사위는 늘 그렇게 웃으며 넘겼어요. 저는 그게 더 미안했습니다."
+    }
+   ],
+   "mood": "calm",
+   "when": "5년 전"
+  },
+  {
+   "title": "업고 뛴 밤",
+   "bg": "night",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "작년 겨울, 저는 새벽에 화장실에 가다 쓰러졌어요."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님! 아버님, 정신 차리세요!",
+     "emotion": "shock",
+     "react": {
+      "father": "sad"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "narrator",
+     "text": "구급차가 오려면 사십 분이라고 했어요. 사위는 저를 업고 빗길을 뛰었습니다."
+    },
+    {
+     "who": "father",
+     "text": "정훈아… 내려놔라. 너 무릎 다 나간다.",
+     "emotion": "cry",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "안 돼요. 아버님까지 보내면, 저 진짜 혼자예요.",
+     "emotion": "cry"
+    },
+    {
+     "who": "narrator",
+     "text": "응급실 의사가 그러더군요. 조금만 늦었어도 큰일 날 뻔했다고."
+    },
+    {
+     "who": "narrator",
+     "text": "그 말을 듣고, 저는 결심했어요. 이 아이를 이제는 놓아줘야겠다고."
+    }
+   ],
+   "mood": "tense",
+   "when": "1년 전",
+   "weather": "rain"
+  },
+  {
+   "title": "늙은이의 결심",
+   "bg": "park",
+   "cast": [
+    "father",
+    "neighbor"
+   ],
+   "lines": [
+    {
+     "who": "father",
+     "text": "순자 씨, 지난번에 말한 은희 씨 말이오. 한번 자리 좀 만들어 주시오.",
+     "emotion": "think",
+     "react": {
+      "neighbor": "surprised"
+     }
+    },
+    {
+     "who": "neighbor",
+     "text": "정훈이가 알아요? 그 사람 성격에 싫다 할 텐데.",
+     "emotion": "think"
+    },
+    {
+     "who": "father",
+     "text": "모르게 해야지. 그냥 차 한잔하자고 불러낼 거요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "father",
+     "text": "내가 먼저 가면, 그 아이 옆에 누가 있겠소.",
+     "emotion": "cry",
+     "react": {
+      "neighbor": "sad"
+     }
+    },
+    {
+     "who": "neighbor",
+     "text": "그 마음은 알겠소. 근데 영감, 그 사람이 왜 안 떠나는지는 물어봤소?",
+     "emotion": "think",
+     "react": {
+      "father": "think"
+     }
+    },
+    {
+     "who": "father",
+     "text": "물어봐도 웃기만 하오. 그러니 내가 나서야지.",
+     "emotion": "sad"
+    },
+    {
+     "who": "neighbor",
+     "text": "알았소. 은희 씨한테는 내가 잘 말해 두리다. 착한 사람이오.",
+     "emotion": "happy",
+     "react": {
+      "father": "sad"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그렇게 저는 평생 처음으로, 사위를 속였습니다."
+    }
+   ],
+   "mood": "calm",
+   "when": "한 달 전"
+  },
+  {
+   "title": "박차고 나간 사위",
+   "bg": "cafe",
+   "cast": [
+    "father",
+    "jeonghun",
+    "eunhee"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그리고 그날, 찻집에서 사위는 처음으로 저에게 화를 냈어요."
+    },
+    {
+     "who": "eunhee",
+     "text": "괜찮아요, 정훈 씨. 저도 사실 억지로 나온 거예요.",
+     "emotion": "happy",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "은희 씨 탓이 아니에요. 아버님, 저 약속한 게 있어요.",
+     "emotion": "sad",
+     "react": {
+      "father": "surprised"
+     }
+    },
+    {
+     "who": "father",
+     "text": "약속? 무슨 약속을 누구랑 했단 말이냐.",
+     "emotion": "surprised"
+    },
+    {
+     "who": "jeonghun",
+     "text": "…먼저 들어가 볼게요. 죄송합니다.",
+     "emotion": "sad",
+     "react": {
+      "father": "think"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "사위가 앉았던 의자 위에는, 늘 품에 넣고 다니던 낡은 수첩이 떨어져 있었어요."
+    }
+   ],
+   "mood": "tense"
+  },
+  {
+   "title": "수첩 첫 장",
+   "bg": "room_night",
+   "cast": [
+    "father"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "남의 수첩을 보는 건 도리가 아닌 줄 알면서도, 저는 그날 밤 수첩을 열었습니다."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님 혈압약 바뀜. 아침 한 알, 저녁 반 알. 짜게 드시면 안 됨.",
+     "emotion": "normal"
+    },
+    {
+     "who": "jeonghun",
+     "text": "미연이 기일. 아버님이 오늘 처음으로 웃으셨다. 미연아, 봤지?",
+     "emotion": "happy"
+    },
+    {
+     "who": "father",
+     "text": "이건… 미연이 글씨 아니냐.",
+     "emotion": "shock",
+     "sfx": "ding"
+    },
+    {
+     "who": "miyeon",
+     "text": "정훈 씨, 우리 아빠 혼자 두지 마. 아빠는 외로우면 밥을 안 먹어.",
+     "emotion": "sad"
+    },
+    {
+     "who": "father",
+     "text": "미연아… 네가 이걸 부탁했구나. 이 바보 같은 녀석은 그걸 십이 년을 지켰고.",
+     "emotion": "cry"
+    }
+   ],
+   "mood": "sad",
+   "when": "그날 밤"
+  },
+  {
+   "title": "그날의 약속",
+   "bg": "hospital",
+   "cast": [
+    "miyeon",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "miyeon",
+     "text": "아빠를 부탁해. 당신밖에 없어.",
+     "emotion": "cry",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "걱정 마. 아버님은 내가 지킬게. 약속해.",
+     "emotion": "cry"
+    },
+    {
+     "who": "miyeon",
+     "text": "그리고 하나 더. 당신도 꼭 행복해야 해. 좋은 사람 생기면 꼭 만나.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "그건… 아버님이 웃으실 때까지는 못 해.",
+     "emotion": "cry"
+    },
+    {
+     "who": "miyeon",
+     "text": "바보. 그럼 우리 아빠 빨리 웃게 해 줘.",
+     "emotion": "happy",
+     "react": {
+      "jeonghun": "cry"
+     }
+    }
+   ],
+   "mood": "sad",
+   "when": "12년 전 · 병실",
+   "flashback": true,
+   "lying": [
+    "miyeon"
+   ]
+  },
+  {
+   "title": "마주 앉은 밤",
+   "bg": "kitchen",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "새벽녘에 들어온 사위 앞에, 저는 수첩을 내밀었어요."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님… 읽으셨어요?",
+     "emotion": "surprised",
+     "react": {
+      "father": "cry"
+     }
+    },
+    {
+     "who": "father",
+     "text": "이 바보야. 미연이가 너 행복하라는 말도 했다며. 그건 왜 안 지키냐.",
+     "emotion": "cry",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님이랑 사는 게, 지금 제 행복이에요. 진짜예요.",
+     "emotion": "cry"
+    },
+    {
+     "who": "father",
+     "text": "그럼 나도 약속 하나 하자. 내가 밥 잘 먹고 오래 살 테니, 너는 네 인생도 살아라.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "…네, 아버님. 대신 김치찌개는 계속 끓여 주셔야 해요.",
+     "emotion": "happy",
+     "react": {
+      "father": "happy"
+     },
+     "sfx": "ding"
+    },
+    {
+     "who": "father",
+     "text": "그래, 이 녀석아. 짜게는 안 끓이마.",
+     "emotion": "happy",
+     "react": {
+      "jeonghun": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그날 새벽, 저희 둘은 식은 찌개를 데워 마주 앉아 먹었어요. 미연이가 바라던 대로요."
+    }
+   ],
+   "mood": "hope",
+   "when": "그날 새벽"
+  },
+  {
+   "title": "감 따는 날",
+   "bg": "yard",
+   "cast": [
+    "father",
+    "jeonghun",
+    "eunhee"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "일 년이 지났어요. 사위는 여전히 저랑 이 시골집에 삽니다."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 올해 감은 은희 씨가 따 준대요.",
+     "emotion": "happy",
+     "react": {
+      "father": "happy",
+      "eunhee": "happy"
+     }
+    },
+    {
+     "who": "eunhee",
+     "text": "아버님, 곶감 만드는 법은 제가 배워 갈게요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "father",
+     "text": "그래, 천천히들 해라. 나는 하나도 안 급하다.",
+     "emotion": "happy"
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 은희 씨 오면 김치찌개 끓여 주신다고 하셨잖아요. 싱겁게요.",
+     "emotion": "happy",
+     "react": {
+      "father": "happy"
+     }
+    },
+    {
+     "who": "father",
+     "text": "이 녀석, 그 소리는 은희 씨 앞에서 하지 마라.",
+     "emotion": "happy",
+     "react": {
+      "eunhee": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "요즘 사위 수첩 맨 뒷장에는 새 글이 적혀 있어요. 미연아, 아버님이 요즘 자주 웃으셔."
+    }
+   ],
+   "mood": "warm",
+   "when": "1년 뒤"
+  },
+  {
+   "title": "여러분께",
+   "bg": "living",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "자식도 아닌 사위가, 딸과의 약속 하나로 십이 년을 지켜 줬습니다."
+    },
+    {
+     "who": "narrator",
+     "text": "여러분이라면 정훈이처럼 할 수 있었을까요? 장인이었다면 사위를 놓아주셨을까요?"
+    },
+    {
+     "who": "father",
+     "text": "여러분 곁의 고마운 사람에게, 오늘 밥 한 끼 먹었냐고 물어봐 주세요.",
+     "emotion": "happy",
+     "react": {
+      "jeonghun": "happy"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 오늘 저녁은 제가 끓일게요. 싱겁게요.",
+     "emotion": "happy",
+     "react": {
+      "father": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "여러분의 생각을 댓글로 들려주세요. 이 이야기는 실제 사연을 바탕으로 한 것이 아닌, 창작 사연입니다."
+    },
+    {
+     "who": "narrator",
+     "text": "구독과 좋아요는 다음 이야기에 큰 힘이 됩니다."
+    }
+   ],
+   "mood": "warm"
+  },
+  {
+   "title": "선 자리",
+   "bg": "cafe",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "jeonghun",
+     "text": "아버님, 이게 뭐예요? 저 선 안 봐요!",
+     "emotion": "shock",
+     "react": {
+      "father": "surprised"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "narrator",
+     "text": "아내를 먼저 보낸 뒤 십이 년째 저를 모시는 사위. 제가 몰래 선 자리를 만들었습니다."
+    },
+    {
+     "who": "father",
+     "text": "너도 이제 네 인생 살아야지. 내가 먼저 가면 넌 혼자다.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "angry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "십이 년 동안 한 번도 언성을 높인 적 없던 아이가, 그날 처음 화를 냈어요."
+    },
+    {
+     "who": "jeonghun",
+     "text": "저 약속한 게 있어요. 먼저 들어갈게요.",
+     "emotion": "angry",
+     "react": {
+      "father": "think"
+     }
+    }
+   ],
+   "mood": "tense",
+   "shorts_only": true
+  },
+  {
+   "title": "딸의 장례식 다음 날",
+   "bg": "memorial",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "십이 년 전, 하나뿐인 딸을 먼저 보냈어요. 저는 사위에게 이제 오지 말라고 했습니다."
+    },
+    {
+     "who": "father",
+     "text": "자네는 아직 젊어. 장인 노릇 그만하겠네.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 이번 주 토요일에 올게요. 보일러 고치기로 했잖아요.",
+     "emotion": "happy",
+     "react": {
+      "father": "surprised"
+     }
+    }
+   ],
+   "mood": "sad",
+   "shorts_only": true,
+   "when": "12년 전"
+  },
+  {
+   "title": "십이 년",
+   "bg": "yard",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "딸 장례식 다음 날, 이제 오지 말라고 했는데 사위는 토요일마다 공구함을 들고 왔어요."
+    },
+    {
+     "who": "jeonghun",
+     "text": "저 회사 읍내로 옮겼어요. 아버님 혼자 밥 거르시는 거 못 보겠어요.",
+     "emotion": "happy",
+     "react": {
+      "father": "cry"
+     }
+    },
+    {
+     "who": "father",
+     "text": "자네는 남이야, 이제. 왜 이렇게까지 하나.",
+     "emotion": "angry",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "남 아니에요. 아버님은 제 아버지예요.",
+     "emotion": "sad",
+     "react": {
+      "father": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그렇게 사위는 서울 집을 팔고, 이 시골집에 들어와 살았습니다."
+    },
+    {
+     "who": "narrator",
+     "text": "재혼하라고 할 때마다 사위는 웃기만 했어요. 저는 그게 늘 미안했습니다."
+    }
+   ],
+   "mood": "warm",
+   "shorts_only": true,
+   "when": "12년 동안"
+  },
+  {
+   "title": "수첩 첫 장",
+   "bg": "room_night",
+   "cast": [
+    "father"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그날 밤, 사위가 떨어뜨린 낡은 수첩을 열었어요. 첫 장에 딸의 글씨가 있었습니다."
+    },
+    {
+     "who": "miyeon",
+     "text": "정훈 씨, 우리 아빠 혼자 두지 마. 아빠는 외로우면 밥을 안 먹어.",
+     "emotion": "sad",
+     "sfx": "ding"
+    },
+    {
+     "who": "jeonghun",
+     "text": "미연이 기일. 아버님이 오늘 처음으로 웃으셨다. 미연아, 봤지?",
+     "emotion": "happy"
+    },
+    {
+     "who": "father",
+     "text": "미연아… 이 녀석이 그 부탁을 십이 년이나 지켰구나.",
+     "emotion": "cry"
+    }
+   ],
+   "mood": "sad",
+   "shorts_only": true,
+   "when": "그날 밤"
+  },
+  {
+   "title": "마주 앉은 새벽",
+   "bg": "kitchen",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "father",
+     "text": "미연이가 너 행복하라는 말도 했다며. 그건 왜 안 지키냐, 이 바보야.",
+     "emotion": "cry",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님이랑 사는 게 지금 제 행복이에요.",
+     "emotion": "cry"
+    },
+    {
+     "who": "father",
+     "text": "그럼 나는 밥 잘 먹고 오래 살 테니, 너는 네 인생도 살아라.",
+     "emotion": "happy",
+     "react": {
+      "jeonghun": "happy"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "네, 아버님. 대신 김치찌개는 계속 끓여 주셔야 해요.",
+     "emotion": "happy",
+     "react": {
+      "father": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "아내의 부탁 하나로 십이 년을 지킨 사위. 여러분이라면 이 사위를 놓아주셨을까요?"
+    }
+   ],
+   "mood": "hope",
+   "shorts_only": true
+  },
+  {
+   "title": "병실의 부탁",
+   "bg": "hospital",
+   "cast": [
+    "miyeon",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "miyeon",
+     "text": "아빠를 부탁해. 당신밖에 없어.",
+     "emotion": "cry",
+     "react": {
+      "jeonghun": "cry"
+     },
+     "sfx": "ding"
+    },
+    {
+     "who": "jeonghun",
+     "text": "걱정 마. 아버님은 내가 지킬게.",
+     "emotion": "cry"
+    },
+    {
+     "who": "miyeon",
+     "text": "그리고 당신도 꼭 행복해야 해. 좋은 사람 생기면 꼭 만나.",
+     "emotion": "sad",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "아내가 떠나고, 사위는 이 약속을 아무에게도 말하지 않았습니다."
+    }
+   ],
+   "mood": "sad",
+   "shorts_only": true,
+   "when": "12년 전",
+   "lying": [
+    "miyeon"
+   ]
+  },
+  {
+   "title": "처가살이",
+   "bg": "yard",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "장인은 이제 오지 말라고 했지만, 사위는 주말마다 세 시간을 운전해 시골집에 왔어요."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 저 회사를 읍내로 옮겼어요. 여기서 같이 살게요.",
+     "emotion": "happy",
+     "react": {
+      "father": "shock"
+     }
+    },
+    {
+     "who": "father",
+     "text": "이 사람이 정신이 있나! 자네는 남이야, 이제.",
+     "emotion": "angry",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "남 아니에요. 아버님 혼자 밥 거르시는 거, 이제 못 보겠어요.",
+     "emotion": "sad",
+     "react": {
+      "father": "cry"
+     }
+    }
+   ],
+   "mood": "warm",
+   "shorts_only": true,
+   "when": "10년 전"
+  },
+  {
+   "title": "업고 뛴 밤",
+   "bg": "night",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "십이 년 동안 장인 곁을 지킨 사위. 어느 겨울밤, 장인이 쓰러졌어요."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님! 정신 차리세요!",
+     "emotion": "shock",
+     "react": {
+      "father": "sad"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "father",
+     "text": "정훈아, 내려놔라… 너 무릎 다 나간다.",
+     "emotion": "cry",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "안 돼요. 아버님까지 보내면 저 진짜 혼자예요.",
+     "emotion": "cry"
+    },
+    {
+     "who": "narrator",
+     "text": "구급차를 기다릴 수 없어서, 사위는 장인을 업고 빗길을 뛰었습니다."
+    }
+   ],
+   "mood": "tense",
+   "shorts_only": true,
+   "when": "12년 뒤",
+   "weather": "rain"
+  },
+  {
+   "title": "몰래 만든 선 자리",
+   "bg": "cafe",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그날 장인은 결심했어요. 이 아이를 이제는 놓아줘야겠다고. 그리고 몰래 선 자리를 만들었습니다."
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님, 저 약속한 게 있어요. 죄송합니다.",
+     "emotion": "angry",
+     "react": {
+      "father": "surprised"
+     }
+    },
+    {
+     "who": "father",
+     "text": "약속? 무슨 약속을 누구랑 했단 말이냐.",
+     "emotion": "surprised",
+     "react": {
+      "jeonghun": "sad"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그날 밤 장인은 사위가 떨어뜨린 수첩 첫 장에서, 먼저 떠난 딸의 글씨를 발견했습니다."
+    },
+    {
+     "who": "miyeon",
+     "text": "정훈 씨, 우리 아빠 혼자 두지 마. 아빠는 외로우면 밥을 안 먹어.",
+     "emotion": "sad",
+     "sfx": "ding"
+    }
+   ],
+   "mood": "tense",
+   "shorts_only": true
+  },
+  {
+   "title": "새벽의 약속",
+   "bg": "kitchen",
+   "cast": [
+    "father",
+    "jeonghun"
+   ],
+   "lines": [
+    {
+     "who": "father",
+     "text": "이 바보야. 행복하라는 약속은 왜 안 지키냐.",
+     "emotion": "cry",
+     "react": {
+      "jeonghun": "cry"
+     }
+    },
+    {
+     "who": "jeonghun",
+     "text": "아버님이 웃으시는 게 제 행복이에요. 미연이도 그걸 바랐을 거예요.",
+     "emotion": "cry",
+     "react": {
+      "father": "cry"
+     }
+    },
+    {
+     "who": "father",
+     "text": "그럼 같이 지키자. 나는 오래 살고, 너는 네 인생도 살고.",
+     "emotion": "happy",
+     "react": {
+      "jeonghun": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그날 새벽, 장인과 사위는 식은 찌개를 데워 마주 앉아 먹었습니다."
+    },
+    {
+     "who": "narrator",
+     "text": "아내의 부탁 하나로 십이 년을 지킨 사위. 여러분이 장인이었다면, 이 사위에게 뭐라고 하셨을까요?"
+    }
+   ],
+   "mood": "hope",
+   "shorts_only": true
+  }
+ ],
+ "teaser": [
+  [
+   5,
+   3,
+   5
+  ],
+  [
+   0,
+   1,
+   2
+  ],
+  [
+   11,
+   3,
+   5
+  ]
+ ],
+ "shorts_speed": 1.25,
+ "shorts": [
+  {
+   "format": "full",
+   "speed": 1.1,
+   "clips": [
+    [
+     16
+    ],
+    [
+     17
+    ],
+    [
+     18
+    ],
+    [
+     19
+    ],
+    [
+     20
+    ]
+   ],
+   "hook": "12년째 장인 모신\n사위의 비밀",
+   "hook_who": "jeonghun",
+   "hook_emotion": "shock",
+   "hook_tone": "red",
+   "hook_prop": {
+    "type": "notebook",
+    "text": "아빠를 부탁해"
+   },
+   "cta_line": "두 사람의 십이 년, 더 긴 이야기는 아래 본편에서 들려 드릴게요.",
+   "end_text": "더 긴 이야기는 본편에서 ▶",
+   "title": "선 자리를 박차고 나간 사위, 수첩 첫 장에 적힌 아내의 부탁 #시니어사연 #감동사연 #사위 #장인 #인생이야기 #가족이야기",
+   "description": "아내를 먼저 보낸 뒤 12년째 장인을 모시는 사위. 몰래 만든 선 자리를 박차고 나간 날, 장인은 사위의 수첩 첫 장에서 딸의 부탁을 읽게 됩니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#시니어사연 #감동사연 #사위 #장인 #인생이야기 #가족이야기 #Shorts",
+   "publish_at": "2026-10-21T18:10:00+09:00"
+  },
+  {
+   "format": "full",
+   "speed": 1.1,
+   "clips": [
+    [
+     21
+    ],
+    [
+     22
+    ],
+    [
+     23
+    ],
+    [
+     24
+    ],
+    [
+     25
+    ]
+   ],
+   "hook": "아내가 남긴\n마지막 부탁",
+   "hook_who": "miyeon",
+   "hook_emotion": "cry",
+   "hook_tone": "blue",
+   "hook_prop": {
+    "type": "notebook",
+    "text": "아빠를 부탁해"
+   },
+   "cta_line": "장인과 사위의 이야기 전체는 아래 본편에서 볼 수 있어요.",
+   "end_text": "전체 이야기는 본편에서 ▶",
+   "title": "아내가 남긴 마지막 부탁, 사위는 12년을 지켰습니다 #시니어사연 #감동사연 #사위 #장인 #인생이야기 #눈물주의",
+   "description": "아내를 먼저 보낸 뒤 12년째 장인을 모시는 사위. 몰래 만든 선 자리를 박차고 나간 날, 장인은 사위의 수첩 첫 장에서 딸의 부탁을 읽게 됩니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#시니어사연 #감동사연 #사위 #장인 #인생이야기 #가족이야기 #Shorts",
+   "publish_at": "2026-10-22T12:00:00+09:00"
+  },
+  {
+   "clips": [
+    [
+     0,
+     1,
+     4
+    ],
+    [
+     5,
+     3,
+     6
+    ]
+   ],
+   "hook": "선 자리 박차고\n나간 사위",
+   "hook_who": "jeonghun",
+   "hook_emotion": "angry",
+   "hook_tone": "red",
+   "hook_prop": {
+    "type": "notebook",
+    "text": "약속"
+   },
+   "end_text": "사위가 지킨 약속은 본편에서 ▶",
+   "title": "선 자리 박차고 나간 사위 #시니어사연 #감동사연 #사위",
+   "publish_at": "2026-10-22T19:00:00+09:00"
+  },
+  {
+   "clips": [
+    [
+     11,
+     3,
+     6
+    ],
+    [
+     12,
+     0,
+     3
+    ]
+   ],
+   "hook": "사위 수첩\n첫 장의 글씨",
+   "hook_who": "father",
+   "hook_emotion": "cry",
+   "hook_tone": "gold",
+   "hook_prop": {
+    "type": "notebook",
+    "text": "아빠를 부탁해"
+   },
+   "end_text": "두 사람의 결말은 본편에서 ▶",
+   "title": "사위 수첩 첫 장의 글씨 #시니어사연 #감동사연 #사위",
+   "publish_at": "2026-10-23T12:00:00+09:00"
+  }
+ ],
+ "thumbnail": {
+  "text": "12년째 처가살이\n사위의 약속",
+  "highlight": "사위의 약속",
+  "badge": "눈물 주의",
+  "variants": [
+   {
+    "style": "story",
+    "tone": "red",
+    "face": [
+     "father",
+     "cry"
+    ],
+    "prop": {
+     "type": "notebook",
+     "text": "아빠를 부탁해"
+    }
+   },
+   {
+    "style": "story",
+    "tone": "blue",
+    "face": [
+     "jeonghun",
+     "shock"
+    ],
+    "text": "선 자리 박차고\n나간 사위",
+    "highlight": "나간 사위",
+    "badge": "12년의 비밀",
+    "prop": {
+     "type": "notebook",
+     "text": "약속"
+    }
+   },
+   {
+    "style": "story",
+    "tone": "gold",
+    "face": [
+     "jeonghun",
+     "cry"
+    ],
+    "text": "아내의\n마지막 부탁",
+    "highlight": "마지막 부탁",
+    "badge": "끝까지 보세요",
+    "prop": {
+     "type": "notebook",
+     "text": "아빠를 부탁해"
+    }
+   }
+  ]
+ },
+ "publish": {
+  "title": "12년째 장인을 모시는 사위, 선 자리를 박차고 나간 날 수첩 첫 장을 보고 울었습니다",
+  "title_variants": [
+   "“아버님, 저 약속한 게 있어요”… 12년째 장인과 사는 사위가 끝내 숨긴 아내의 부탁",
+   "아내를 먼저 보내고 12년째 처가살이하는 사위, 장인이 몰래 만든 선 자리에서 일어난 일"
+  ],
+  "description": "“아버님, 이게 뭐예요? 저 선 같은 거 안 봐요.” 아내를 먼저 보낸 뒤 12년째 시골에서 장인을 모시는 사위 정훈. 사위의 앞날이 걱정된 장인이 몰래 선 자리를 만들던 날, 사위는 처음으로 화를 내고 자리를 뜹니다. 그날 밤 장인은 사위의 낡은 수첩 첫 장에서 먼저 떠난 딸의 글씨를 발견합니다.\n\n⏱ 챕터\n{chapters}\n\n여러분이라면 정훈이처럼 할 수 있었을까요? 장인이었다면 사위를 놓아주셨을까요? 댓글로 들려주세요.\n\n※ 이 이야기는 창작 사연이며, 등장인물과 사건은 실제와 관련이 없습니다.\n※ AI 음성과 직접 그린 만화로 제작되었습니다.\n#사연 #시니어사연 #감동사연",
+  "tags": [
+   "사연",
+   "시니어사연",
+   "감동 사연",
+   "사위",
+   "장인",
+   "처가살이",
+   "가족 사연",
+   "인생이야기",
+   "사연 만화",
+   "사연 애니메이션",
+   "눈물 사연",
+   "효도",
+   "창작 사연"
+  ],
+  "category": 1,
+  "playlist": "감동 가족 사연",
+  "publish_at": "2026-10-21T18:00:00+09:00",
+  "pinned_comment": "여러분이라면 정훈이처럼 할 수 있었을까요? 장인이었다면 사위를 놓아주셨을까요? 🙏",
+  "made_for_kids": false,
+  "synthetic_media": true
+ }
+}
