@@ -14,7 +14,7 @@ _FONT_FOR_BG = next((p for p in ("/usr/share/fonts/opentype/noto/NotoSansCJK-Bol
                      if _os.path.exists(p)), None)  # 배경 속 작은 글자(문 호수 등)
 BG_ALIAS = {"livingroom": "living", "night_room": "room_night", "bedroom_night": "room_night", "funeral": "memorial", "hospital_room": "hospital", "bank": "office", "home": "room", "house": "room", "bedroom": "room", "school": "classroom",
             "company": "office", "bar": "hoesik", "restaurant": "hoesik", "bbq": "hoesik", "pub": "hoesik", "outside": "park", "city": "street",
-            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding", "supermarket": "mart", "store": "mart", "roof": "rooftop", "oktap": "rooftop", "school_gate": "schoolgate", "gate": "schoolgate", "countryside": "yard", "madang": "yard", "village": "yard"}
+            "road": "street", "evening": "night", "logistics": "warehouse", "factory": "warehouse", "bread": "bakery", "court": "office", "corridor": "hallway", "apartment": "hallway", "wedding_hall": "wedding", "supermarket": "mart", "store": "mart", "roof": "rooftop", "oktap": "rooftop", "school_gate": "schoolgate", "gate": "schoolgate", "countryside": "yard", "madang": "yard", "village": "yard", "library": "study", "den": "study"}
 DEFAULT_LOOK = {"color": "#ff8a65", "skin": "#ffdcb8", "hair": "short", "hair_color": "#3b2a20"}
 
 
@@ -441,6 +441,36 @@ def draw_bg(w, h, kind, horizon):
             y1 = hz + int((H - hz) * .1)
             d.ellipse([x - w_, y1 - int(w_ * 1.5), x + w_, y1], fill=(110, 64, 40), outline=OUT, width=lw)
             d.ellipse([x - int(w_ * .5), y1 - int(w_ * 1.65), x + int(w_ * .5), y1 - int(w_ * 1.35)], fill=(90, 50, 32), outline=OUT, width=lw)
+    elif kind == "study":  # 서재: 짙은 나무 벽, 책장 두 개, 액자(가족사진), 책상 위 스탠드
+        grad(d, W, H, 0, hz, (196, 170, 140), (176, 150, 120))
+        d.rectangle([0, hz, W, H], fill=(120, 84, 60))
+        for i in range(1, 8):
+            d.line([(0, hz + (H - hz) * i // 8), (W, hz + (H - hz) * i // 8)], fill=(104, 72, 50), width=lw)
+        cols = [(150, 60, 50), (60, 90, 140), (200, 170, 90), (70, 120, 80), (120, 70, 110), (190, 120, 60)]
+        for bx0 in (int(W * .03), int(W * .72)):  # 책장
+            bw = int(W * .25)
+            d.rectangle([bx0, int(hz * .08), bx0 + bw, hz], fill=(110, 70, 44), outline=OUT, width=lw)
+            for r_ in range(4):
+                y1 = int(hz * (.28 + r_ * .2))
+                d.rectangle([bx0, y1, bx0 + bw, y1 + int(hz * .025)], fill=(90, 56, 34), outline=OUT, width=max(2, lw // 2))
+                x = bx0 + int(W * .01)
+                while x < bx0 + bw - int(W * .02):
+                    w_ = int(W * rnd.uniform(.012, .022))
+                    h_ = int(hz * rnd.uniform(.11, .16))
+                    d.rectangle([x, y1 - h_, x + w_, y1], fill=cols[rnd.randrange(len(cols))], outline=OUT, width=max(1, lw // 2))
+                    x += w_ + int(W * .002)
+        fx0, fx1 = int(W * .4), int(W * .6)  # 가족사진 액자
+        d.rectangle([fx0, int(hz * .12), fx1, int(hz * .42)], fill=(200, 170, 90), outline=OUT, width=lw)
+        d.rectangle([fx0 + lw * 3, int(hz * .12) + lw * 3, fx1 - lw * 3, int(hz * .42) - lw * 3], fill=(226, 214, 190))
+        for k in range(3):
+            cx_ = fx0 + int((fx1 - fx0) * (.25 + k * .25))
+            r_ = int(W * .018)
+            d.ellipse([cx_ - r_, int(hz * .2), cx_ + r_, int(hz * .2) + 2 * r_], fill=(240, 210, 180), outline=OUT, width=max(1, lw // 2))
+            d.rectangle([cx_ - r_, int(hz * .2) + 2 * r_, cx_ + r_, int(hz * .38)], fill=(120, 110, 130), outline=OUT, width=max(1, lw // 2))
+        d.rectangle([int(W * .3), int(hz * .7), int(W * .7), int(hz * .76)], fill=(96, 60, 38), outline=OUT, width=lw)  # 책상
+        d.rectangle([int(W * .32), int(hz * .76), int(W * .68), hz], fill=(110, 70, 44), outline=OUT, width=lw)
+        d.polygon([(int(W * .62), int(hz * .56)), (int(W * .67), int(hz * .56)), (int(W * .66), int(hz * .48)), (int(W * .63), int(hz * .48))], fill=(60, 120, 80), outline=OUT)
+        d.line([(int(W * .645), int(hz * .56)), (int(W * .645), int(hz * .7))], fill=OUT, width=lw)
     elif kind == "night":
         grad(d, W, H, 0, hz, (16, 20, 52), (60, 52, 110))
         for _ in range(70):
@@ -996,7 +1026,7 @@ def _fit_font(d, text, max_w, size, font_path):
 
 
 def prop_image(kind, size, text, font_path):
-    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar/envelope/receipt/umbrella/notebook"""
+    """소품 그림(RGBA). size = 소품 가로 길이(px). kind: bankbook/letter/money/phone/photo/sidedish/key/calendar/envelope/receipt/umbrella/notebook/will"""
     W, H = int(size), int(size * .72)
     im = Image.new("RGBA", (W + 20, H + 20), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -1098,6 +1128,22 @@ def prop_image(kind, size, text, font_path):
             d.rounded_rectangle([o + (W - tw) / 2 - W * .04, o + H * .7, o + (W + tw) / 2 + W * .04, o + H * .7 + (bb[3] - bb[1]) + H * .08],
                                 radius=int(size * .02), fill=(255, 255, 255), outline=(214, 40, 48), width=lw)
             d.text((o + (W - tw) / 2 - bb[0], o + H * .74 - bb[1]), text, font=f, fill=(214, 40, 48))
+    elif kind == "will":  # 유언장: 흰 문서, 세로 제목 '유언장', 본문 줄, 아래 빨간 인감 도장 + 날짜(text)
+        d.rectangle([o + W * .12, o, o + W * .88, o + H], fill=(255, 253, 244), outline=OUT, width=lw)
+        hf = _fit_font(d, "유 언 장", W * .5, H * .16, font_path)
+        d.text((o + W * .5 - d.textlength("유 언 장", font=hf) / 2, o + H * .05), "유 언 장", font=hf, fill=OUT)
+        for k in range(5):
+            y = o + H * (.32 + k * .09)
+            d.line([(o + W * .2, y), (o + W * .8, y)], fill=(170, 170, 176), width=max(2, lw // 2))
+        r_ = W * .08
+        cx, cy = o + W * .7, o + H * .84
+        d.ellipse([cx - r_, cy - r_, cx + r_, cy + r_], fill=(210, 30, 40), outline=OUT, width=max(2, lw // 2))
+        sf = _fit_font(d, "인", r_ * 1.1, r_ * 1.1, font_path)
+        bb = d.textbbox((0, 0), "인", font=sf)
+        d.text((cx - (bb[0] + bb[2]) / 2, cy - (bb[1] + bb[3]) / 2), "인", font=sf, fill=(255, 245, 240))
+        if text:
+            f = _fit_font(d, text, W * .42, H * .13, font_path)
+            d.text((o + W * .2, o + H * .78), text, font=f, fill=(200, 30, 40))
     elif kind == "notebook":  # 펼친 낡은 수첩: 누런 종이, 가운데 접힌 선, 오른쪽 장에 손글씨(text)
         d.rounded_rectangle([o, o + H * .06, o + W, o + H], radius=int(size * .03), fill=(110, 70, 44), outline=OUT, width=lw)
         for k, (x0, x1) in enumerate(((o + W * .04, o + W * .5), (o + W * .5, o + W * .96))):
