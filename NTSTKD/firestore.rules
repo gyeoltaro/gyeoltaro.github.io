@@ -1,0 +1,94 @@
+rules_version = '2';
+
+// 무한의 격파 랭킹전 보안 규칙 (gyeokpa + worldtkd + hansung + NTSTKD 공용)
+// - 이 프로젝트의 규칙은 하나뿐이라, 모든 도장의 랭킹 규칙을 함께 적어 둡니다.
+//   ranking: https://gyeoltaro.github.io/gyeokpa/
+//   worldtkd_ranking: https://gyeoltaro.github.io/worldtkd/
+//   hansung_ranking: https://gyeoltaro.github.io/hansung/
+//   ntstkd_ranking: https://gyeoltaro.github.io/NTSTKD/
+// - 누구나 랭킹을 읽을 수 있습니다.
+// - 각 기기는 익명 로그인 아이디로 자기 기록(각 도장 컬렉션의 <아이디>) 하나만 쓸 수 있고,
+//   이전보다 높은 점수로만 고칠 수 있습니다.
+// - 닉네임 길이, 점수 범위, 필드 구성이 맞지 않으면 거부합니다.
+// - 기록 삭제는 Firebase 콘솔에서만 할 수 있습니다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ranking/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.keys().hasAll(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.nick is string
+        && request.resource.data.nick.size() >= 1
+        && request.resource.data.nick.size() <= 20
+        && request.resource.data.score is int
+        && request.resource.data.score > 0
+        && request.resource.data.score <= 100000
+        && request.resource.data.belt is int
+        && request.resource.data.belt >= 0
+        && request.resource.data.belt <= 20
+        && request.resource.data.at == request.time
+        && (resource == null || request.resource.data.score > resource.data.score);
+      allow delete: if false;
+    }
+
+    match /worldtkd_ranking/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.keys().hasAll(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.nick is string
+        && request.resource.data.nick.size() >= 1
+        && request.resource.data.nick.size() <= 20
+        && request.resource.data.score is int
+        && request.resource.data.score > 0
+        && request.resource.data.score <= 100000
+        && request.resource.data.belt is int
+        && request.resource.data.belt >= 0
+        && request.resource.data.belt <= 20
+        && request.resource.data.at == request.time
+        && (resource == null || request.resource.data.score > resource.data.score);
+      allow delete: if false;
+    }
+    match /hansung_ranking/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.keys().hasAll(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.nick is string
+        && request.resource.data.nick.size() >= 1
+        && request.resource.data.nick.size() <= 20
+        && request.resource.data.score is int
+        && request.resource.data.score > 0
+        && request.resource.data.score <= 100000
+        && request.resource.data.belt is int
+        && request.resource.data.belt >= 0
+        && request.resource.data.belt <= 20
+        && request.resource.data.at == request.time
+        && (resource == null || request.resource.data.score > resource.data.score);
+      allow delete: if false;
+    }
+    match /ntstkd_ranking/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.keys().hasAll(['nick', 'score', 'belt', 'at'])
+        && request.resource.data.nick is string
+        && request.resource.data.nick.size() >= 1
+        && request.resource.data.nick.size() <= 20
+        && request.resource.data.score is int
+        && request.resource.data.score > 0
+        && request.resource.data.score <= 100000
+        && request.resource.data.belt is int
+        && request.resource.data.belt >= 0
+        && request.resource.data.belt <= 20
+        && request.resource.data.at == request.time
+        && (resource == null || request.resource.data.score > resource.data.score);
+      allow delete: if false;
+    }
+  }
+}
