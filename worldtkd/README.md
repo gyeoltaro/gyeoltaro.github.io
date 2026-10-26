@@ -5,7 +5,7 @@
 - 주소: https://gyeoltaro.github.io/worldtkd/
 - `gyeokpa/` 게임을 복사한 별도 버전입니다. 족자 글씨는 "월드 태권도"이고, 최고 기록과 랭킹은 `gyeokpa/`와 섞이지 않습니다.
   - 랭킹은 같은 Firebase 프로젝트(`infinite-gyeokpa`)의 `worldtkd_ranking` 컬렉션에 따로 저장됩니다.
-  - 이 폴더의 `firestore.rules`에는 두 게임의 규칙이 함께 들어 있습니다. 콘솔에 규칙을 붙여 넣을 때는 이 파일을 쓰세요.
+  - 이 폴더의 `firestore.rules`에는 모든 도장(gyeokpa, worldtkd, hansung)의 규칙이 함께 들어 있습니다. 콘솔에 규칙을 붙여 넣을 때는 이 파일을 쓰세요.
 - 파일 하나(`index.html`)로 동작하고, 그래픽과 효과음, 배경음악을 모두 브라우저에서 직접 그리고 연주합니다.
 - 랭킹전은 Firebase(Firestore)에 저장됩니다. 설정 전에는 랭킹 화면에 "준비 중"이 표시되고, 나머지 게임은 그대로 동작합니다.
 
