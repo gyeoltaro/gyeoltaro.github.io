@@ -1,0 +1,1158 @@
+{
+ "title": "20년 동안 '아줌마'라 부른 새엄마, 결혼식 전날 친엄마가 건넨 상자를 열고 울었습니다",
+ "slug": "stepmom-seat",
+ "voice": "ko-KR-SunHiNeural",
+ "narrator_gvoice": "ko-KR-Chirp3-HD-Kore",
+ "cast": {
+  "seoyeon": {
+   "name": "서연",
+   "gvoice": "ko-KR-Chirp3-HD-Kore",
+   "color": "#fafafa",
+   "hair": "long",
+   "hair_color": "#3a2618",
+   "skin": "#fbdcc4"
+  },
+  "stepmom": {
+   "name": "새엄마 정숙",
+   "gvoice": "ko-KR-Chirp3-HD-Despina",
+   "color": "#8e7cc3",
+   "hair": "bun",
+   "hair_color": "#4a3a32",
+   "skin": "#f2cba8"
+  },
+  "birthmom": {
+   "name": "친엄마",
+   "gvoice": "ko-KR-Chirp3-HD-Vindemiatrix",
+   "color": "#90a4ae",
+   "hair": "short",
+   "hair_color": "#6d625a",
+   "skin": "#eec4a2"
+  },
+  "dad": {
+   "name": "아빠",
+   "gvoice": "ko-KR-Chirp3-HD-Charon",
+   "color": "#5d4037",
+   "hair": "short",
+   "hair_color": "#9e9a96",
+   "accessory": "glasses"
+  },
+  "seoyeon_kid": {
+   "name": "어린 서연",
+   "gvoice": "ko-KR-Chirp3-HD-Leda",
+   "color": "#f48fb1",
+   "hair": "long",
+   "hair_color": "#3a2618",
+   "skin": "#ffe0c8",
+   "accessory": "bow",
+   "scale": 0.7
+  },
+  "junho": {
+   "name": "예비신랑 준호",
+   "gvoice": "ko-KR-Chirp3-HD-Puck",
+   "color": "#1e88e5",
+   "hair": "short",
+   "hair_color": "#222222"
+  }
+ },
+ "scenes": [
+  {
+   "title": "친엄마의 전화",
+   "bg": "living",
+   "cast": [
+    "seoyeon",
+    "stepmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "결혼식을 한 달 앞둔 밤, 이십 년 동안 연락이 없던 사람에게서 전화가 왔어요."
+    },
+    {
+     "who": "birthmom",
+     "text": "서연아, 엄마야. 네 결혼식 혼주석에… 엄마가 앉고 싶어.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "shock",
+      "stepmom": "surprised"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "seoyeon",
+     "text": "…친엄마요? 이제 와서요?",
+     "emotion": "shock"
+    },
+    {
+     "who": "narrator",
+     "text": "그 통화를 부엌에서 듣던 새엄마는, 아무 말 없이 행주만 접고 있었어요."
+    },
+    {
+     "who": "seoyeon",
+     "text": "아줌마, 들었어요? 친엄마가 혼주석에 앉고 싶대요.",
+     "emotion": "think",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "…그래. 그럴 수 있지. 낳아 주신 분이잖아.",
+     "emotion": "sad"
+    },
+    {
+     "who": "narrator",
+     "text": "그리고 그 주에, 새엄마가 맞춰 두었던 한복을 조용히 취소했다는 걸 알게 됐습니다."
+    },
+    {
+     "who": "narrator",
+     "text": "이 이야기를 하려면, 제가 여덟 살이던 봄으로 돌아가야 해요."
+    }
+   ],
+   "mood": "tense",
+   "when": "결혼 한 달 전"
+  },
+  {
+   "title": "새엄마가 온 날",
+   "bg": "room",
+   "cast": [
+    "seoyeon_kid",
+    "stepmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "여덟 살 봄, 아빠가 낯선 아줌마를 데려왔어요."
+    },
+    {
+     "who": "stepmom",
+     "text": "서연아, 안녕. 오늘부터 같이 살게 됐어. 정숙이라고 해.",
+     "emotion": "happy",
+     "react": {
+      "seoyeon_kid": "angry"
+     }
+    },
+    {
+     "who": "seoyeon_kid",
+     "text": "아줌마는 우리 엄마 아니야! 엄마라고 안 부를 거야!",
+     "emotion": "angry",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "그래, 그럼 아줌마라고 불러. 대신 밥은 꼭 같이 먹자.",
+     "emotion": "happy"
+    },
+    {
+     "who": "seoyeon_kid",
+     "text": "…싫어. 아줌마 밥 안 먹어.",
+     "emotion": "sad",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그날 밤, 방문 앞에는 계란말이를 올린 밥상이 놓여 있었어요. 저는 몰래 다 먹었죠."
+    }
+   ],
+   "mood": "tense",
+   "when": "22년 전",
+   "flashback": true
+  },
+  {
+   "title": "운동회 도시락",
+   "bg": "park",
+   "cast": [
+    "seoyeon_kid",
+    "stepmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "초등학교 마지막 운동회 날, 새엄마는 새벽부터 김밥을 쌌어요."
+    },
+    {
+     "who": "stepmom",
+     "text": "서연아, 김밥 먹자. 네가 좋아하는 햄 많이 넣었어.",
+     "emotion": "happy",
+     "react": {
+      "seoyeon_kid": "sad"
+     }
+    },
+    {
+     "who": "seoyeon_kid",
+     "text": "애들 앞에서 크게 부르지 마. 그냥 우리 집 아줌마라고 했단 말이야.",
+     "emotion": "angry",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "그래, 알았어. 아줌마는 저기 나무 밑에 있을게.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "새엄마는 운동회가 끝날 때까지 나무 밑에 혼자 앉아, 제 달리기를 보며 박수만 쳤어요."
+    },
+    {
+     "who": "seoyeon_kid",
+     "text": "…아줌마, 나 일등 했어. 봤어?",
+     "emotion": "happy",
+     "react": {
+      "stepmom": "happy"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "그럼, 봤지. 아줌마가 제일 크게 박수 쳤어.",
+     "emotion": "happy"
+    }
+   ],
+   "mood": "calm",
+   "when": "18년 전",
+   "flashback": true
+  },
+  {
+   "title": "사춘기",
+   "bg": "room_night",
+   "cast": [
+    "seoyeon",
+    "stepmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "중학생이 되고, 저는 더 날카로워졌어요."
+    },
+    {
+     "who": "seoyeon",
+     "text": "아줌마가 뭔데 내 일에 간섭해? 진짜 엄마도 아니면서!",
+     "emotion": "angry",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "그래, 진짜 엄마는 아니지. 그래도 밥은 먹고 자.",
+     "emotion": "sad"
+    },
+    {
+     "who": "seoyeon",
+     "text": "우리 진짜 엄마는 나를 보고 싶어 하지도 않는데, 아줌마가 왜 이래!",
+     "emotion": "cry",
+     "react": {
+      "stepmom": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그날 밤 새엄마 방에는 늦게까지 불이 켜져 있었어요. 누군가에게 편지를 쓰고 있었죠."
+    },
+    {
+     "who": "narrator",
+     "text": "저는 그 편지가 누구에게 가는 건지, 이십 년 동안 몰랐습니다."
+    }
+   ],
+   "mood": "tense",
+   "when": "14년 전"
+  },
+  {
+   "title": "졸업식",
+   "bg": "classroom",
+   "cast": [
+    "seoyeon",
+    "stepmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "고등학교 졸업식 날, 아빠는 출장이었어요. 새엄마가 꽃다발을 들고 왔죠."
+    },
+    {
+     "who": "stepmom",
+     "text": "서연아, 졸업 축하해. 꽃 사 왔어.",
+     "emotion": "happy",
+     "react": {
+      "seoyeon": "sad"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "친구들이 누구냐고 물어보잖아요. 그냥 저기 계세요.",
+     "emotion": "angry",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "그래. 그럼 사진만 한 장 찍을게. 멀리서.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "새엄마는 강당 맨 뒤에서 까치발을 들고, 제 사진을 몇 장이나 찍었어요."
+    },
+    {
+     "who": "narrator",
+     "text": "그 사진들이 어디로 갔는지, 저는 결혼식 전날에야 알게 됐어요."
+    }
+   ],
+   "mood": "sad",
+   "when": "11년 전",
+   "flashback": true
+  },
+  {
+   "title": "상견례",
+   "bg": "cafe",
+   "cast": [
+    "seoyeon",
+    "stepmom",
+    "junho"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "서른 살, 저는 결혼을 앞두고 상견례 자리에 앉았어요."
+    },
+    {
+     "who": "junho",
+     "text": "어머님, 처음 뵙겠습니다. 서연이한테 얘기 많이 들었어요.",
+     "emotion": "happy",
+     "react": {
+      "stepmom": "happy",
+      "seoyeon": "think"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "아… 저희 새어머니세요.",
+     "emotion": "think",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "네, 서연이가 어릴 때부터 같이 살았어요. 잘 부탁드려요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "식사 내내, 새엄마는 웃으며 제 접시에 고기를 올려 줬어요. 저는 그 웃음이 왜 쓸쓸해 보였는지 몰랐어요."
+    }
+   ],
+   "mood": "calm",
+   "when": "두 달 전"
+  },
+  {
+   "title": "친엄마와의 만남",
+   "bg": "street",
+   "cast": [
+    "seoyeon",
+    "birthmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "전화를 받은 다음 날, 저는 이십 년 만에 친엄마를 만났어요."
+    },
+    {
+     "who": "birthmom",
+     "text": "서연아, 이렇게 컸구나. 엄마가… 미안하다.",
+     "emotion": "cry",
+     "react": {
+      "seoyeon": "angry"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "이십 년 동안 연락 한 번 없다가, 왜 이제 와서요?",
+     "emotion": "angry"
+    },
+    {
+     "who": "birthmom",
+     "text": "엄마가 너무 아팠어. 빚도 많았고. 너를 데려갈 수가 없었어.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "think"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "아프셨으면 연락이라도 하시지. 저는 엄마가 저를 버린 줄 알았어요.",
+     "emotion": "cry",
+     "react": {
+      "birthmom": "cry"
+     }
+    },
+    {
+     "who": "birthmom",
+     "text": "버린 게 아니야. 매일 생각했어. 그런데 너한테는 이미 좋은 사람이 있다고 들었어.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "surprised"
+     }
+    },
+    {
+     "who": "birthmom",
+     "text": "결혼식 날 혼주석에 한 번만 앉고 싶어. 엄마로서 마지막 부탁이야.",
+     "emotion": "cry"
+    },
+    {
+     "who": "narrator",
+     "text": "저는 대답하지 못했어요. 그런데 이상하게, 새엄마 얼굴이 먼저 떠올랐어요."
+    }
+   ],
+   "mood": "tense",
+   "when": "결혼 한 달 전"
+  },
+  {
+   "title": "한복 취소",
+   "bg": "living",
+   "cast": [
+    "seoyeon",
+    "stepmom"
+   ],
+   "lines": [
+    {
+     "who": "stepmom",
+     "text": "서연아, 혼주석은 친엄마 드려라. 낳아 주신 분이잖니.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "surprised"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "…아줌마 한복은요? 석 달 전에 맞췄잖아요.",
+     "emotion": "think"
+    },
+    {
+     "who": "stepmom",
+     "text": "취소했어. 괜찮아. 나는 하객석에서 보면 돼.",
+     "emotion": "happy",
+     "react": {
+      "seoyeon": "shock"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "seoyeon",
+     "text": "아줌마는 끝까지 남이네요. 이럴 때도 그냥 비켜 주고.",
+     "emotion": "angry",
+     "react": {
+      "stepmom": "sad"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "남이라서 비켜 주는 게 아니야. 네 마음 편하라고 그러는 거야.",
+     "emotion": "sad"
+    },
+    {
+     "who": "seoyeon",
+     "text": "내 마음이 왜 편해요? 이십 년을 같이 살았는데, 결혼식 날 하객석이라니.",
+     "emotion": "cry",
+     "react": {
+      "stepmom": "cry"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "서연아, 엄마는… 아니, 아줌마는 괜찮아. 정말이야.",
+     "emotion": "cry"
+    },
+    {
+     "who": "narrator",
+     "text": "저는 그 말에 대답도 안 하고 방문을 닫아 버렸어요. 서운한 건 저였는데, 왜 서운한지도 몰랐어요."
+    }
+   ],
+   "mood": "tense"
+  },
+  {
+   "title": "아빠의 한마디",
+   "bg": "kitchen",
+   "cast": [
+    "seoyeon",
+    "dad"
+   ],
+   "lines": [
+    {
+     "who": "dad",
+     "text": "서연아, 아빠가 하나만 말할게.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "think"
+     }
+    },
+    {
+     "who": "dad",
+     "text": "정숙 씨가 그 한복 석 달 전에 맞춘 이유, 너 아니?",
+     "emotion": "think"
+    },
+    {
+     "who": "seoyeon",
+     "text": "결혼식이니까 입으려고 맞춘 거겠죠.",
+     "emotion": "think"
+    },
+    {
+     "who": "dad",
+     "text": "네 결혼식 날, 이십 년 만에 엄마 소리 한 번 들을까 해서 맞춘 거다. 저 사람이 그러더라.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "shock"
+     }
+    },
+    {
+     "who": "dad",
+     "text": "그래도 네 친엄마가 오고 싶어 하면, 자기는 빠지겠다고. 너 힘들지 않게.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "cry"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "아빠, 아줌마는 왜 한 번도 서운하다고 안 했어요?",
+     "emotion": "cry",
+     "react": {
+      "dad": "sad"
+     }
+    },
+    {
+     "who": "dad",
+     "text": "서운한 걸 말하면 네가 미안해할까 봐. 그 사람은 이십 년 내내 그랬다.",
+     "emotion": "sad"
+    }
+   ],
+   "mood": "calm",
+   "when": "그날 밤"
+  },
+  {
+   "title": "복도의 상자",
+   "bg": "hallway",
+   "cast": [
+    "seoyeon",
+    "birthmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "결혼식 전날 밤, 친엄마가 우리 아파트 복도까지 찾아왔어요."
+    },
+    {
+     "who": "birthmom",
+     "text": "서연아, 이거 받아. 엄마가 이십 년 동안 받은 거야.",
+     "emotion": "sad",
+     "react": {
+      "seoyeon": "surprised"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "이게 뭐예요? 편지… 사진…?",
+     "emotion": "surprised"
+    },
+    {
+     "who": "birthmom",
+     "text": "네 새엄마가 매년 보낸 편지야. 내가 어디 사는지 수소문해서, 한 해도 안 빠지고.",
+     "emotion": "cry",
+     "react": {
+      "seoyeon": "shock"
+     },
+     "sfx": "ding"
+    },
+    {
+     "who": "birthmom",
+     "text": "나는 이 사람 덕분에 너를 다 봤어. 운동회도, 졸업식도.",
+     "emotion": "cry"
+    },
+    {
+     "who": "seoyeon",
+     "text": "졸업식 사진도… 이거 아줌마가 강당 뒤에서 찍은 거예요.",
+     "emotion": "cry",
+     "react": {
+      "birthmom": "sad"
+     }
+    },
+    {
+     "who": "birthmom",
+     "text": "그래. 이 사람이 매년 편지 끝에 썼어. 언제든 보러 오셔도 된다고.",
+     "emotion": "cry"
+    },
+    {
+     "who": "birthmom",
+     "text": "그리고 서연이는 엄마를 미워하지 않게 키우겠다고.",
+     "emotion": "cry",
+     "react": {
+      "seoyeon": "cry"
+     }
+    },
+    {
+     "who": "birthmom",
+     "text": "그 자리는 내 자리가 아니야. 혼주석은 이 사람 거야.",
+     "emotion": "cry",
+     "react": {
+      "seoyeon": "cry"
+     }
+    }
+   ],
+   "mood": "sad",
+   "when": "결혼식 전날"
+  },
+  {
+   "title": "20년 치 편지",
+   "bg": "room_night",
+   "cast": [
+    "seoyeon"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그날 밤, 저는 상자 속 편지를 하나씩 읽었어요."
+    },
+    {
+     "who": "stepmom",
+     "text": "서연이가 오늘 자전거를 처음 탔어요. 넘어져도 울지 않더라고요. 어머님 닮았나 봐요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "stepmom",
+     "text": "서연이가 저를 아줌마라고 불러요. 괜찮아요. 언젠가 어머님을 만나도 미워하지 않게 키울게요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "stepmom",
+     "text": "서연이가 대학에 붙었어요. 사진 보내 드려요. 언제든 보고 싶으시면 연락하세요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "stepmom",
+     "text": "서연이가 오늘 저한테 진짜 엄마도 아니면서, 라고 했어요. 맞는 말이라 아무 말도 못 했어요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "stepmom",
+     "text": "서연이 졸업식이었어요. 맨 뒤에서 찍어서 사진이 흐려요. 그래도 많이 컸죠.",
+     "emotion": "happy"
+    },
+    {
+     "who": "seoyeon",
+     "text": "아줌마… 이걸 이십 년 동안 혼자…",
+     "emotion": "cry"
+    },
+    {
+     "who": "narrator",
+     "text": "편지 맨 마지막 장은, 석 달 전 날짜였어요. 서연이가 결혼해요. 혼주석은 어머님 자리로 비워 둘게요."
+    }
+   ],
+   "mood": "sad",
+   "when": "그날 밤"
+  },
+  {
+   "title": "결혼식 아침",
+   "bg": "bridalroom",
+   "cast": [
+    "seoyeon",
+    "stepmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "결혼식 날 아침, 저는 신부 대기실에서 전화를 걸었어요."
+    },
+    {
+     "who": "seoyeon",
+     "text": "아줌마… 한복 다시 입고 와 주세요. 대여점에 제가 다 말해 놨어요.",
+     "emotion": "cry",
+     "react": {
+      "stepmom": "surprised"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "서연아, 그래도 되니? 친엄마가…",
+     "emotion": "surprised"
+    },
+    {
+     "who": "seoyeon",
+     "text": "친엄마가 그러셨어요. 그 자리는 아줌마 거라고.",
+     "emotion": "cry",
+     "react": {
+      "stepmom": "cry"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "…알았어. 금방 갈게. 울지 마, 화장 번진다.",
+     "emotion": "cry"
+    },
+    {
+     "who": "junho",
+     "text": "서연아, 장모님 오셨어. 한복 입으셨어.",
+     "emotion": "happy",
+     "react": {
+      "seoyeon": "cry"
+     }
+    }
+   ],
+   "mood": "hope",
+   "when": "결혼식 날"
+  },
+  {
+   "title": "혼주석",
+   "bg": "wedding",
+   "cast": [
+    "seoyeon",
+    "stepmom",
+    "birthmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "식이 시작되기 직전, 한복을 입은 새엄마가 하객석 맨 뒤에 조용히 섰어요."
+    },
+    {
+     "who": "seoyeon",
+     "text": "잠깐만요.",
+     "emotion": "normal",
+     "react": {
+      "stepmom": "surprised"
+     }
+    },
+    {
+     "who": "seoyeon",
+     "text": "엄마, 여기 앉으세요. 여기가 엄마 자리예요.",
+     "emotion": "cry",
+     "react": {
+      "stepmom": "cry",
+      "birthmom": "cry"
+     },
+     "sfx": "ding"
+    },
+    {
+     "who": "stepmom",
+     "text": "서연아… 지금 엄마라고 했니?",
+     "emotion": "cry"
+    },
+    {
+     "who": "seoyeon",
+     "text": "이십 년 동안 못 한 말이에요. 엄마, 키워 줘서 고마워요.",
+     "emotion": "cry",
+     "react": {
+      "stepmom": "cry"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "아이고, 이 녀석. 이십 년 기다린 보람이 있네.",
+     "emotion": "cry",
+     "react": {
+      "seoyeon": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "하객석 한쪽에서, 친엄마가 눈물을 닦으며 가장 크게 박수를 쳐 주었어요."
+    },
+    {
+     "who": "birthmom",
+     "text": "고마워요, 정숙 씨. 우리 서연이 이렇게 키워 줘서.",
+     "emotion": "cry",
+     "react": {
+      "stepmom": "cry"
+     }
+    }
+   ],
+   "mood": "warm"
+  },
+  {
+   "title": "집들이",
+   "bg": "living",
+   "cast": [
+    "seoyeon",
+    "stepmom",
+    "birthmom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "신혼집 집들이에는 엄마가 두 분 오셨어요."
+    },
+    {
+     "who": "birthmom",
+     "text": "정숙 씨, 이 잡채 비법 좀 알려 줘요. 서연이가 이게 제일 맛있대요.",
+     "emotion": "happy",
+     "react": {
+      "stepmom": "happy"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "비법은 무슨요. 서연이가 어릴 때 시금치를 안 먹어서 조금만 넣었어요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "seoyeon",
+     "text": "엄마들, 둘이서 제 흉보는 거 다 들려요.",
+     "emotion": "happy",
+     "react": {
+      "stepmom": "happy",
+      "birthmom": "happy"
+     }
+    },
+    {
+     "who": "stepmom",
+     "text": "서연아, 이번 주말엔 김밥 싸 갈게. 햄 많이 넣어서.",
+     "emotion": "happy",
+     "react": {
+      "seoyeon": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "저는 이제 두 분을 다 엄마라고 불러요. 한 분은 저를 낳아 주셨고, 한 분은 저를 키워 주셨어요."
+    }
+   ],
+   "mood": "warm",
+   "when": "두 달 뒤"
+  },
+  {
+   "title": "여러분께",
+   "bg": "park",
+   "cast": [
+    "seoyeon"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "이십 년 동안 아줌마라고 불렀던 사람이, 이십 년 동안 저를 지켜 주고 있었어요."
+    },
+    {
+     "who": "narrator",
+     "text": "여러분이라면 혼주석에 누구를 앉히셨을까요? 낳아 준 엄마, 키워 준 엄마?"
+    },
+    {
+     "who": "seoyeon",
+     "text": "곁에서 묵묵히 키워 준 분이 있다면, 오늘은 꼭 고맙다고 말해 주세요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "여러분의 생각을 댓글로 들려주세요. 이 이야기는 실제 사연을 바탕으로 한 것이 아닌, 창작 사연입니다."
+    },
+    {
+     "who": "narrator",
+     "text": "구독과 좋아요는 다음 이야기에 큰 힘이 됩니다."
+    }
+   ],
+   "mood": "warm"
+  }
+ ],
+ "teaser": [
+  [
+   0,
+   1,
+   2
+  ],
+  [
+   7,
+   2,
+   3
+  ],
+  [
+   9,
+   3,
+   4
+  ]
+ ],
+ "shorts_speed": 1.25,
+ "shorts": [
+  {
+   "format": "full",
+   "speed": 1.0,
+   "clips": [
+    [
+     12,
+     2,
+     3
+    ],
+    [
+     0,
+     1,
+     5
+    ],
+    [
+     7,
+     0,
+     7
+    ],
+    [
+     9,
+     1,
+     8
+    ],
+    [
+     10,
+     1,
+     3
+    ],
+    [
+     10,
+     6,
+     8
+    ],
+    [
+     11,
+     1,
+     5
+    ],
+    [
+     12,
+     2,
+     8
+    ]
+   ],
+   "hook": "엄마, 여기가\n엄마 자리예요",
+   "hook_who": "seoyeon",
+   "hook_emotion": "cry",
+   "hook_tone": "gold",
+   "hook_prop": {
+    "type": "box",
+    "text": "20년 치 편지"
+   },
+   "cta_line": "새엄마와 딸의 이십 년, 더 긴 이야기는 아래 본편에서 들려 드릴게요.",
+   "end_text": "더 긴 이야기는 본편에서 ▶",
+   "title": "\"엄마, 여기가 엄마 자리예요\" 20년 만에 처음 부른 이름 #감동사연 #새엄마 #결혼식 #가족사연 #인생이야기",
+   "description": "여덟 살 때부터 20년 동안 새엄마를 '아줌마'라고만 불렀던 딸. 결혼식을 앞두고 친엄마가 혼주석에 앉고 싶다며 나타났고, 새엄마는 조용히 한복을 취소했습니다. 그리고 결혼식 전날, 친엄마가 상자 하나를 건넸습니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#감동사연 #시니어사연 #새엄마 #결혼식 #가족사연 #인생이야기 #Shorts",
+   "publish_at": "2026-10-31T18:10:00+09:00"
+  },
+  {
+   "format": "full",
+   "speed": 1.0,
+   "clips": [
+    [
+     0,
+     1,
+     3
+    ],
+    [
+     6,
+     1,
+     8
+    ],
+    [
+     7,
+     0,
+     4
+    ],
+    [
+     7,
+     4,
+     7
+    ],
+    [
+     9,
+     1,
+     8
+    ],
+    [
+     11,
+     1,
+     4
+    ],
+    [
+     12,
+     1,
+     8
+    ]
+   ],
+   "hook": "혼주석에 앉고 싶다는\n친엄마",
+   "hook_who": "birthmom",
+   "hook_emotion": "sad",
+   "hook_tone": "red",
+   "hook_prop": {
+    "type": "box",
+    "text": "20년 치 편지"
+   },
+   "cta_line": "이 가족의 이야기 전체는 아래 본편에서 볼 수 있어요.",
+   "end_text": "전체 이야기는 본편에서 ▶",
+   "title": "\"혼주석에 엄마가 앉고 싶어\" 20년 만에 나타난 친엄마 #감동사연 #시니어사연 #친엄마 #새엄마 #결혼식",
+   "description": "여덟 살 때부터 20년 동안 새엄마를 '아줌마'라고만 불렀던 딸. 결혼식을 앞두고 친엄마가 혼주석에 앉고 싶다며 나타났고, 새엄마는 조용히 한복을 취소했습니다. 그리고 결혼식 전날, 친엄마가 상자 하나를 건넸습니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#감동사연 #시니어사연 #새엄마 #결혼식 #가족사연 #인생이야기 #Shorts",
+   "publish_at": "2026-11-01T12:00:00+09:00"
+  },
+  {
+   "format": "full",
+   "speed": 1.0,
+   "clips": [
+    [
+     10,
+     2,
+     3
+    ],
+    [
+     1,
+     1,
+     6
+    ],
+    [
+     2,
+     2,
+     5
+    ],
+    [
+     3,
+     1,
+     6
+    ],
+    [
+     4,
+     1,
+     5
+    ],
+    [
+     9,
+     3,
+     8
+    ],
+    [
+     10,
+     1,
+     8
+    ],
+    [
+     12,
+     2,
+     6
+    ]
+   ],
+   "hook": "아줌마라고 불러도\n괜찮아요",
+   "hook_who": "stepmom",
+   "hook_emotion": "sad",
+   "hook_tone": "blue",
+   "hook_prop": {
+    "type": "letter",
+    "text": "괜찮아요"
+   },
+   "cta_line": "새엄마가 보낸 이십 년 치 편지, 처음부터 본편에서 보실 수 있어요.",
+   "end_text": "전체 이야기는 본편에서 ▶",
+   "title": "\"아줌마라고 불러도 괜찮아요\" 새엄마가 20년 동안 몰래 쓴 편지 #감동사연 #새엄마 #가족사연 #눈물주의",
+   "description": "여덟 살 때부터 20년 동안 새엄마를 '아줌마'라고만 불렀던 딸. 결혼식을 앞두고 친엄마가 혼주석에 앉고 싶다며 나타났고, 새엄마는 조용히 한복을 취소했습니다. 그리고 결혼식 전날, 친엄마가 상자 하나를 건넸습니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#감동사연 #시니어사연 #새엄마 #결혼식 #가족사연 #인생이야기 #Shorts",
+   "publish_at": "2026-11-02T12:00:00+09:00"
+  },
+  {
+   "clips": [
+    [
+     0,
+     1,
+     3
+    ],
+    [
+     0,
+     3,
+     5
+    ],
+    [
+     7,
+     0,
+     3
+    ]
+   ],
+   "hook": "말없이 한복을\n취소한 새엄마",
+   "hook_who": "stepmom",
+   "hook_emotion": "sad",
+   "hook_tone": "red",
+   "hook_prop": {
+    "type": "box",
+    "text": "20년 치 편지"
+   },
+   "end_text": "상자 속 비밀은 본편에서 ▶",
+   "title": "\"혼주석은 친엄마 드려라\" #감동사연 #새엄마 #결혼식",
+   "publish_at": "2026-11-02T19:00:00+09:00"
+  }
+ ],
+ "thumbnail": {
+  "text": "20년 '아줌마'\n상자의 비밀",
+  "highlight": "상자의 비밀",
+  "badge": "눈물 주의",
+  "variants": [
+   {
+    "style": "story",
+    "tone": "gold",
+    "face": [
+     "seoyeon",
+     "cry"
+    ],
+    "prop": {
+     "type": "box",
+     "text": "20년 치 편지"
+    }
+   },
+   {
+    "style": "story",
+    "tone": "red",
+    "face": [
+     "birthmom",
+     "sad"
+    ],
+    "text": "혼주석에 앉겠다는\n친엄마",
+    "highlight": "친엄마",
+    "badge": "20년 만에",
+    "prop": {
+     "type": "box",
+     "text": "20년 치 편지"
+    }
+   },
+   {
+    "style": "story",
+    "tone": "blue",
+    "face": [
+     "stepmom",
+     "cry"
+    ],
+    "text": "말없이 한복을\n취소한 새엄마",
+    "highlight": "새엄마",
+    "badge": "끝까지 보세요",
+    "prop": {
+     "type": "letter",
+     "text": "괜찮아요"
+    }
+   }
+  ]
+ },
+ "publish": {
+  "title": "20년 동안 '아줌마'라 부른 새엄마, 결혼식 전날 친엄마가 건넨 상자를 열고 울었습니다",
+  "title_variants": [
+   "“혼주석에 엄마가 앉고 싶어”… 20년 만에 나타난 친엄마, 새엄마는 말없이 한복을 취소했다",
+   "새엄마가 20년 동안 몰래 쓴 편지, 결혼식 전날 친엄마가 건넨 상자 속에 있었다"
+  ],
+  "description": "“서연아, 엄마야. 네 결혼식 혼주석에 엄마가 앉고 싶어.” 여덟 살 때부터 20년 동안 새엄마를 '아줌마'라고만 불렀던 서연. 결혼식을 앞두고 연락이 끊겼던 친엄마가 나타나자, 새엄마는 석 달 전에 맞춘 한복을 조용히 취소합니다. 그리고 결혼식 전날, 친엄마가 상자 하나를 건넵니다.\n\n⏱ 챕터\n{chapters}\n\n여러분이라면 혼주석에 누구를 앉히셨을까요? 낳아 준 엄마, 키워 준 엄마? 댓글로 들려주세요.\n\n※ 이 이야기는 창작 사연이며, 등장인물과 사건은 실제와 관련이 없습니다.\n※ AI 음성과 직접 그린 만화로 제작되었습니다.\n#사연 #감동사연 #새엄마",
+  "tags": [
+   "사연",
+   "감동 사연",
+   "시니어사연",
+   "새엄마",
+   "친엄마",
+   "결혼식",
+   "혼주석",
+   "가족 사연",
+   "기른 정",
+   "인생이야기",
+   "사연 만화",
+   "눈물 사연",
+   "창작 사연"
+  ],
+  "category": 1,
+  "playlist": "감동 가족 사연",
+  "publish_at": "2026-10-31T18:00:00+09:00",
+  "pinned_comment": "여러분이라면 혼주석에 누구를 앉히셨을까요? 낳아 준 엄마, 키워 준 엄마? 🙏",
+  "made_for_kids": false,
+  "synthetic_media": true
+ }
+}
