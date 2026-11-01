@@ -1,0 +1,1041 @@
+{
+ "title": "10년 동안 김장을 혼자 떠맡은 며느리, 올해 시어머니가 김치통 대신 기차표를 내밀었다",
+ "slug": "kimjang-ticket",
+ "voice": "ko-KR-SunHiNeural",
+ "narrator_gvoice": "ko-KR-Chirp3-HD-Callirrhoe",
+ "cast": {
+  "sujin": {
+   "name": "수진",
+   "gvoice": "ko-KR-Chirp3-HD-Callirrhoe",
+   "color": "#e57373",
+   "hair": "long",
+   "hair_color": "#2f2118",
+   "skin": "#fbdcc4"
+  },
+  "mil": {
+   "name": "시어머니",
+   "gvoice": "ko-KR-Chirp3-HD-Achernar",
+   "color": "#6d4c6f",
+   "hair": "bun",
+   "hair_color": "#8e8985",
+   "skin": "#e8b994"
+  },
+  "husband": {
+   "name": "남편",
+   "gvoice": "ko-KR-Chirp3-HD-Puck",
+   "color": "#5c7cbf",
+   "hair": "short",
+   "hair_color": "#222222"
+  },
+  "sister": {
+   "name": "시누이",
+   "gvoice": "ko-KR-Chirp3-HD-Despina",
+   "color": "#f06292",
+   "hair": "long",
+   "hair_color": "#4a3020"
+  },
+  "mom": {
+   "name": "친정엄마",
+   "gvoice": "ko-KR-Chirp3-HD-Gacrux",
+   "color": "#a1887f",
+   "hair": "bun",
+   "hair_color": "#6d625a",
+   "skin": "#eec4a2"
+  },
+  "neighbor": {
+   "name": "이웃 할머니",
+   "gvoice": "ko-KR-Chirp3-HD-Vindemiatrix",
+   "color": "#81a58a",
+   "hair": "bun",
+   "hair_color": "#b7b2ad",
+   "skin": "#e8b994"
+  }
+ },
+ "scenes": [
+  {
+   "title": "기차표",
+   "bg": "yard",
+   "cast": [
+    "sujin",
+    "mil",
+    "sister"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "올해 김장 날, 시어머니가 제 앞에 봉투를 내밀었어요. 김치통이 아니라 기차표였어요."
+    },
+    {
+     "who": "mil",
+     "text": "올해는 네 친정엄마 김장 도와드려라. 사돈이 혼자 하신다고 들었다.",
+     "emotion": "normal",
+     "react": {
+      "sujin": "shock",
+      "sister": "surprised"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "sister",
+     "text": "엄마, 무슨 소리야! 김장은 언니가 해야 하는 거잖아!",
+     "emotion": "angry",
+     "react": {
+      "mil": "angry"
+     }
+    },
+    {
+     "who": "mil",
+     "text": "10년을 혼자 한 애한테 올해는 내가 하고 싶었다. 너는 거들떠도 안 봤잖니.",
+     "emotion": "angry",
+     "react": {
+      "sister": "shock"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "저는 그 자리에서 아무 말도 못 하고 서 있었어요. 눈물이 먼저 나왔거든요."
+    },
+    {
+     "who": "narrator",
+     "text": "이 이야기를 하려면, 10년 전 첫 김장부터 말씀드려야 해요."
+    }
+   ],
+   "mood": "tense",
+   "when": "올해 김장 날"
+  },
+  {
+   "title": "10년째 김장",
+   "bg": "kitchen",
+   "cast": [
+    "sujin",
+    "mil"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "결혼 첫해 11월, 시어머니는 저에게 앞치마를 내밀었어요. 배추 백 포기가 마당에 쌓여 있었죠."
+    },
+    {
+     "who": "mil",
+     "text": "새아기야, 김장은 며느리가 해야 맛이 나는 거다. 열심히 배워라.",
+     "emotion": "normal",
+     "react": {
+      "sujin": "surprised"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "네, 어머님. 열심히 할게요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "그해에는 일이 서툰 줄 알고 참았어요. 둘째 해에도, 셋째 해에도요."
+    },
+    {
+     "who": "mil",
+     "text": "간이 싱겁구나. 올해도 영 별로네. 이래서 쓰겠니?",
+     "emotion": "normal",
+     "react": {
+      "sujin": "sad"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "죄송해요, 어머님. 다음엔 더 잘할게요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "narrator",
+     "text": "열 번의 김장 동안 칭찬은 한 번도 들어 보지 못했어요. 손톱 밑이 빨갛게 물들어도 괜찮다고 했죠."
+    },
+    {
+     "who": "narrator",
+     "text": "저는 그냥 며느리는 원래 이런 거라고 생각했어요."
+    }
+   ],
+   "mood": "sad",
+   "when": "10년 전부터",
+   "flashback": true
+  },
+  {
+   "title": "마당의 수육",
+   "bg": "yard",
+   "cast": [
+    "sujin",
+    "husband",
+    "sister"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "작년 김장 날이었어요. 저는 새벽 다섯 시부터 열 시간째 배추를 버무리고 있었죠."
+    },
+    {
+     "who": "sister",
+     "text": "오빠, 수육 맛있다. 언니가 해 준 김치랑 먹으니까 더 맛있네.",
+     "emotion": "happy",
+     "react": {
+      "husband": "happy"
+     }
+    },
+    {
+     "who": "husband",
+     "text": "그치? 역시 김장은 수진이 손이 제일이야. 수진아, 우리 먹고 있을게!",
+     "emotion": "happy"
+    },
+    {
+     "who": "sujin",
+     "text": "…응, 천천히 먹어. 나는 좀 더 하고 갈게.",
+     "emotion": "sad",
+     "react": {
+      "husband": "happy"
+     }
+    },
+    {
+     "who": "sister",
+     "text": "언니, 이거 좀 짜다. 다음엔 간 좀 신경 써 줘요. 엄마 입맛에 맞춰야지.",
+     "emotion": "normal",
+     "react": {
+      "sujin": "shock"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "narrator",
+     "text": "그 순간 손에 든 고무장갑이 갑자기 너무 무겁게 느껴졌어요."
+    },
+    {
+     "who": "narrator",
+     "text": "저는 속으로 다짐했어요. 올해가 마지막이라고."
+    }
+   ],
+   "mood": "tense",
+   "when": "작년 김장"
+  },
+  {
+   "title": "일기장 속 한 줄",
+   "bg": "room_night",
+   "cast": [
+    "sujin",
+    "husband"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "저는 매년 김장 날 밤마다 몰래 일기장을 썼어요. 남편은 그걸 몰랐죠."
+    },
+    {
+     "who": "sujin",
+     "text": "엄마 보고 싶다. 올해도 엄마 김장 못 도와드렸네. 엄마 혼자 얼마나 힘드실까.",
+     "emotion": "cry"
+    },
+    {
+     "who": "narrator",
+     "text": "친정은 부산이라 멀기도 했지만, 시댁 김장 때문에 한 번도 갈 수가 없었어요."
+    },
+    {
+     "who": "husband",
+     "text": "수진아, 올해 김장 날짜 잡혔어. 11월 셋째 주 토요일이래.",
+     "emotion": "happy",
+     "react": {
+      "sujin": "sad"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "자기야, 올해는 나 정말 힘들 것 같아. 열 번이야, 열 번.",
+     "emotion": "sad",
+     "react": {
+      "husband": "surprised"
+     }
+    },
+    {
+     "who": "husband",
+     "text": "에이, 어머니가 서운해하셔. 한 번만 더 해 줘. 부탁이야.",
+     "emotion": "normal",
+     "react": {
+      "sujin": "cry"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "…그럼 내가 어머님께 직접 말씀드릴게.",
+     "emotion": "sad",
+     "sfx": "ding"
+    },
+    {
+     "who": "narrator",
+     "text": "그렇게 저는 처음으로 시어머니께 거절의 말을 꺼내기로 했어요."
+    }
+   ],
+   "mood": "sad",
+   "when": "올해 가을"
+  },
+  {
+   "title": "전화 한 통",
+   "bg": "living",
+   "cast": [
+    "sujin",
+    "mil"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "김장 일주일 전, 저는 떨리는 손으로 시어머니께 전화를 걸었어요."
+    },
+    {
+     "who": "sujin",
+     "text": "어머님, 저 수진이에요. 올해는 제가 몸이 안 좋아서 일찍 못 갈 것 같아요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "mil",
+     "text": "…몸이 안 좋다고? 어디가?",
+     "emotion": "think"
+    },
+    {
+     "who": "sujin",
+     "text": "그냥 좀… 요즘 많이 지쳐서요. 죄송합니다, 어머님.",
+     "emotion": "sad"
+    },
+    {
+     "who": "mil",
+     "text": "…그래. 알았다.",
+     "emotion": "sad"
+    },
+    {
+     "who": "narrator",
+     "text": "시어머니는 한참 말이 없다가, 그 한마디만 하고 전화를 끊었어요."
+    },
+    {
+     "who": "narrator",
+     "text": "저는 수화기를 든 채로 한참 서 있었어요. 야단을 맞을 줄 알았는데 이상하게 더 무서웠죠."
+    },
+    {
+     "who": "sujin",
+     "text": "어머님이 단단히 서운하셨나 봐. 어떡하지.",
+     "emotion": "cry"
+    }
+   ],
+   "mood": "tense",
+   "when": "김장 일주일 전"
+  },
+  {
+   "title": "새벽 네 시",
+   "bg": "kitchen",
+   "cast": [
+    "mil",
+    "neighbor"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그날 새벽 네 시, 시댁 부엌에는 불이 켜져 있었다고 해요."
+    },
+    {
+     "who": "neighbor",
+     "text": "아이고 형님, 이 새벽에 뭐 하세요. 배추 백 포기를 혼자 하시려고요?",
+     "emotion": "surprised",
+     "react": {
+      "mil": "sad"
+     }
+    },
+    {
+     "who": "mil",
+     "text": "응. 이번엔 내가 하려고. 우리 며느리가 몸이 안 좋다잖아.",
+     "emotion": "happy"
+    },
+    {
+     "who": "neighbor",
+     "text": "형님 허리도 안 좋으신데. 며느리가 안 하면 딸한테 시키세요.",
+     "emotion": "sad"
+    },
+    {
+     "who": "mil",
+     "text": "우리 며느리가 10년 동안 얼마나 힘들었는지, 나는 이제야 알겠어.",
+     "emotion": "sad",
+     "react": {
+      "neighbor": "think"
+     }
+    },
+    {
+     "who": "mil",
+     "text": "작년에 김장 끝나고 보니까, 그 애 손가락이 퉁퉁 부어 있더라. 그걸 보고도 내가 입을 닫았어.",
+     "emotion": "cry"
+    },
+    {
+     "who": "neighbor",
+     "text": "형님…",
+     "emotion": "sad",
+     "react": {
+      "mil": "cry"
+     },
+     "sfx": "ding"
+    },
+    {
+     "who": "narrator",
+     "text": "시어머니는 얼음장 같은 물에 배추를 씻으며, 혼자 그렇게 중얼거리셨대요."
+    }
+   ],
+   "mood": "sad",
+   "when": "김장 날 새벽 · 시어머니의 기억",
+   "flashback": true
+  },
+  {
+   "title": "이미 끝난 김장",
+   "bg": "yard",
+   "cast": [
+    "sujin",
+    "mil",
+    "sister"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "저는 눈치를 보며 시댁에 갔어요. 안 가면 더 마음이 불편할 것 같았거든요."
+    },
+    {
+     "who": "sujin",
+     "text": "어머님, 저 왔어요. 몸은 좀 괜찮아져서…",
+     "emotion": "sad"
+    },
+    {
+     "who": "narrator",
+     "text": "그런데 마당에는 이미 절임 배추와 양념이 다 끝나 있었어요. 동네 할머니들이 김칫독을 채우고 계셨죠."
+    },
+    {
+     "who": "sujin",
+     "text": "어머님, 이게 다 뭐예요? 설마 혼자 다 하신 거예요?",
+     "emotion": "shock",
+     "react": {
+      "mil": "happy"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "sister",
+     "text": "엄마, 왜 이렇게 무리를 해! 언니가 하면 되잖아!",
+     "emotion": "angry",
+     "react": {
+      "mil": "angry"
+     }
+    },
+    {
+     "who": "mil",
+     "text": "10년을 혼자 한 애한테 올해는 내가 하고 싶었다. 너희는 거들떠도 안 봤잖니.",
+     "emotion": "angry",
+     "react": {
+      "sister": "shock"
+     }
+    },
+    {
+     "who": "sister",
+     "text": "엄마…",
+     "emotion": "sad"
+    },
+    {
+     "who": "narrator",
+     "text": "시누이는 그제야 고개를 숙였어요. 마당이 쥐 죽은 듯 조용해졌죠."
+    }
+   ],
+   "mood": "hope",
+   "when": "김장 날 오전"
+  },
+  {
+   "title": "봉투와 일기장",
+   "bg": "room",
+   "cast": [
+    "sujin",
+    "mil"
+   ],
+   "lines": [
+    {
+     "who": "mil",
+     "text": "수진아, 이리 와서 앉아 봐라. 줄 게 있다.",
+     "emotion": "happy",
+     "react": {
+      "sujin": "surprised"
+     }
+    },
+    {
+     "who": "mil",
+     "text": "여기, 부산 가는 KTX 표다. 내일 아침 첫 열차야. 두 장 샀다.",
+     "emotion": "happy"
+    },
+    {
+     "who": "sujin",
+     "text": "어머님, 이게 무슨…",
+     "emotion": "surprised"
+    },
+    {
+     "who": "mil",
+     "text": "올해는 네 친정엄마 김장 도와드려라. 사돈이 혼자 하신다고 들었다. 이 어미 대신 인사도 드리고.",
+     "emotion": "happy",
+     "react": {
+      "sujin": "cry"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "어머님, 저는 친정 김장 이야기 한 번도 안 했는데, 어떻게 아셨어요?",
+     "emotion": "cry"
+    },
+    {
+     "who": "mil",
+     "text": "작년에 네 방 청소하다가 일기장을 봤다. 훔쳐보려던 건 아닌데… 엄마 보고 싶다는 글이 있더라.",
+     "emotion": "sad",
+     "react": {
+      "sujin": "shock"
+     },
+     "sfx": "thud"
+    },
+    {
+     "who": "mil",
+     "text": "10년 동안 시댁 김장 때문에 친정 한 번을 못 간 거, 이 어미가 모르고 있었다.",
+     "emotion": "sad"
+    },
+    {
+     "who": "sujin",
+     "text": "어머님… 죄송해요, 제가 말씀드렸어야 했는데.",
+     "emotion": "cry"
+    },
+    {
+     "who": "mil",
+     "text": "죄송할 사람은 너가 아니라 나다. 열 번이나 김장을 시켜 놓고 칭찬 한마디 안 했어.",
+     "emotion": "cry",
+     "react": {
+      "sujin": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "저는 그 자리에서 무릎을 꿇고 소리 내어 울었어요. 시어머니도 제 손을 꼭 잡고 우셨죠."
+    }
+   ],
+   "mood": "warm",
+   "when": "그날 오후"
+  },
+  {
+   "title": "남편의 배웅",
+   "bg": "street",
+   "cast": [
+    "sujin",
+    "husband"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "다음 날 새벽, 남편이 저를 역까지 데려다 줬어요."
+    },
+    {
+     "who": "husband",
+     "text": "수진아, 내가 정말 미안해. 10년 동안 너 혼자 그렇게 힘들었는데 눈치도 못 챘어.",
+     "emotion": "sad",
+     "react": {
+      "sujin": "surprised"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "자기 잘못만은 아니야. 나도 말을 못 했으니까.",
+     "emotion": "sad"
+    },
+    {
+     "who": "husband",
+     "text": "아니야. 이제 김장은 우리 둘이 같이 하자. 어머니랑 여동생까지 다 같이.",
+     "emotion": "normal"
+    },
+    {
+     "who": "husband",
+     "text": "그리고 장모님 뵈면 내가 큰절 올리러 못 가서 죄송하다고 꼭 전해 줘.",
+     "emotion": "sad"
+    },
+    {
+     "who": "sujin",
+     "text": "…응, 전할게. 자기도 몸 챙기고.",
+     "emotion": "happy",
+     "react": {
+      "husband": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "기차가 출발하자 남편이 플랫폼에서 한참 손을 흔들었어요. 저는 창밖을 보며 또 울었죠."
+    }
+   ],
+   "mood": "warm",
+   "when": "다음 날 아침"
+  },
+  {
+   "title": "친정 마당",
+   "bg": "yard",
+   "cast": [
+    "sujin",
+    "mom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "열 번의 겨울을 건너뛴 끝에, 저는 친정 마당에 들어섰어요."
+    },
+    {
+     "who": "sujin",
+     "text": "엄마, 나 왔어. 수진이 왔어.",
+     "emotion": "cry",
+     "react": {
+      "mom": "surprised"
+     }
+    },
+    {
+     "who": "mom",
+     "text": "아이고 내 새끼야! 연락도 없이 이게 웬일이니!",
+     "emotion": "surprised"
+    },
+    {
+     "who": "sujin",
+     "text": "엄마, 미안해. 10년 동안 한 번도 못 와서. 김장도 못 도와드리고.",
+     "emotion": "cry"
+    },
+    {
+     "who": "mom",
+     "text": "무슨 소리야, 이 사람아. 시집간 딸이 얼마나 바쁜 줄 내가 다 알아.",
+     "emotion": "cry",
+     "react": {
+      "sujin": "cry"
+     }
+    },
+    {
+     "who": "mom",
+     "text": "그런데 사돈이 보내신 이 김치 좀 봐라. 어제 택배로 왔다.",
+     "emotion": "happy"
+    },
+    {
+     "who": "narrator",
+     "text": "엄마 손에는 시어머니가 보낸 김치 한 통과 손 편지 한 장이 들려 있었어요."
+    }
+   ],
+   "mood": "sad",
+   "when": "그날 오전"
+  },
+  {
+   "title": "사돈의 편지",
+   "bg": "living",
+   "cast": [
+    "sujin",
+    "mom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "엄마는 안경을 쓰고 편지를 천천히 읽어 주었어요."
+    },
+    {
+     "who": "mom",
+     "text": "사돈, 우리 수진이 곱게 키워 주셔서 고맙습니다. 저희 집에서 10년 동안 너무 고생을 시켰습니다.",
+     "emotion": "cry"
+    },
+    {
+     "who": "mom",
+     "text": "올해는 사돈 댁에서 김장을 도와 드리라고 보냅니다. 이 어미가 대신 인사드립니다.",
+     "emotion": "cry",
+     "react": {
+      "sujin": "cry"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "엄마… 어머님이 이런 편지를…",
+     "emotion": "cry",
+     "sfx": "ding"
+    },
+    {
+     "who": "mom",
+     "text": "수진아, 네 시어머니가 참 좋은 분이시다. 딸이 이런 집에 가서 얼마나 다행인지 몰라.",
+     "emotion": "happy"
+    },
+    {
+     "who": "sujin",
+     "text": "맞아 엄마. 나 처음으로 시어머니께 인사드리고 싶은 마음이 들었어.",
+     "emotion": "happy",
+     "react": {
+      "mom": "happy"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "그날 저는 엄마와 나란히 앉아, 10년 치 이야기를 쏟아 놓았어요."
+    }
+   ],
+   "mood": "hope",
+   "when": "그날 오후"
+  },
+  {
+   "title": "엄마와 함께",
+   "bg": "kitchen",
+   "cast": [
+    "sujin",
+    "mom"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "그날 저녁, 저는 엄마와 나란히 서서 김장 양념을 버무렸어요."
+    },
+    {
+     "who": "mom",
+     "text": "수진아, 간은 이만하면 됐다. 어쩜 이렇게 솜씨가 늘었니.",
+     "emotion": "happy",
+     "react": {
+      "sujin": "happy"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "시어머니께 10년 배웠거든요. 엄마 입맛에 맞을지는 모르겠지만.",
+     "emotion": "happy"
+    },
+    {
+     "who": "mom",
+     "text": "맛있다. 정말 맛있어. 우리 딸 손이 이렇게 컸구나.",
+     "emotion": "cry"
+    },
+    {
+     "who": "narrator",
+     "text": "엄마의 한마디가 열 번의 김장 칭찬보다 더 오래 마음에 남았어요."
+    },
+    {
+     "who": "narrator",
+     "text": "그때 시어머니에게서 전화가 걸려 왔어요."
+    },
+    {
+     "who": "mil",
+     "text": "수진아, 잘 도착했니? 사돈 모시고 맛있는 거 많이 먹어라. 김치는 우리가 잘 챙겨 놓을게.",
+     "emotion": "happy",
+     "react": {
+      "sujin": "cry"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "어머님, 고맙습니다. 올해는 저도 어머님께 갚을 차례예요.",
+     "emotion": "cry"
+    }
+   ],
+   "mood": "warm",
+   "when": "그날 저녁"
+  },
+  {
+   "title": "여러분께",
+   "bg": "park",
+   "cast": [
+    "sujin",
+    "mil"
+   ],
+   "lines": [
+    {
+     "who": "narrator",
+     "text": "한 달 뒤, 저는 시어머니 손을 잡고 시장에 갔어요. 김장 속에 넣을 굴을 사러요."
+    },
+    {
+     "who": "mil",
+     "text": "수진아, 올해 김치는 어땠니? 사돈이 맛있다고 하시더구나.",
+     "emotion": "happy",
+     "react": {
+      "sujin": "happy"
+     }
+    },
+    {
+     "who": "sujin",
+     "text": "어머님 김치가 제일이에요. 내년엔 제가 어머님 옆에서 배울게요.",
+     "emotion": "happy"
+    },
+    {
+     "who": "mil",
+     "text": "내년엔 같이 하자. 이젠 며느리가 아니라 우리 딸이다.",
+     "emotion": "cry",
+     "react": {
+      "sujin": "cry"
+     }
+    },
+    {
+     "who": "narrator",
+     "text": "저는 이제 압니다. 10년의 서운함은 한마디 말에 녹을 수 있다는 걸요."
+    },
+    {
+     "who": "narrator",
+     "text": "여러분이라면 시어머니께 어떻게 인사드리셨을까요? 댓글로 들려주세요."
+    },
+    {
+     "who": "narrator",
+     "text": "※ 이 이야기는 창작 사연이며, 등장인물과 사건은 실제와 관련이 없습니다."
+    }
+   ],
+   "mood": "warm",
+   "when": "한 달 뒤"
+  }
+ ],
+ "teaser": [
+  [
+   0,
+   1,
+   3
+  ],
+  [
+   7,
+   5,
+   6
+  ],
+  [
+   10,
+   3,
+   4
+  ]
+ ],
+ "shorts_speed": 1.25,
+ "shorts": [
+  {
+   "format": "full",
+   "speed": 1.0,
+   "clips": [
+    [
+     0,
+     1,
+     5
+    ],
+    [
+     1,
+     1,
+     8
+    ],
+    [
+     2,
+     1,
+     7
+    ],
+    [
+     6,
+     1,
+     8
+    ],
+    [
+     7,
+     2,
+     9
+    ],
+    [
+     9,
+     1,
+     4
+    ]
+   ],
+   "hook": "올해는 네 친정엄마\n김장 도와드려라",
+   "hook_who": "mil",
+   "hook_emotion": "happy",
+   "hook_tone": "red",
+   "hook_prop": {
+    "type": "envelope",
+    "text": "부산행 KTX 표"
+   },
+   "cta_line": "시어머니가 건넨 기차표의 사연, 아래 본편에서 이어집니다.",
+   "end_text": "더 긴 이야기는 본편에서 ▶",
+   "title": "\"올해는 네 친정엄마 김장 도와드려라\" 시어머니가 내민 기차표 #시니어사연 #감동사연 #김장",
+   "description": "10년 동안 시댁 김장을 혼자 해 온 며느리에게 올해 시어머니가 내민 것은 김치통이 아니라 부산행 기차표였습니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#시니어사연 #감동사연 #김장 #시어머니 #며느리 #인생이야기 #Shorts",
+   "publish_at": "2026-11-08T18:10:00+09:00"
+  },
+  {
+   "format": "full",
+   "speed": 1.0,
+   "clips": [
+    [
+     6,
+     3,
+     8
+    ],
+    [
+     2,
+     1,
+     7
+    ],
+    [
+     1,
+     4,
+     8
+    ],
+    [
+     7,
+     5,
+     10
+    ],
+    [
+     10,
+     1,
+     6
+    ],
+    [
+     9,
+     3,
+     7
+    ]
+   ],
+   "hook": "10년을 혼자 한 애한테\n올해는 내가",
+   "hook_who": "mil",
+   "hook_emotion": "angry",
+   "hook_tone": "gold",
+   "hook_prop": {
+    "type": "envelope",
+    "text": "10년 치 김장"
+   },
+   "cta_line": "며느리의 10년, 처음부터 본편에서 보실 수 있어요.",
+   "end_text": "전체 이야기는 본편에서 ▶",
+   "title": "\"10년을 혼자 한 애한테 올해는 내가 하고 싶었다\" 시어머니의 마당 호통 #감동사연 #김장 #시어머니 #눈물주의",
+   "description": "10년 동안 시댁 김장을 혼자 해 온 며느리에게 올해 시어머니가 내민 것은 김치통이 아니라 부산행 기차표였습니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#시니어사연 #감동사연 #김장 #시어머니 #며느리 #인생이야기 #Shorts",
+   "publish_at": "2026-11-09T12:00:00+09:00"
+  },
+  {
+   "format": "full",
+   "speed": 1.0,
+   "clips": [
+    [
+     7,
+     5,
+     10
+    ],
+    [
+     9,
+     1,
+     7
+    ],
+    [
+     10,
+     0,
+     7
+    ],
+    [
+     11,
+     1,
+     8
+    ],
+    [
+     12,
+     1,
+     4
+    ]
+   ],
+   "hook": "일기장 속\n엄마 보고 싶다",
+   "hook_who": "sujin",
+   "hook_emotion": "cry",
+   "hook_tone": "blue",
+   "hook_prop": {
+    "type": "envelope",
+    "text": "시어머니의 편지"
+   },
+   "cta_line": "일기장 속 한 줄의 비밀, 본편에서 이어서 볼 수 있어요.",
+   "end_text": "전체 이야기는 본편에서 ▶",
+   "title": "\"작년에 네 일기장을 봤다\" 시어머니가 알고 있던 한 줄 #감동사연 #시어머니 #친정엄마 #눈물주의",
+   "description": "10년 동안 시댁 김장을 혼자 해 온 며느리에게 올해 시어머니가 내민 것은 김치통이 아니라 부산행 기차표였습니다.\n※ AI 음성과 직접 그린 만화로 제작한 창작 사연입니다.\n#시니어사연 #감동사연 #김장 #시어머니 #며느리 #인생이야기 #Shorts",
+   "publish_at": "2026-11-10T12:00:00+09:00"
+  },
+  {
+   "clips": [
+    [
+     0,
+     1,
+     4
+    ],
+    [
+     7,
+     3,
+     5
+    ]
+   ],
+   "hook": "시어머니가 내민 건\n김치통이 아니었다",
+   "hook_who": "mil",
+   "hook_emotion": "happy",
+   "hook_tone": "red",
+   "hook_prop": {
+    "type": "envelope",
+    "text": "부산행 KTX 표"
+   },
+   "end_text": "기차표의 사연은 본편에서 ▶",
+   "title": "\"올해는 네 친정엄마 김장 도와드려라\" #시니어사연 #감동사연 #김장",
+   "publish_at": "2026-11-10T19:00:00+09:00"
+  }
+ ],
+ "thumbnail": {
+  "text": "김치통 대신\n기차표",
+  "highlight": "기차표",
+  "badge": "감동 사연",
+  "variants": [
+   {
+    "style": "story",
+    "tone": "red",
+    "face": [
+     "sujin",
+     "shock"
+    ],
+    "prop": {
+     "type": "envelope",
+     "text": "부산행 KTX 표"
+    }
+   },
+   {
+    "style": "story",
+    "tone": "gold",
+    "face": [
+     "mil",
+     "cry"
+    ],
+    "text": "10년을 혼자 한 애한테\n올해는 내가",
+    "highlight": "올해는 내가",
+    "badge": "눈물 주의",
+    "prop": {
+     "type": "envelope",
+     "text": "10년 치 김장"
+    }
+   },
+   {
+    "style": "story",
+    "tone": "blue",
+    "face": [
+     "sujin",
+     "cry"
+    ],
+    "text": "일기장 속\n엄마 보고 싶다",
+    "highlight": "엄마 보고 싶다",
+    "badge": "며느리의 10년",
+    "prop": {
+     "type": "envelope",
+     "text": "시어머니의 편지"
+    }
+   }
+  ]
+ },
+ "publish": {
+  "title": "10년 동안 김장을 혼자 떠맡은 며느리, 올해 시어머니가 김치통 대신 기차표를 내밀었다",
+  "title_variants": [
+   "“올해는 네 친정엄마 김장 도와드려라”… 10년 김장을 혼자 한 며느리에게 시어머니가 내민 것",
+   "10년 동안 시댁 김장을 혼자 한 며느리, 김장 날 마당에서 시어머니의 호통을 듣고 무너졌다"
+  ],
+  "description": "“올해는 네 친정엄마 김장 도와드려라. 사돈이 혼자 하신다고 들었다.” 10년 동안 시댁 김장을 혼자 해 온 며느리에게 시어머니가 김치통 대신 기차표를 내밀었습니다. 시어머니가 알고 있던 일기장 속 한 줄은 무엇이었을까요.\n\n⏱ 챕터\n{chapters}\n\n여러분이라면 시어머니께 어떻게 인사드리셨을까요? 댓글로 들려주세요.\n\n※ 이 이야기는 창작 사연이며, 등장인물과 사건은 실제와 관련이 없습니다.\n※ AI 음성과 직접 그린 만화로 제작되었습니다.\n#사연 #시니어사연 #감동사연",
+  "tags": [
+   "사연",
+   "시니어사연",
+   "감동 사연",
+   "김장",
+   "시어머니",
+   "며느리",
+   "친정엄마",
+   "고부",
+   "인생이야기",
+   "사연 만화",
+   "창작 사연"
+  ],
+  "category": 1,
+  "playlist": "감동 가족 사연",
+  "publish_at": "2026-11-08T18:00:00+09:00",
+  "pinned_comment": "여러분이라면 시어머니께 어떻게 인사드리셨을까요? 🙏",
+  "made_for_kids": false,
+  "synthetic_media": true
+ }
+}
