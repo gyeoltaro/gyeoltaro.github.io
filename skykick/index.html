@@ -1040,13 +1040,13 @@ function drawDojang(c, base) {
   ctx.fillStyle = '#2c313b'; rr(c - 130, eave - 90, 260, 14, 6); ctx.fill();
   ctx.strokeStyle = '#2c313b'; ctx.lineWidth = 6; ctx.lineCap = 'round';
   for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(c + s * 124, eave - 80); ctx.quadraticCurveTo(c + s * 142, eave - 86, c + s * 138, eave - 102); ctx.stroke(); }
-  // 현판 with the dojang name
-  const pw = 156, ph = 34, px = c - pw / 2, py = wallTop + 8;
+  // 현판 with the dojang name, sized to fit it
+  ctx.font = '24px "Nanum Brush Script", "Gowun Dodum", serif';
+  const pw = clamp(ctx.measureText(DOJANG.name).width + 34, 156, 240), ph = 34, px = c - pw / 2, py = wallTop + 8;
   ctx.fillStyle = 'rgba(40,25,12,.25)'; ctx.fillRect(px + 3, py + 4, pw, ph);
   ctx.fillStyle = '#4a2e1b'; rr(px, py, pw, ph, 3); ctx.fill();
   ctx.fillStyle = '#24160d'; rr(px + 4, py + 4, pw - 8, ph - 8, 2); ctx.fill();
-  ctx.fillStyle = '#f2cf7a'; ctx.font = '24px "Nanum Brush Script", "Gowun Dodum", serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#f2cf7a'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(DOJANG.name, c, py + ph / 2 + 1);
 }
 function drawGround() {

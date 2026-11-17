@@ -35,7 +35,7 @@
 |---|---|
 | `index.html` | 게임 전체 |
 | `firebase-config.js` | Firebase 웹 설정값 (무한의 격파와 같은 프로젝트) |
-| `firestore.rules` | 랭킹 보안 규칙. 무한의 격파 5개 도장과 하늘 발차기를 모두 담은 공용 규칙입니다 |
+| `firestore.rules` | 랭킹 보안 규칙. 무한의 격파와 하늘 발차기의 모든 도장 규칙을 담은 공용 규칙입니다 |
 
 ## 랭킹전 켜기 (한 번만)
 
@@ -43,9 +43,16 @@ Firebase 프로젝트와 익명 로그인, 승인된 도메인은 무한의 격�
 
 1. https://console.firebase.google.com 에서 `infinite-gyeokpa` 프로젝트를 엽니다.
 2. **빌드 > Firestore Database > 규칙** 탭에서 기존 내용을 모두 지우고 `firestore.rules` 내용을 그대로 붙여 넣은 뒤 **게시**합니다.
-   - 이 파일에는 기존 무한의 격파 규칙 5개가 그대로 들어 있고 `skykick_ranking` 규칙만 추가되어 있어서, 통째로 바꿔도 기존 랭킹은 그대로 동작합니다.
+   - 이 파일에는 기존 무한의 격파 규칙 5개가 그대로 들어 있고 하늘 발차기 규칙만 추가되어 있어서, 통째로 바꿔도 기존 랭킹은 그대로 동작합니다.
 
 규칙을 올리기 전에는 랭킹 화면에 "랭킹전은 준비 중이에요"가 표시되고, 게임은 그대로 할 수 있습니다.
+
+## 도장별 버전
+
+| 도장 | 주소 | 랭킹 컬렉션 |
+|---|---|---|
+| 어울림 태권도 | https://gyeoltaro.github.io/skykick/ | `skykick_ranking` |
+| 국가대표 태권도 | https://gyeoltaro.github.io/nationaltkd/skykick/ | `skykick_nationaltkd_ranking` |
 
 ## 다른 도장 버전 만들기
 
